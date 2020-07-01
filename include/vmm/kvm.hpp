@@ -18,7 +18,7 @@ namespace vmm::kvm {
 
 	class system final {
 		private:
-			int fd_;
+			unsigned int fd_;
 
 			/// Creates a virtual machine and returns a file descriptor.
 			///
@@ -30,24 +30,26 @@ namespace vmm::kvm {
 			/// Default constructor.
 			system() : fd_{open()} {}
 
-			/// Constructs a kvm object from a file descriptor assumed to be
-			/// associated with /dev/kvm.
+			/// Constructs a kvm object from a file descriptor.
 			///
 			/// The passed file descriptor must have O_RDWR permissions for
 			/// things to work. It is also encouraged to have O_CLOEXEC set,
 			/// on the descriptor, though the flag may be omitted as needed.
 			///
+			/// Note that the passed file descriptor is of type unsigned int.
+			/// As such, users will have to use kvm::system::open() instead of
+			/// the C-style open() if they want to create a kvm object. This
+			/// ensures that `fd` is both a valid handle and one that contains
+			/// a proper amount of permissions for subsequent KVM operations.
+			///
+			/// # Safety
+			///
 			/// Ownership of `fd` is transferred over to the created Kvm object.
 			///
-			/// # Example
+			/// # Examples
 			///
-			/// ```
-			/// #include <vmm/kvm.hpp>
-			///
-			/// auto fd{...}          // preferably, via kvm::system::open()
-			/// kvm::system kvm{fd};
-			/// ```
-			explicit system(int fd) noexcept : fd_{fd} {};
+			/// See kvm::system::open().
+			explicit system(unsigned int fd) noexcept : fd_{fd} {};
 
 			/// Opens /dev/kvm and returns a file descriptor.
 			///
@@ -57,21 +59,21 @@ namespace vmm::kvm {
 			/// exec() into another program with seccomp filters that blacklist
 			/// certain syscalls.
 			///
-			/// # Example
+			/// # Examples
 			///
 			/// ```
 			/// #include <vmm/kvm.hpp>
 			///
-			/// auto fd{kvm::system::open()};
-			/// kvm::system kvm{fd};
+			/// auto fd {kvm::system::open()};
+			/// kvm::system kvm {fd};
 			/// ```
-			static auto open(bool cloexec=true) -> int {
-				auto ret{::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
-				if (ret < 0)
+			static auto open(const bool cloexec=true) -> unsigned int {
+				const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
+				if (fd < 0)
 					throw fs::filesystem_error{"open()",
 											   "/dev/kvm",
 											   std::error_code{errno, std::system_category()}};
-				return ret;
+				return fd;
 			}
 
 			/// Returns the KVM API version.
@@ -85,7 +87,7 @@ namespace vmm::kvm {
 			/// outside a condition check. Therefore, it doesn't need to throw
 			/// anything since the user will always check its value anyways.
 			///
-			/// # Example
+			/// # Examples
 			///
 			/// ```
 			/// #include <vmm/kvm.hpp>
@@ -119,8 +121,8 @@ namespace vmm::kvm {
 
 	class vm final {
 		private:
-			int fd_;
-			int mmap_size_;
+			unsigned int fd_;
+			unsigned int mmap_size_;
 
 			/// Constructor.
 			///
@@ -128,7 +130,7 @@ namespace vmm::kvm {
 			/// descriptors and to restrict construction to existing KVM system
 			/// objects, system::vm() should be the only function that calls
 			/// this method.
-			vm(int fd, int mmap_size) : fd_{fd}, mmap_size_{mmap_size} {}
+			vm(const unsigned int fd, const unsigned int mmap_size) : fd_{fd}, mmap_size_{mmap_size} {}
 			friend vm system::vm();
 		public:
 			~vm() noexcept { close(fd_); }
