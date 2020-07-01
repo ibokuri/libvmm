@@ -3,10 +3,10 @@
 #pragma once
 
 #include <filesystem>
+#include <vmm/utils.hpp>
 
 #include <fcntl.h>
 #include <linux/kvm.h>
-#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -23,13 +23,8 @@ namespace vmm::kvm {
 			/// Creates a virtual machine and returns a file descriptor.
 			///
 			/// This should only be used indirectly through system::vm().
-			auto create_vm() -> int {
-				auto fd = ioctl(fd_, KVM_CREATE_VM, 0);
-				if (fd < 0)
-					throw fs::filesystem_error{"ioctl()",
-											   "KVM_CREATE_VM",
-											   std::error_code{errno, std::system_category()}};
-				return fd;
+			auto create_vm() -> unsigned int {
+				return utils::ioctl(fd_, KVM_CREATE_VM);
 			}
 		public:
 			/// Default constructor.
@@ -98,19 +93,23 @@ namespace vmm::kvm {
 			/// kvm::system kvm;
 			/// if (kvm.api_version() != 12) throw TODO;
 			/// ```
-			auto api_version() noexcept -> int {
-				return ioctl(fd_, KVM_GET_API_VERSION, 0);
+			auto api_version() -> unsigned int {
+				return utils::ioctl(fd_, KVM_GET_API_VERSION);
 			}
 
 			/// Returns the size of the shared memory region used by the KVM_RUN
 			/// ioctl to communicate with userspace.
-			auto vcpu_mmap_size() -> int {
-				auto ret = ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE, 0);
-				if (ret < 0)
-					throw fs::filesystem_error{"ioctl()",
-											   "KVM_GET_VCPU_MMAP_SIZE",
-											   std::error_code{errno, std::system_category()}};
-				return ret;
+			///
+			/// # Examples
+			///
+			/// ```
+			/// #include <vmm/kvm.hpp>
+			///
+			/// kvm::system kvm;
+			/// TODO
+			/// ```
+			auto vcpu_mmap_size() -> unsigned int {
+				return utils::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
 			}
 
 			auto vm() -> vm;
