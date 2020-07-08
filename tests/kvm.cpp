@@ -20,5 +20,10 @@ TEST_CASE("API version (manual)", "[api]") {
 
 TEST_CASE("Create VM", "[api]") {
 	kvm::system kvm;
-	kvm::vm vm{kvm.vm()};
+	kvm::vm vm {kvm.vm()};
+}
+
+TEST_CASE("Get MSR index list", "[api]") {
+	kvm::system kvm;
+	auto msr_list = kvm.msr_index_list();
 }
