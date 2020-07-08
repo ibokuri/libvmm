@@ -6,16 +6,14 @@ I/O virtualization via virtio platform). However, these components are typically
 reimplemented for each project, resulting in duplicated efforts and forcing
 developers to perform drudge work before even starting their project.
 
-<!--\# **Installation**-->
+<!-- ## **Installation**-->
 
-<!--\# **Contributing**-->
-
-# **Resources**
+## **Resources**
 Documentation:       [libvmm-docs](https://man.sr.ht/~satchmo/libvmm-docs)
 
-Patches & questions: [Mailing Lists](https://sr.ht/~satchmo/libvmm/lists)
+Patches & Questions: [Mailing Lists](https://sr.ht/~satchmo/libvmm/lists)
 
-Bugs & todo:         [Issue Trackers](https://sr.ht/~satchmo/libvmm/trackers)
+Bugs & Features:     [Issue Trackers](https://sr.ht/~satchmo/libvmm/trackers)
 
 ## **License**
 This project is released under the [MIT](LICENSE).
