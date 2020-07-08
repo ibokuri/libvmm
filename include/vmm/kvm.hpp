@@ -107,7 +107,7 @@ namespace vmm::kvm {
 			/// #include <vmm/kvm.hpp>
 			///
 			/// auto fd {kvm::system::open()};
-			/// kvm::system kvm {fd};
+			/// kvm::system kvm{fd};
 			/// ```
 			static auto open(const bool cloexec=true) -> unsigned int {
 				const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
@@ -119,15 +119,6 @@ namespace vmm::kvm {
 			}
 
 			/// Returns the KVM API version.
-			///
-			/// Since one can construct a kvm object from any file descriptor,
-			/// it is highly encouraged to always check that a kvm object
-			/// contains a proper handle to /dev/kvm by calling this function
-			/// before any other KVM-related functions.
-			///
-			/// There's really no situation where this function would be called
-			/// outside a condition check. Therefore, it doesn't need to throw
-			/// anything since the user will always check its value anyways.
 			///
 			/// # Examples
 			///
@@ -201,17 +192,20 @@ namespace vmm::kvm {
 
 	/// Create a virtual machine.
 	///
-	/// # Example
+	/// This function will also initialize the size of the vcpu mmap area with
+	/// the KVM_GET_VCPU_MMAP_SIZE ioctl's result.
+	///
+	/// # Examples
 	///
 	/// ```
 	/// #include <vmm/kvm.hpp>
 	///
 	/// kvm::system kvm;
-	/// kvm::vm{kvm.vm()};
+	/// kvm::vm {kvm.vm()};
 	/// ```
 	auto system::vm() -> vmm::kvm::vm {
-		auto mmap_size{vcpu_mmap_size()};
-		auto fd{create_vm()};
+		const auto mmap_size {vcpu_mmap_size()};
+		const auto fd {create_vm()};
 		return vmm::kvm::vm{fd, mmap_size};
 	}
 }
