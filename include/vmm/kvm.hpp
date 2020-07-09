@@ -14,12 +14,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-/*
+/**
  * Size of reserved custom MSR range (0x4b564d00 to 0x4b564dff)
  */
 #define MAX_IO_MSRS 256
 
-/*
+/**
  * Size of `msr_based_features_all` array in linux/arch/x86/kvm/x86.c
  */
 #define MAX_IO_MSRS_FEATURES 22
