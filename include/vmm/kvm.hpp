@@ -27,8 +27,6 @@
 namespace vmm::kvm {
     namespace fs = std::filesystem;
 
-    /* TODO: Provide a view into @list_.indices so that we can do things like
-     *       range for loops over the elements.  */
     class MsrList {
         private:
             std::unique_ptr<kvm_msr_list, void(*)(kvm_msr_list*)> list_;
@@ -36,16 +34,15 @@ namespace vmm::kvm {
             /**
              * Constructs an MSR list with @size possible entries.
              *
-             * Heap-allocating kvm_msr_list with `new` doesn't really
-             * work since `sizeof(kvm_msr_list)` doesn't include the
-             * trailing FAM. Luckily, kvm_msr_list contains only
-             * uint32_t members, meaning there's never any padding to
-             * be done. This lets us allocate the struct as a uint32_t
-             * buffer.
+             * The relevant struct is as follows:
+             *
+             *     struct kvm_msr_list {
+             *         __u32 nmsrs;
+             *         __u32 indices[0];
+             *     };
              */
-            MsrList(const std::size_t size)
-                : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[offsetof(kvm_msr_list, indices) + sizeof(uint32_t) * size]),
-                        [](kvm_msr_list *l){ delete[] reinterpret_cast<uint32_t*>(l); }}
+            MsrList(const std::size_t size) : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1]),
+                                                    [](kvm_msr_list *l){ delete[] reinterpret_cast<uint32_t*>(l); }}
             {
                 list_->nmsrs = size;
             }
@@ -125,9 +122,7 @@ namespace vmm::kvm {
             static auto open(const bool cloexec=true) -> unsigned int {
                 const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
                 if (fd < 0)
-                    throw fs::filesystem_error{"open()",
-                                               "/dev/kvm",
-                                               std::error_code{errno, std::system_category()}};
+                    throw fs::filesystem_error{"open()", "/dev/kvm", std::error_code{errno, std::system_category()}};
                 return fd;
             }
 
