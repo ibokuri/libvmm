@@ -12,7 +12,9 @@ duplicated efforts and boring drudge work. Libvmm hopes to prevent this.
 
 ## **Resources**
 Documentation:       [libvmm-docs](https://man.sr.ht/~satchmo/libvmm-docs)
+
 Patches & Questions: [Mailing Lists](https://sr.ht/~satchmo/libvmm/lists)
+
 Bugs & Features:     [Issue Trackers](https://sr.ht/~satchmo/libvmm/trackers)
 
 ## **License**
