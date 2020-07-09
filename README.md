@@ -11,8 +11,8 @@ all that.
 
 <!--\## **Installation**-->
 
-## **Resources**
-Documentation:       [libvmm-docs](https://man.sr.ht/~satchmo/libvmm-docs)
+## **Contributing**
+<!--Documentation:       [libvmm-docs](https://man.sr.ht/~satchmo/libvmm-docs)-->
 
 Patches & Questions: [Mailing Lists](https://sr.ht/~satchmo/libvmm/lists)
 
