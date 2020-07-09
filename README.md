@@ -3,11 +3,10 @@
 Libvmm provides common virtualization components for Virtual Machine Monitor
 (VMM) and hypervisor development.
 
-VMMs and hypervisors often share common bits and pieces (e.g., VM lifecycle and
-resource management via KVM, I/O virtualization via virtio). Unfortunately,
-these components are typically reimplemented for each project, resulting in
-duplicated efforts and boring drudge work. Hopefully, Libvmm can help you avoid
-all that.
+VMMs and hypervisors often share common components (e.g., VM lifecycle/resource
+management via KVM, I/O virtualization via virtio). Unfortunately, these pieces
+are typically reimplemented for each project, resulting in duplicated efforts
+and boring drudge work. The goal of Libvmm is to prevent this redundancy.
 
 <!--\## **Installation**-->
 
