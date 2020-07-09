@@ -1,4 +1,6 @@
-// Modular VMM components - System utilities
+/*
+ * utils.hpp - System utilities
+ */
 
 #pragma once
 
