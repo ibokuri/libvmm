@@ -45,56 +45,54 @@ $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" <patch>
 ```
 
 Note that a "patch" can actually refer to a number of things. But more often
-than not, a revision list is what you'll be using. See the [Resources](#resources)
+than not, a revision list is what you'll want. See the [Resources](#resources)
 section for more information on revision lists.
 
-##### Version Numbers
+And now you know how to send patches! As a little bonus, I'll also show you how
+to do some common things when working with patches:
 
-After review, you may be asked to fix up or add things to your patch (perhaps
-there's conflicts). If you find yourself in this situation, simply fix whatever
-issues there are and send out another version of the patch using the `-v<N>`
-option, where `<N>` is the version number of the patch:
+* **Version numbers**  —  After review, you may be asked to fix up or add
+  things to your patch (perhaps there's conflicts). If you find yourself in
+  this situation, simply fix whatever issues there are and send out another
+  version of the patch using the `-v<N>` option, where `<N>` is the version
+  number of the patch:
 
-```sh
-$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 <patch>
-```
+  ```sh
+  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 <patch>
+  ```
 
-##### Comments
+* **Comments**  —  Often times, you'll also want to include comments in a patch
+  but not the final git log. For instance, you may note that a particular patch
+  fixes an issue raised by a previous version of the patch. To do this, use the
+  `--annotate` option to open the patch in an editor so that you may modify it:
 
-Often times, you'll also want to include comments in a patch but not the final
-git log. For instance, you may note that a particular patch fixes an issue
-raised by a previous version of the patch. To do this, use the `--annotate`
-option to open the patch in an editor so that you may modify it:
+  ```sh
+  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 <patch>
+  ```
 
-```sh
-$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 <patch>
-```
+  Once in the editor, add your comments after the `---` mark:
 
-Once in the editor, add your comments after the "---" mark:
+  ```console
+  Subject: [PATCH v3] Fix typo in README
 
-```console
-Subject: [PATCH v3] Fix typo in README
+  ---
+  This fixes issues raised in the second patch.
 
----
-This fixes issues raised in the second patch.
+  README.md | 1 +
+  ...
+  ```
 
-README.md | 1 +
-...
-```
+* **Cover letters**  —  It's common to have a cover letter for more complex
+  patches in order to provide an introduction or some context for the patch. To
+  do this, use the `--cover-letter` option to create a separate email that will
+  be sent ahead of your actual patch:
 
-##### Cover Letters
+  ```sh
+  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patch>
+  ```
 
-It's common to have a cover letter for more complex patches in order to provide
-an introduction or some context for the patch. To do this, use the
-`--cover-letter` option to create a separate email that will be sent ahead of
-your actual patch:
-
-```sh
-$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patch>
-```
-
-Note that we must also use the `--annotate` option, as we need to edit the
-cover letter's "Subject" header appropriately:
+  Note that we must also use the `--annotate` option, as we need to edit the
+  cover letter's "Subject" header appropriately.
 
 #### Resources
 
