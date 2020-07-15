@@ -82,13 +82,13 @@ to do some common things when working with patches:
   ...
   ```
 
-* Cover letters  —  It's common to have a cover letter for more complex patches
-  in order to provide an introduction or some context for the patch. To do
-  this, use the `--cover-letter` option to create a separate email that will be
-  sent ahead of your actual patch:
+* Cover letters  —  It's common to have a cover letter for patchsets (i.e., a
+  collection of patches) in order to provide an introduction to or some context
+  for the various patches. To do this, use the `--cover-letter` option to
+  create a separate email that will be sent ahead of your actual patch:
 
   ```sh
-  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patch>
+  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patchset>
   ```
 
   Note that we must also use the `--annotate` option, as we need to edit the
