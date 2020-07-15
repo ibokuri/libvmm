@@ -39,14 +39,14 @@ The last part can be easily done with `git send-email`, which creates a patch
 for you and sends it off in a single step. All you have to do is tell it where
 to send the patch and which commits should be included:
 
-```
+```sh
 $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" <git revision>
 ```
 
 If, after review, your patch needs some work (perhaps there's conflicts),
 simply fix whatever issues there are and send out another version of the patch:
 
-```
+```sh
 $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 <git revision>
 ```
 
@@ -55,10 +55,11 @@ want such information in the final git log. In these cases, use the
 `--annotate` flag, which will open up the email in an editor so that you may
 modify it. Add your comments below the "---" symbol.
 
-```
+```sh
 $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 <git revision>
+```
 
-# In editor
+```console
 Subject: [PATCH v3] Fix typo in README
 
 ---

@@ -34,7 +34,7 @@ $ sudo ninja -C build install
 
 Supported Linux distributions include:
 
-```
+```sh
 # Arch Linux
 $ pacman -S libvmm
 
@@ -49,7 +49,7 @@ $ apt install libvmm
 ```
 
 ## **Contributing**
-See [CONTRIBUTING](https://git.sr.ht/~satchmo/libvmm/tree/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://git.sr.ht/~satchmo/libvmm/tree/master/CONTRIBUTING.md).
 
 ## **License**
 This project is released under the [MIT](https://git.sr.ht/~satchmo/libvmm/tree/master/LICENSE) license.
