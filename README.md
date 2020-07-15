@@ -9,9 +9,9 @@ virtio), these shared pieces are typically reimplemented for each project,
 resulting in duplicated efforts and boring drudge work. The goal of Libvmm is
 to prevent this redundancy.
 
-## **Installation**
+## Installation
 
-### Manual
+#### Manual
 To build and install from source:
 
 ```
@@ -30,7 +30,7 @@ $ sudo ninja -C build install
 <!--$ sudo ldconfig-->
 <!--```-->
 
-### Packages
+#### Packages
 
 Supported Linux distributions include:
 
@@ -48,8 +48,8 @@ $ yum install libvmm
 $ apt install libvmm
 ```
 
-## **Contributing**
+## Contributing
 See [CONTRIBUTING.md](https://git.sr.ht/~satchmo/libvmm/tree/master/CONTRIBUTING.md).
 
-## **License**
+## License
 This project is released under the [MIT](https://git.sr.ht/~satchmo/libvmm/tree/master/LICENSE) license.
