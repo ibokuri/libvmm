@@ -45,7 +45,7 @@ $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" <patch>
 ```
 
 Note that a "patch" can actually refer to a number of things. But more often
-than not, a revision list is what you'll be using. See the [Resources](#resources)
+than not, a revision list is what you'll be using. See the [Resources](#**resources**)
 section for more information on revision lists.
 
 #### Version Numbers
