@@ -51,18 +51,18 @@ section for more information on revision lists.
 And now you know how to send patches! As a little bonus, I'll also show you how
 to do some common things when working with patches:
 
-* **Version numbers**  —  After review, you may be asked to fix up or add
-  things to your patch (perhaps there's conflicts). If you find yourself in
-  this situation, simply fix whatever issues there are and send out another
-  version of the patch using the `-v<N>` option, where `<N>` is the version
-  number of the patch:
+* Version numbers  —  After review, you may be asked to fix up or add things to
+  your patch (perhaps there's conflicts). If you find yourself in this
+  situation, simply fix whatever issues there are and send out another version
+  of the patch using the `-v<N>` option, where `<N>` is the version number of
+  the patch:
 
   ```sh
   $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 <patch>
   ```
 
-* **Comments**  —  Often times, you'll also want to include comments in a patch
-  but not the final git log. For instance, you may note that a particular patch
+* Comments  —  Often times, you'll also want to include comments in a patch but
+  not the final git log. For instance, you may note that a particular patch
   fixes an issue raised by a previous version of the patch. To do this, use the
   `--annotate` option to open the patch in an editor so that you may modify it:
 
@@ -82,10 +82,10 @@ to do some common things when working with patches:
   ...
   ```
 
-* **Cover letters**  —  It's common to have a cover letter for more complex
-  patches in order to provide an introduction or some context for the patch. To
-  do this, use the `--cover-letter` option to create a separate email that will
-  be sent ahead of your actual patch:
+* Cover letters  —  It's common to have a cover letter for more complex patches
+  in order to provide an introduction or some context for the patch. To do
+  this, use the `--cover-letter` option to create a separate email that will be
+  sent ahead of your actual patch:
 
   ```sh
   $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patch>
