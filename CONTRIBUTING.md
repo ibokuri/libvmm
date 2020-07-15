@@ -7,7 +7,7 @@ have an email address and know how to send emails, you're already familiar with
 90% of Libvmm's development workflow! The other 10% can be broken down into two
 things: knowing where to send emails and knowing how to work with patches.
 
-### Mailing Lists and Trackers
+#### Mailing Lists and Trackers
 
 In Sourcehut, emails go to one of two places: mailing lists and trackers.
 Generally, mailing lists are used for patches and discussions while trackers
@@ -29,7 +29,7 @@ You can find the various mailing lists and trackers for Libvmm below:
 <!--There's also a web interface for each mailing list and tracker. You can find-->
 <!--these using the links above.-->
 
-### Patches
+#### Patches
 
 Now let's talk about patches. The general process for patch submission is as
 follows: clone the upstream repository, make your changes, commit them, and
@@ -48,7 +48,7 @@ Note that a "patch" can actually refer to a number of things. But more often
 than not, a revision list is what you'll be using. See the [Resources](#resources)
 section for more information on revision lists.
 
-#### Version Numbers
+##### Version Numbers
 
 After review, you may be asked to fix up or add things to your patch (perhaps
 there's conflicts). If you find yourself in this situation, simply fix whatever
@@ -59,7 +59,7 @@ option, where `<N>` is the version number of the patch:
 $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 <patch>
 ```
 
-#### Comments
+##### Comments
 
 Often times, you'll also want to include comments in a patch but not the final
 git log. For instance, you may note that a particular patch fixes an issue
@@ -82,7 +82,7 @@ README.md | 1 +
 ...
 ```
 
-#### Cover Letters
+##### Cover Letters
 
 It's common to have a cover letter for more complex patches in order to provide
 an introduction or some context for the patch. To do this, use the
@@ -96,7 +96,7 @@ $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annot
 Note that we must also use the `--annotate` option, as we need to edit the
 cover letter's "Subject" header appropriately:
 
-### Resources
+#### Resources
 
 * For a tutorial on sending patches: [git-send-email](https://git-send-email.io/)
 * For general guidelines on email etiquette: [man.sr.ht](https://man.sr.ht/lists.sr.ht/etiquette.md)
