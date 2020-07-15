@@ -47,7 +47,7 @@ $ sudo ninja -C build install
 <!--```-->
 
 ## **Contributing**
-See [CONTRIBUTING](CONTRIBUTING.md).
+See [CONTRIBUTING](https://git.sr.ht/~satchmo/libvmm/tree/master/CONTRIBUTING.md).
 
 ## **License**
-This project is released under the [MIT](LICENSE) license.
+This project is released under the [MIT](https://git.sr.ht/~satchmo/libvmm/tree/master/LICENSE) license.
