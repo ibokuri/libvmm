@@ -30,21 +30,23 @@ $ sudo ninja -C build install
 <!--$ sudo ldconfig-->
 <!--```-->
 
-<!-- ### **Packages**-->
+### **Packages**
 
-<!--```-->
-<!-- # Arch Linux-->
-<!--$ pacman -S libvmm-->
+Supported Linux distributions include:
 
-<!-- # Fedora-->
-<!--$ dnf install libvmm-->
+```
+# Arch Linux
+$ pacman -S libvmm
 
-<!-- # CentOS, RHEL-->
-<!--$ yum install libvmm-->
+# Fedora
+$ dnf install libvmm
 
-<!-- # Debian, Ubuntu-->
-<!--$ apt install libvmm-->
-<!--```-->
+# CentOS, RHEL
+$ yum install libvmm
+
+# Debian, Ubuntu
+$ apt install libvmm
+```
 
 ## **Contributing**
 See [CONTRIBUTING](https://git.sr.ht/~satchmo/libvmm/tree/master/CONTRIBUTING.md).
