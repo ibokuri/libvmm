@@ -48,8 +48,8 @@ Note that a "patch" can actually refer to a number of things. But more often
 than not, a revision list is what you'll want. See the [Resources](#resources)
 section for more information on revision lists.
 
-And now you know how to send patches! As a bonus, I'll also show you how to do
-some common things when working with patches:
+And now you know how to send patches! As a bonus, here is how to do some common
+patch-related things:
 
 * Version numbers  —  After review, you may be asked to fix up or add things to
   your patch (perhaps there's conflicts). If you find yourself in this
