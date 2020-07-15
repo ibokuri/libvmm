@@ -1,6 +1,8 @@
 #define CATCH_CONFIG_MAIN
 
-#include "../include/vmm/kvm.hpp"
+//#include <vmm/system.hpp>
+#include "../include/vmm/kvm/system.hpp"
+#include "../include/vmm/kvm/vm.hpp"
 #include <catch2/catch.hpp>
 
 namespace kvm = vmm::kvm;

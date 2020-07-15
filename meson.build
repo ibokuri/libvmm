@@ -6,8 +6,10 @@ project(
     default_options : [
 	'cpp_std=c++17',
 	'werror=true',
-    ]
+    ],
 )
+
+project_description = 'Modular VMM and hypervisor components'
 
 warnings = [
     # extra
@@ -23,18 +25,27 @@ warnings = [
 ]
 
 cc = meson.get_compiler('cpp')
+
 add_project_arguments(
     cc.get_supported_arguments(warnings),
-    language: 'cpp'
+    language: 'cpp',
 )
 
-inc = include_directories('include/vmm')
-subdir('include/vmm')
-subdir('tests')
+subdir('include')
+subdir('src')
+
+target = shared_library(
+  'vmm',
+  sources,
+  install: true,
+  include_directories : public_headers,
+)
 
 pkgc = import('pkgconfig')
 pkgc.generate(
     name : meson.project_name(),
     version : meson.project_version(),
-    description : 'Modular VMM components'
+    description : project_description,
+    subdirs : meson.project_name(),
+    libraries : target,
 )
