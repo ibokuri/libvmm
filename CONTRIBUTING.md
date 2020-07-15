@@ -7,7 +7,7 @@ an email address and know how to send emails, congratulations! You already know
 90% of Libvmm's development workflow! The other 10% can be broken down into
 knowing where to send emails and how to work with patches.
 
-### **Mailing Lists and Trackers**
+### Mailing Lists and Trackers
 
 In Sourcehut, emails go to one of two places: mailing lists or trackers.
 Generally, mailing lists are used for patches and discussion while trackers are
@@ -29,7 +29,7 @@ If you still don't want to use email for your contributions, no worries.
 There's also a web interface for each mailing list and tracker. You can find
 these using the links above.
 
-### **Patches**
+### Patches
 
 Now let's talk about patches. The general process for patch submission is as
 follows: clone the upstream repository, make your changes, commit them, and
@@ -68,7 +68,7 @@ README.md | 1 +
 ...
 ```
 
-### **Resources**
+### Resources
 
 * For a tutorial on sending patches: [git-send-email](https://git-send-email.io/)
 * For general guidelines on email etiquette: [man.sr.ht](https://man.sr.ht/lists.sr.ht/etiquette.md)

@@ -11,7 +11,7 @@ to prevent this redundancy.
 
 ## **Installation**
 
-### **Manual**
+### Manual
 To build and install from source:
 
 ```
@@ -30,7 +30,7 @@ $ sudo ninja -C build install
 <!--$ sudo ldconfig-->
 <!--```-->
 
-### **Packages**
+### Packages
 
 Supported Linux distributions include:
 
