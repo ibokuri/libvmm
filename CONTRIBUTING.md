@@ -96,7 +96,7 @@ $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annot
 Note that we must also use the `--annotate` option, as we need to edit the
 cover letter's "Subject" header appropriately:
 
-### Resources
+### **Resources**
 
 * For a tutorial on sending patches: [git-send-email](https://git-send-email.io/)
 * For general guidelines on email etiquette: [man.sr.ht](https://man.sr.ht/lists.sr.ht/etiquette.md)
