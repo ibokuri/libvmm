@@ -9,65 +9,60 @@ things: knowing where to send emails and knowing how to work with patches.
 
 #### Mailing Lists and Trackers
 
-In Sourcehut, emails go to one of two places: mailing lists and trackers.
-Generally, mailing lists are used for patches and discussions while trackers
-are used for issues or feature requests.
-
-There may be multiple mailing lists or trackers for a single project, but
-they'll each share a common email domain: mailing lists use `lists.sr.ht` and
-trackers use `todo.sr.ht`. For example, patches for Libvmm should be sent to
+In Sourcehut, emails go to one of two places: mailing lists or trackers. Each
+destination type has its own email domain, which is used across all Sourcehut
+projects: mailing lists use `lists.sr.ht` and trackers use `todo.sr.ht`. For
+example, patches for Libvmm should be sent to
 <~satchmo/libvmm-devel@lists.sr.ht>, and bug reports to
 <~satchmo/libvmm@todo.sr.ht>.
 
-You can find the various mailing lists and trackers for Libvmm below:
+Generally, mailing lists are used for patches and discussions while trackers
+are used for issues or feature requests. You can find the various mailing
+lists and trackers for Libvmm below:
 
 * Patches & Questions: [Mailing Lists](https://sr.ht/~satchmo/libvmm/lists)
 * Bugs & Features:     [Issue Trackers](https://sr.ht/~satchmo/libvmm/trackers)
-<!--* Documentation:       [libvmm-docs](https://man.sr.ht/~satchmo/libvmm-docs)-->
-
-<!--If you still don't want to use email for your contributions, no worries.-->
-<!--There's also a web interface for each mailing list and tracker. You can find-->
-<!--these using the links above.-->
 
 #### Patches
 
-Now let's talk about patches. The general process for patch submission is as
-follows: clone the upstream repository, make your changes, commit them, and
-send out a patch to the appropriate mailing list. The first three steps should
-be familiar, so we'll focus on the last one.
+The general process for patch submission is as follows:
 
-To send out a patch, `git send-email` can be used. This command creates a patch
-and sends it out in a single step; all you have to do is tell it where to send
-the patch and which commits should be included:
+1. Clone the upstream repository.
+2. Make your changes.
+3. Commit your changes.
+4. Send out a patch to the appropriate mailing list.
+
+The first three steps are easy enough, so we'll focus on the last one. To send
+a patch, `git send-email` is your friend. It creates and sends out a patch; all
+you have to do is tell it where to send the patch and what should be included:
 
 ```sh
-$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" <patch>
+$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" PATCH
 ```
 
-Note that a "patch" can actually refer to a number of things. But more often
-than not, a revision list is what you'll want. See the [Resources](#resources)
-section for more information on revision lists.
+where `PATCH` is typically a commit id, revision list, or the flag `-<N>`
+(where `<N>` speficies the last `N` commits in the current branch). For more
+information, see the [Resources](#resources) section.
 
-And now you know how to send patches! As a bonus, here is how to do some common
-patch-related things:
+Once the patch hits the mailing list, a maintainer will review it and push it
+upstream if everything looks okay. If there's a problem with the patch, simply
+fix whatever issues are pointed out and send out another version of the patch
+using the `-v<N>` option, where `<N>` is the version number of the patch:
 
-* Version numbers  —  After review, you may be asked to fix up or add things to
-  your patch (perhaps there's conflicts). If you find yourself in this
-  situation, simply fix whatever issues there are and send out another version
-  of the patch using the `-v<N>` option, where `<N>` is the version number of
-  the patch:
+```sh
+$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 PATCH
+```
 
-  ```sh
-  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 <patch>
-  ```
+And now you know how to send patches! To end this section, I'll leave you with
+a few common patch-related operations:
 
-* Comments  —  Often times, you'll also want to include comments in a patch but
+* **Comments**: Often times, you'll also want to include comments in a patch but
   not the final git log. For instance, you may note that a particular patch
   fixes an issue raised by a previous version of the patch. To do this, use the
   `--annotate` option to open the patch in an editor so that you may modify it:
 
   ```sh
-  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 <patch>
+  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 PATCH
   ```
 
   Once in the editor, add your comments after the `---` mark:
@@ -82,10 +77,11 @@ patch-related things:
   ...
   ```
 
-* Cover letters  —  It's common to have a cover letter for patchsets (i.e., a
+* **Cover letters**: It's common to have a cover letter for patchsets (a
   collection of patches) in order to provide an introduction to or some context
-  for the various patches. To do this, use the `--cover-letter` option to
-  create a separate email that will be sent ahead of your actual patch:
+  for the various patches. If you want to include a cover letter, use the
+  `--cover-letter` option to create a separate email which will be sent right
+  before your actual patch:
 
   ```sh
   $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patchset>
