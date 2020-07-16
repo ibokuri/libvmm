@@ -41,7 +41,7 @@ $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" PATCH
 ```
 
 where `PATCH` is typically a commit id, revision list, or the flag `-<N>`
-(where `<N>` speficies the last `N` commits in the current branch). For more
+(where `<N>` is the last `N` commits in the current branch). For more
 information, see the [Resources](#resources) section.
 
 Once the patch hits the mailing list, a maintainer will review it and push it
