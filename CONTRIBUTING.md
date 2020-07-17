@@ -37,7 +37,7 @@ a patch, `git send-email` is your friend. It creates and sends out a patch; all
 you have to do is tell it where to send the patch and what should be included:
 
 ```sh
-$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" PATCH
+git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" PATCH
 ```
 
 where `PATCH` is typically a commit id, revision list, or the flag `-<N>`
@@ -50,7 +50,7 @@ fix whatever issues are pointed out and send out another version of the patch
 using the `-v<N>` option, where `<N>` is the version number of the patch:
 
 ```sh
-$ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 PATCH
+git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 PATCH
 ```
 
 And now you know how to send patches! To end this section, I'll leave you with
@@ -62,7 +62,7 @@ a few common patch-related operations:
   `--annotate` option to open the patch in an editor so that you may modify it:
 
   ```sh
-  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 PATCH
+  git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 PATCH
   ```
 
   Once in the editor, add your comments after the `---` mark:
@@ -84,7 +84,7 @@ a few common patch-related operations:
   before your actual patch:
 
   ```sh
-  $ git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patchset>
+  git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patchset>
   ```
 
   Note that we must also use the `--annotate` option, as we need to edit the
