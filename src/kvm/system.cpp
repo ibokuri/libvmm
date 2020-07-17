@@ -11,8 +11,6 @@
 #include <sys/stat.h>
 
 namespace vmm::kvm {
-    //class vm;
-
     /**
      * Creates a virtual machine and returns a file descriptor.
      *

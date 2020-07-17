@@ -5,7 +5,7 @@
 
 /**
  * NOTE: Model-specific registers (MSRs)
- *
+ * =====================================
  * A MSR is any control register in the x86 instruction set used for debugging,
  * program execution tracing, computer performance monitoring, and toggling
  * certain CPU features.
@@ -16,6 +16,20 @@
  * features that would not be present in future versions of the processor. The
  * first of these were two "test registers" that allowed the 80386 to speed up
  * virtual-to-physical address conversions.
+ *
+ * NOTE: Copy constructors for MsrList & MsrFeatureList?
+ * =====================================================
+ * No.
+ *
+ * Usage of MsrList and MsrFeatureList objects revolves solely around MSR
+ * enumeration; that is, you use them to either query the system to learn which
+ * MSRs/features are supported or to learn the indices of certain MSRs so that
+ * you may specify them in a subsequent KVM_GET_MSRS or KVM_SET_MSRS ioctl
+ * call.
+ *
+ * Consequently, copying these objects makes no sense, as a mutable copy
+ * provides no benefit in regards to the objects' original purpose: to
+ * represent all supported or feature-exposing MSRs.
  */
 
 /**
@@ -30,11 +44,11 @@
 
 namespace vmm::kvm {
     class MsrList {
-        private:
-            std::unique_ptr<kvm_msr_list, void(*)(kvm_msr_list*)> list_;
         protected:
+            std::unique_ptr<kvm_msr_list, void(*)(kvm_msr_list*)> list_;
+
             /**
-             * Constructs an MSR list with @size possible entries.
+             * Constructs an MSR index list with @size possible entries.
              *
              * The relevant struct is as follows:
              *
@@ -43,14 +57,18 @@ namespace vmm::kvm {
              *         __u32 indices[0];
              *     };
              */
-            MsrList(const std::size_t size) : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1]),
-                                                    [](kvm_msr_list *l){ delete[] reinterpret_cast<uint32_t*>(l); }}
+            MsrList(const std::size_t size)
+                : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1]),
+                        [](kvm_msr_list *l){ delete[] reinterpret_cast<uint32_t*>(l); }}
             {
                 list_->nmsrs = size;
             }
         public:
             MsrList() : MsrList(MAX_IO_MSRS) {}
-            MsrList(MsrList&&) = default;
+            MsrList(const MsrList&) = delete;
+            MsrList& operator=(const MsrList&) = delete;
+            MsrList(MsrList&&);
+            MsrList& operator=(MsrList&& other);
 
             kvm_msr_list* data() { return list_.get(); }
             uint32_t nmsrs() { return list_->nmsrs; }
@@ -60,7 +78,10 @@ namespace vmm::kvm {
     class MsrFeatureList : public MsrList {
         public:
             MsrFeatureList() : MsrList(MAX_IO_MSRS_FEATURES) {}
-            MsrFeatureList(MsrFeatureList&&) = default;
+            MsrFeatureList(const MsrFeatureList&) = delete;
+            MsrFeatureList& operator=(const MsrFeatureList&) = delete;
+            MsrFeatureList(MsrFeatureList&& other) : MsrList(std::move(other)) {}
+            MsrFeatureList& operator=(MsrFeatureList&& other);
     };
 
     class Msrs {
@@ -84,8 +105,9 @@ namespace vmm::kvm {
              *         __u64 data;
              *     };
              */
-            Msrs(const std::size_t size) : msrs_{reinterpret_cast<kvm_msrs*>(new uint64_t[2 * size + 1]),
-                                                 [](kvm_msrs *m){ delete[] reinterpret_cast<uint64_t*>(m); }}
+            Msrs(const std::size_t size)
+                : msrs_{reinterpret_cast<kvm_msrs*>(new uint64_t[size * 2 + 1]),
+                        [](kvm_msrs *m){ delete[] reinterpret_cast<uint64_t*>(m); }}
             {
                 msrs_->nmsrs = size;
             }
