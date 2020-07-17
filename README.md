@@ -15,9 +15,10 @@ to prevent this redundancy.
 To build and install from source:
 
 ```
-$ git clone https://git.sr.ht/~satchmo/libvmm && cd libvmm
-$ meson build
-$ sudo ninja -C build install
+git clone https://git.sr.ht/~satchmo/libvmm && cd libvmm
+meson build
+ninja -C build
+sudo ninja -C build install
 ```
 
 <!--Make sure that wherever meson installs the library files to (typically-->
@@ -32,21 +33,14 @@ $ sudo ninja -C build install
 
 #### Packages
 
-Supported Linux distributions include:
+Libvmm is available in many Linux distributions (as `libvmm`), including:
 
-```sh
-# Arch Linux
-$ pacman -S libvmm
-
-# Fedora
-$ dnf install libvmm
-
-# CentOS, RHEL
-$ yum install libvmm
-
-# Debian, Ubuntu
-$ apt install libvmm
-```
+* Arch Linux
+* CentOS
+* Debian
+* Fedora
+* RHEL
+* Ubuntu
 
 ## Contributing
 See [CONTRIBUTING.md](https://git.sr.ht/~satchmo/libvmm/tree/master/CONTRIBUTING.md).
