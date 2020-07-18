@@ -1,36 +1,11 @@
+/*
+ * types.hpp - KVM types
+ */
+
 #pragma once
 
 #include <memory>
 #include <linux/kvm.h>
-
-/**
- * NOTE: Model-specific registers (MSRs)
- * =====================================
- * A MSR is any control register in the x86 instruction set used for debugging,
- * program execution tracing, computer performance monitoring, and toggling
- * certain CPU features.
- *
- * A control register is one that changes/controls the general behavior of a
- * CPU (e.g., interrupt control, switching addressing modes, paging control).
- * For example, with the 80386 processor, Intel introduced experimental
- * features that would not be present in future versions of the processor. The
- * first of these were two "test registers" that allowed the 80386 to speed up
- * virtual-to-physical address conversions.
- *
- * NOTE: Copy constructors for MsrList & MsrFeatureList?
- * =====================================================
- * No.
- *
- * Usage of MsrList and MsrFeatureList objects revolves solely around MSR
- * enumeration; that is, you use them to either query the system to learn which
- * MSRs/features are supported or to learn the indices of certain MSRs so that
- * you may specify them in a subsequent KVM_GET_MSRS or KVM_SET_MSRS ioctl
- * call.
- *
- * Consequently, copying these objects makes no sense, as a mutable copy
- * provides no benefit in regards to the objects' original purpose: to
- * represent all supported or feature-exposing MSRs.
- */
 
 /**
  * Size of reserved range for KVM-specific MSRs (0x4b564d00 to 0x4b564dff)
@@ -88,9 +63,7 @@ namespace vmm::kvm {
     class Msrs : public FamStruct<kvm_msrs, uint64_t> {
         public:
             /**
-             * Constructs an Msrs with @size possible entries.
-             *
-             * The relevant structs are as follows:
+             * Relevant structs:
              *
              *     struct kvm_msrs {
              *         __u32 nmsrs;

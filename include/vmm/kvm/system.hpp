@@ -30,10 +30,10 @@ namespace vmm::kvm {
              * on the descriptor, though the flag may be omitted as needed.
              *
              * Note that the passed file descriptor is of type unsigned int.
-             * As such, users will have to use kvm::system::open() instead of
-             * the C-style open() if they want to create a kvm object. This
-             * ensures that `fd` is both a valid handle and one that contains
-             * a proper amount of permissions for subsequent KVM operations.
+             * As such, users must use kvm::system::open() to create a `kvm`
+             * object unless they're willing to do cast's on C's open(). This
+             * ensures that `fd` is both a valid handle and one that contains a
+             * proper amount of permissions for subsequent KVM operations.
              *
              * # Safety
              *
@@ -44,6 +44,8 @@ namespace vmm::kvm {
              * See kvm::system::open().
              */
             explicit system(unsigned int fd) noexcept : fd_{fd} {};
+
+            ~system() noexcept { ::close(fd_); }
 
             /**
             * Opens /dev/kvm and returns a file descriptor.
@@ -66,7 +68,11 @@ namespace vmm::kvm {
             static auto open(const bool cloexec=true) -> unsigned int {
                 const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
                 if (fd < 0)
-                    throw std::filesystem::filesystem_error{"open()", "/dev/kvm", std::error_code{errno, std::system_category()}};
+                    throw std::filesystem::filesystem_error{
+                        "open()",
+                        "/dev/kvm",
+                        std::error_code{errno, std::system_category()}
+                    };
                 return fd;
             }
 
@@ -76,8 +82,6 @@ namespace vmm::kvm {
             auto msr_feature_index_list() -> MsrFeatureList;
             auto msrs() -> unsigned int;
             auto vm() -> vm;
-
-            ~system() noexcept { ::close(fd_); }
     };
 
 }

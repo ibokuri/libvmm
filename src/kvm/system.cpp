@@ -29,7 +29,8 @@ namespace vmm::kvm {
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
-     * if (kvm.api_version() != 12) throw TODO;
+     * if (kvm.api_version() != KVM_API_VERSION)
+     *     throw;
      * ```
      */
     auto system::api_version() -> unsigned int {
@@ -37,8 +38,8 @@ namespace vmm::kvm {
     }
 
     /**
-     * Returns the size of the shared memory region used by the KVM_RUN
-     * ioctl to communicate with userspace.
+     * Returns the size of the shared memory region used to communicate with
+     * userspace by the KVM_RUN ioctl.
      *
      * # Examples
      *
@@ -46,6 +47,7 @@ namespace vmm::kvm {
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
+     * auto mmap_size {kvm.vcpu_mmap_size()};
      * TODO
      * ```
      */
@@ -74,8 +76,8 @@ namespace vmm::kvm {
     /**
      * Returns a list of MSRs exposing MSR-based CPU features.
      *
-     * This can be used, for instance, by a hypervisor to validate
-     * requested CPU features.
+     * This can be used, for instance, by a hypervisor to validate requested
+     * CPU features.
      *
      * # Examples
      *
@@ -101,16 +103,9 @@ namespace vmm::kvm {
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
-     *
-     * // system
-     * kvm::msr_feature_list msr_feature_list{TODO};
-     * auto nmsrs {kvm.msrs(msr_feature_list)};
-     *
-     * // vcpu
-     * kvm::vm vm {kvm.vm()};
-     * kvm::vcpu vcpu {vm.vcpu()};
      * kvm::msrs msrs{TODO};
-     * auto nmsrs {vcpu.msrs(msrs)};
+     * auto nmsrs {kvm.msrs(msrs)};
+     * TODO
      * ```
      */
     auto system::msrs() -> unsigned int {
@@ -122,9 +117,9 @@ namespace vmm::kvm {
     }
 
     /**
-     * Create a virtual machine.
+     * Creates a virtual machine.
      *
-     * This function will also initialize the size of the vcpu mmap area with
+     * This function will also initialize the size of the vCPU mmap area with
      * the KVM_GET_VCPU_MMAP_SIZE ioctl's result.
      *
      * # Examples
