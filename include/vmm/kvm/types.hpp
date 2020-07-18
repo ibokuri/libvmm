@@ -67,8 +67,7 @@ namespace vmm::kvm {
              *         __u32 indices[0];
              *     };
              */
-            MsrList(const std::size_t size)
-                : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1])}
+            MsrList(const std::size_t size) : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1])}
             {
                 list_->nmsrs = size;
             }
@@ -77,7 +76,13 @@ namespace vmm::kvm {
 
             kvm_msr_list* data() { return list_.get(); }
             uint32_t nmsrs() { return list_->nmsrs; }
-            uint32_t* indices() { return list_->indices; }
+
+            uint32_t* begin() {return list_->indices;}
+            uint32_t* end()   {return list_->indices + list_->nmsrs;}
+            uint32_t const* begin()  const {return list_->indices;}
+            uint32_t const* end()    const {return list_->indices + list_->nmsrs;}
+            uint32_t const* cbegin() const {return begin();}
+            uint32_t const* cend()   const {return end();}
     };
 
     class MsrFeatureList : public MsrList {
@@ -106,12 +111,19 @@ namespace vmm::kvm {
              *         __u64 data;
              *     };
              */
-            Msrs(const std::size_t size)
-                : msrs_{reinterpret_cast<kvm_msrs*>(new uint64_t[size * 2 + 1])}
+            Msrs(const std::size_t size) : msrs_{reinterpret_cast<kvm_msrs*>(new uint64_t[size * 2 + 1])}
             {
                 msrs_->nmsrs = size;
             }
 
+            kvm_msrs* data() { return msrs_.get(); }
             uint32_t nmsrs() { return msrs_->nmsrs; }
+
+            kvm_msr_entry* begin() {return msrs_->entries;}
+            kvm_msr_entry* end()   {return msrs_->entries + msrs_->nmsrs;}
+            kvm_msr_entry const* begin()  const {return msrs_->entries;}
+            kvm_msr_entry const* end()    const {return msrs_->entries + msrs_->nmsrs;}
+            kvm_msr_entry const* cbegin() const {return begin();}
+            kvm_msr_entry const* cend()   const {return end();}
     };
 };
