@@ -38,25 +38,27 @@ The general process for patch submission is as follows:
 6. Delete the branch after patch is accepted.
 
 Step 5 is the only part that may be unfamiliar to users coming from other
-workflows, so we'll focus on that. To send a patch, `git-send-email` is often
-used. The command takes care of creating and sending out patches; all you have
-to do is tell it where to send the patch and what commits should be included:
+workflows, so we'll focus on that. In short, `git-send-email` is your friend.
+The command takes care of creating and sending out patches; all you have to do
+is tell it where to send the patch and what commits should be included:
 
 ```sh
 git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" <patch>
 ```
 
 Here, `<patch>` is typically a commit ID or [revision
-list](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection). You can
-also omit `<patch>` and use the flag `-<N>`, where `<N>` specifies the last `N`
-commits in the current branch.
+list](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection). If
+`<patch>` is a commit ID, you can optionally use the flag `-<N>`, where `<N>`
+is a number, to specify that you want to include the last `<N>` commits
+starting at `<patch>`. If `-<N>` is specified but `<patch>` is not provided,
+`HEAD` is used as the starting point.
 
-After the patch is sent, it is eventually reviewed and pushed upstream by a
-maintainer if everything checks out. If there's a problem, simply fix any
-issues pointed out and send out another version of the patch like so:
+After the patch is sent, a maintainer will review it and push it upstream if
+everything checks out. If there's a problem with your patch, simply fix any
+issues pointed out and send another version of the patch like so:
 
 ```sh
-git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 PATCH
+git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" -v2 <patch>
 ```
 
 #### Comments
@@ -67,7 +69,7 @@ raised by a previous version of the patch. To do this, use the `--annotate`
 option to open the patch in an editor so that you may modify it:
 
 ```sh
-git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 PATCH
+git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --annotate -v3 <patch>
 ```
 
 Once in the editor, add your comments after the `---` mark:
@@ -84,10 +86,10 @@ README.md | 1 +
 
 #### Cover Letters
 
-It's common to have a cover letter for patchsets (a collection of patches) to
-introduce or provide some context for the various patches. If you want to
-include a cover letter, use the `--cover-letter` option to create a separate
-email which will be sent ahead of your actual patch:
+For complex changes, multiple patches may be necessary. In such cases, it's
+common to have a cover letter to introduce or provide additional context for
+the patches. To do so, use the `--cover-letter` option to create a separate
+email that will be sent ahead of your patches:
 
 ```sh
 git send-email --to="~satchmo/libvmm-devel@lists.sr.ht" --cover-letter --annotate <patchset>
