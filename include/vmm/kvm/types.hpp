@@ -42,47 +42,42 @@
  */
 #define MAX_IO_MSRS_FEATURES 22
 
-/**
- * Deleter for std::unique_ptr-wrapped FAM structs.
- */
-template<typename StructType, typename BufferType>
-struct FamStructDeleter {
-    void operator()(StructType *struct_p) const {
-        delete[] reinterpret_cast<BufferType*>(struct_p);
-    }
+template<typename struct_t, typename buffer_t>
+class FamStruct {
+    protected:
+        std::unique_ptr<struct_t, void(*)(struct_t*)> s_;
+    public:
+        FamStruct(const size_t n) : s_{reinterpret_cast<struct_t*>(new buffer_t[n]()),
+                                       [](struct_t *p){ delete[] reinterpret_cast<buffer_t*>(p); }} {}
+        struct_t* get() { return s_.get(); }
 };
 
 namespace vmm::kvm {
-    class MsrList {
+    class MsrList : public FamStruct<kvm_msr_list, uint32_t> {
         protected:
-            std::unique_ptr<kvm_msr_list, FamStructDeleter<kvm_msr_list, uint32_t>> list_;
-
             /**
-             * Constructs an MSR index list with @size possible entries.
-             *
-             * The relevant struct is as follows:
+             * Relevant struct:
              *
              *     struct kvm_msr_list {
              *         __u32 nmsrs;
              *         __u32 indices[0];
              *     };
              */
-            MsrList(const std::size_t size) : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1])}
+            MsrList(const size_t n) : FamStruct(n + 1)
             {
-                list_->nmsrs = size;
+                s_->nmsrs = n;
             }
         public:
             MsrList() : MsrList(MAX_IO_MSRS) {}
 
-            kvm_msr_list* data() { return list_.get(); }
-            uint32_t nmsrs() { return list_->nmsrs; }
+            uint32_t nmsrs() {return s_->nmsrs;}
 
-            uint32_t* begin() {return list_->indices;}
-            uint32_t* end()   {return list_->indices + list_->nmsrs;}
-            uint32_t const* begin()  const {return list_->indices;}
-            uint32_t const* end()    const {return list_->indices + list_->nmsrs;}
-            uint32_t const* cbegin() const {return begin();}
-            uint32_t const* cend()   const {return end();}
+            uint32_t* begin()              { return s_->indices; }
+            uint32_t* end()                { return s_->indices + s_->nmsrs; }
+            uint32_t const* begin()  const { return s_->indices; }
+            uint32_t const* end()    const { return s_->indices + s_->nmsrs; }
+            uint32_t const* cbegin() const { return begin(); }
+            uint32_t const* cend()   const { return end(); }
     };
 
     class MsrFeatureList : public MsrList {
@@ -90,9 +85,7 @@ namespace vmm::kvm {
             MsrFeatureList() : MsrList(MAX_IO_MSRS_FEATURES) {}
     };
 
-    class Msrs {
-        private:
-            std::unique_ptr<kvm_msrs, FamStructDeleter<kvm_msrs, uint64_t>> msrs_;
+    class Msrs : public FamStruct<kvm_msrs, uint64_t> {
         public:
             /**
              * Constructs an Msrs with @size possible entries.
@@ -111,19 +104,18 @@ namespace vmm::kvm {
              *         __u64 data;
              *     };
              */
-            Msrs(const std::size_t size) : msrs_{reinterpret_cast<kvm_msrs*>(new uint64_t[size * 2 + 1])}
+            Msrs(const size_t n) : FamStruct(n * 2 + 1)
             {
-                msrs_->nmsrs = size;
+                s_->nmsrs = n;
             }
 
-            kvm_msrs* data() { return msrs_.get(); }
-            uint32_t nmsrs() { return msrs_->nmsrs; }
+            uint32_t nmsrs() { return s_->nmsrs; }
 
-            kvm_msr_entry* begin() {return msrs_->entries;}
-            kvm_msr_entry* end()   {return msrs_->entries + msrs_->nmsrs;}
-            kvm_msr_entry const* begin()  const {return msrs_->entries;}
-            kvm_msr_entry const* end()    const {return msrs_->entries + msrs_->nmsrs;}
-            kvm_msr_entry const* cbegin() const {return begin();}
-            kvm_msr_entry const* cend()   const {return end();}
+            kvm_msr_entry* begin()              { return s_->entries; }
+            kvm_msr_entry* end()                { return s_->entries + s_->nmsrs; }
+            kvm_msr_entry const* begin()  const { return s_->entries; }
+            kvm_msr_entry const* end()    const { return s_->entries + s_->nmsrs; }
+            kvm_msr_entry const* cbegin() const { return begin(); }
+            kvm_msr_entry const* cend()   const { return end(); }
     };
 };

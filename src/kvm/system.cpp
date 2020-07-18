@@ -67,7 +67,7 @@ namespace vmm::kvm {
      */
     auto system::msr_index_list() -> MsrList {
         MsrList msr_list;
-        utils::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msr_list.data());
+        utils::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msr_list.get());
         return msr_list;
     }
 
@@ -88,7 +88,7 @@ namespace vmm::kvm {
      */
     auto system::msr_feature_index_list() -> MsrFeatureList {
         MsrFeatureList msr_feature_list;
-        utils::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_feature_list.data());
+        utils::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_feature_list.get());
         return msr_feature_list;
     }
 
