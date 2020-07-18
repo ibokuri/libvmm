@@ -42,10 +42,20 @@
  */
 #define MAX_IO_MSRS_FEATURES 22
 
+/**
+ * Deleter for std::unique_ptr-wrapped FAM structs.
+ */
+template<typename StructType, typename BufferType>
+struct FamStructDeleter {
+    void operator()(StructType *struct_p) const {
+        delete[] reinterpret_cast<BufferType*>(struct_p);
+    }
+};
+
 namespace vmm::kvm {
     class MsrList {
         protected:
-            std::unique_ptr<kvm_msr_list, void(*)(kvm_msr_list*)> list_;
+            std::unique_ptr<kvm_msr_list, FamStructDeleter<kvm_msr_list, uint32_t>> list_;
 
             /**
              * Constructs an MSR index list with @size possible entries.
@@ -58,8 +68,7 @@ namespace vmm::kvm {
              *     };
              */
             MsrList(const std::size_t size)
-                : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1]),
-                        [](kvm_msr_list *l){ delete[] reinterpret_cast<uint32_t*>(l); }}
+                : list_{reinterpret_cast<kvm_msr_list*>(new uint32_t[size + 1])}
             {
                 list_->nmsrs = size;
             }
@@ -78,7 +87,7 @@ namespace vmm::kvm {
 
     class Msrs {
         private:
-            std::unique_ptr<kvm_msrs, void(*)(kvm_msrs*)> msrs_;
+            std::unique_ptr<kvm_msrs, FamStructDeleter<kvm_msrs, uint64_t>> msrs_;
         public:
             /**
              * Constructs an Msrs with @size possible entries.
@@ -98,8 +107,7 @@ namespace vmm::kvm {
              *     };
              */
             Msrs(const std::size_t size)
-                : msrs_{reinterpret_cast<kvm_msrs*>(new uint64_t[size * 2 + 1]),
-                        [](kvm_msrs *m){ delete[] reinterpret_cast<uint64_t*>(m); }}
+                : msrs_{reinterpret_cast<kvm_msrs*>(new uint64_t[size * 2 + 1])}
             {
                 msrs_->nmsrs = size;
             }
