@@ -65,10 +65,6 @@ namespace vmm::kvm {
             }
         public:
             MsrList() : MsrList(MAX_IO_MSRS) {}
-            MsrList(const MsrList&) = delete;
-            MsrList& operator=(const MsrList&) = delete;
-            MsrList(MsrList&&);
-            MsrList& operator=(MsrList&& other);
 
             kvm_msr_list* data() { return list_.get(); }
             uint32_t nmsrs() { return list_->nmsrs; }
@@ -78,10 +74,6 @@ namespace vmm::kvm {
     class MsrFeatureList : public MsrList {
         public:
             MsrFeatureList() : MsrList(MAX_IO_MSRS_FEATURES) {}
-            MsrFeatureList(const MsrFeatureList&) = delete;
-            MsrFeatureList& operator=(const MsrFeatureList&) = delete;
-            MsrFeatureList(MsrFeatureList&& other) : MsrList(std::move(other)) {}
-            MsrFeatureList& operator=(MsrFeatureList&& other);
     };
 
     class Msrs {
