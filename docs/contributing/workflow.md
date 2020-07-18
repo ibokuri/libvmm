@@ -1,4 +1,4 @@
-# **Workflow**
+# Workflow
 
 Contributing to Libvmm is done primarily through email, which means that if you
 have an email address and know how to send emails, you're already familiar with

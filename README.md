@@ -1,4 +1,4 @@
-# **Libvmm**
+# Libvmm
 
 Libvmm provides common virtualization components for Virtual Machine Monitor
 (VMM) and hypervisor development.

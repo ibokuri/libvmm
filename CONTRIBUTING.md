@@ -1,4 +1,4 @@
-# **Contributing to Libvmm**
+# Contributing to Libvmm
 
 Contributions to Libvmm are very welcome! This document provides some
 guidelines, information, and instructions to help you get started.
