@@ -43,7 +43,7 @@ Libvmm is available in many Linux distributions (as `libvmm`), including:
 * Ubuntu
 
 ## Contributing
-See [CONTRIBUTING.md](https://git.sr.ht/~satchmo/libvmm/tree/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
-This project is released under the [MIT](https://git.sr.ht/~satchmo/libvmm/tree/master/LICENSE) license.
+This project is released under the [MIT](LICENSE) license.
