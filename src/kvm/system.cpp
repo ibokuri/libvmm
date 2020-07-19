@@ -136,4 +136,37 @@ namespace vmm::kvm {
         const auto fd {create_vm()};
         return vmm::kvm::vm{fd, mmap_size};
     }
+
+    system::~system() noexcept {
+        if (!closed_) {
+            try {
+                utils::close(fd_);
+            }
+            catch (std::system_error& e) {
+                /* TODO: log error */
+            }
+        }
+    }
+
+    /**
+     * Closes the KVM subsystem handle.
+     *
+     * Use this if you'd like to handle possible failures of `utils::close()`.
+     *
+     * # Examples
+     *
+     * ```
+     * #include <vmm/kvm.hpp>
+     *
+     * kvm::system kvm;
+     *
+     * ...
+     *
+     * kvm.close();
+     * ```
+     */
+    auto system::close() -> void {
+        utils::close(-1);
+        closed_ = true;
+    }
 }

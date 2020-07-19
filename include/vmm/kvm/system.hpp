@@ -8,9 +8,7 @@
 #include <memory>
 
 #include "types.hpp"
-
-#include <fcntl.h>
-#include <unistd.h>
+#include "../utils.hpp"
 
 namespace vmm::kvm {
     class vm;
@@ -18,9 +16,11 @@ namespace vmm::kvm {
     class system final {
         private:
             unsigned int fd_;
+            bool closed_;
+
             auto create_vm() -> unsigned int;
         public:
-            system() : fd_{open()} {}
+            system() : fd_{open()}, closed_{false} {}
 
             /**
              * Constructs a kvm object from a file descriptor.
@@ -43,9 +43,13 @@ namespace vmm::kvm {
              *
              * See kvm::system::open().
              */
-            explicit system(unsigned int fd) noexcept : fd_{fd} {};
+            explicit system(unsigned int fd) noexcept : fd_{fd}, closed_{false} {};
+            ~system() noexcept;
 
-            ~system() noexcept { ::close(fd_); }
+            system(const system& other) = default;
+            system(system&& other) = default;
+            system& operator=(const system& other) = default;
+            system& operator=(system& other) = default;
 
             /**
             * Opens /dev/kvm and returns a file descriptor.
@@ -75,6 +79,8 @@ namespace vmm::kvm {
                     };
                 return fd;
             }
+
+            auto close() -> void;
 
             auto api_version() -> unsigned int;
             auto vcpu_mmap_size() -> unsigned int;
