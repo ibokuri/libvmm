@@ -17,7 +17,7 @@
  */
 #define MAX_IO_MSRS_FEATURES 22
 
-template<typename struct_t, typename buffer_t>
+template<class struct_t, class buffer_t>
 class FamStruct {
     protected:
         std::unique_ptr<struct_t, void(*)(struct_t*)> s_;
