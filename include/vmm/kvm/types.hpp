@@ -38,7 +38,7 @@ namespace vmm::kvm {
              *         __u32 indices[0];
              *     };
              */
-            MsrIndexList(const size_t n) : FamStruct{n + 1} { s_->nmsrs = n; }
+            MsrIndexList(const size_t n) : FamStruct(n + 1) { s_->nmsrs = n; }
         public:
             MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
 
@@ -74,7 +74,7 @@ namespace vmm::kvm {
              *         __u64 data;
              *     };
              */
-            Msrs(const size_t n) : FamStruct{n * 2 + 1} { s_->nmsrs = n; }
+            Msrs(const size_t n) : FamStruct(n * 2 + 1) { s_->nmsrs = n; }
 
             uint32_t nmsrs() { return s_->nmsrs; }
 
