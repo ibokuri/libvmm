@@ -28,7 +28,7 @@ class FamStruct {
 };
 
 namespace vmm::kvm {
-    class MsrList : public FamStruct<kvm_msr_list, uint32_t> {
+    class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
         protected:
             /**
              * Relevant struct:
@@ -38,12 +38,9 @@ namespace vmm::kvm {
              *         __u32 indices[0];
              *     };
              */
-            MsrList(const size_t n) : FamStruct{n + 1}
-            {
-                s_->nmsrs = n;
-            }
+            MsrIndexList(const size_t n) : FamStruct{n + 1} { s_->nmsrs = n; }
         public:
-            MsrList() : MsrList(MAX_IO_MSRS) {}
+            MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
 
             uint32_t nmsrs() {return s_->nmsrs;}
 
@@ -55,9 +52,9 @@ namespace vmm::kvm {
             uint32_t const* cend()   const { return end(); }
     };
 
-    class MsrFeatureList : public MsrList {
+    class MsrFeatureList : public MsrIndexList {
         public:
-            MsrFeatureList() : MsrList(MAX_IO_MSRS_FEATURES) {}
+            MsrFeatureList() : MsrIndexList(MAX_IO_MSRS_FEATURES) {}
     };
 
     class Msrs : public FamStruct<kvm_msrs, uint64_t> {
@@ -77,10 +74,7 @@ namespace vmm::kvm {
              *         __u64 data;
              *     };
              */
-            Msrs(const size_t n) : FamStruct{n * 2 + 1}
-            {
-                s_->nmsrs = n;
-            }
+            Msrs(const size_t n) : FamStruct{n * 2 + 1} { s_->nmsrs = n; }
 
             uint32_t nmsrs() { return s_->nmsrs; }
 

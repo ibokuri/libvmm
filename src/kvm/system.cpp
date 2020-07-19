@@ -64,11 +64,11 @@ namespace vmm::kvm {
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
-     * kvm::MsrList msr_list {kvm.msr_index_list()};
+     * kvm::MsrIndexList msr_list {kvm.msr_index_list()};
      * ```
      */
-    auto system::msr_index_list() -> MsrList {
-        MsrList msr_list;
+    auto system::msr_index_list() -> MsrIndexList {
+        MsrIndexList msr_list;
         utils::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msr_list.get());
         return msr_list;
     }
