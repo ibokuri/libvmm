@@ -17,14 +17,15 @@
  */
 #define MAX_IO_MSRS_FEATURES 22
 
-template<class struct_t, class buffer_t>
+template<class Struct, class Buffer>
 class FamStruct {
     protected:
-        std::unique_ptr<struct_t, void(*)(struct_t*)> s_;
+        std::unique_ptr<Struct, void(*)(Struct*)> ptr_;
+
+        FamStruct(const size_t n) : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
+                                         [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
     public:
-        FamStruct(const size_t n) : s_{reinterpret_cast<struct_t*>(new buffer_t[n]()),
-                                       [](struct_t *p){ delete[] reinterpret_cast<buffer_t*>(p); }} {}
-        struct_t* get() { return s_.get(); }
+        Struct* get() { return ptr_.get(); }
 };
 
 namespace vmm::kvm {
