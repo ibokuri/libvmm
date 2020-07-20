@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <linux/kvm.h>
 
@@ -31,26 +32,18 @@ class FamStruct {
 namespace vmm::kvm {
     class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
         protected:
-            /**
-             * Relevant struct:
-             *
-             *     struct kvm_msr_list {
-             *         __u32 nmsrs;
-             *         __u32 indices[0];
-             *     };
-             */
-            MsrIndexList(const size_t n) : FamStruct(n + 1) { s_->nmsrs = n; }
+            MsrIndexList(const size_t n);
         public:
             MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
 
-            uint32_t nmsrs() {return s_->nmsrs;}
+            uint32_t nmsrs() const;
 
-            uint32_t* begin()              { return s_->indices; }
-            uint32_t* end()                { return s_->indices + s_->nmsrs; }
-            uint32_t const* begin()  const { return s_->indices; }
-            uint32_t const* end()    const { return s_->indices + s_->nmsrs; }
-            uint32_t const* cbegin() const { return begin(); }
-            uint32_t const* cend()   const { return end(); }
+            uint32_t* begin();
+            uint32_t* end();
+            uint32_t const* begin() const;
+            uint32_t const* end() const;
+            uint32_t const* cbegin() const;
+            uint32_t const* cend() const;
     };
 
     class MsrFeatureList : public MsrIndexList {
@@ -59,31 +52,70 @@ namespace vmm::kvm {
     };
 
     class Msrs : public FamStruct<kvm_msrs, uint64_t> {
+        private:
+            Msrs(const size_t n);
         public:
+            Msrs(kvm_msr_entry entry);
+
             /**
-             * Relevant structs:
+             * Range constructor.
              *
-             *     struct kvm_msrs {
-             *         __u32 nmsrs;
-             *         __u32 pad;
-             *         struct kvm_msr_entry entries[0];
-             *     };
+             * # Examples
              *
-             *     struct kvm_msr_entry {
-             *         __u32 index;
-             *         __u32 reserved;
-             *         __u64 data;
-             *     };
+             * ```
+             * #include <vmm/kvm.hpp>
+             *
+             * kvm::system kvm;
+             * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
+             * std::vector<kvm_msr_entry> entries;
+             *
+             * for (auto msr : msr_list) {
+             *     kvm_msr_entry entry{msr};
+             *     entries.push_back(entry);
+             * }
+             *
+             * kvm::Msrs msrs{entries.begin(), entries.end()};
+             * ```
              */
-            Msrs(const size_t n) : FamStruct(n * 2 + 1) { s_->nmsrs = n; }
+            template <class Iterator>
+            Msrs(Iterator first, Iterator last) : Msrs(std::distance(first, last)) {
+                std::copy_if(first, last, ptr_->entries, [](kvm_msr_entry) { return true; });
+            }
 
-            uint32_t nmsrs() { return s_->nmsrs; }
+            /**
+             * Container constructor.
+             *
+             * # Examples
+             *
+             * ```
+             * #include <vmm/kvm.hpp>
+             *
+             * kvm::system kvm;
+             * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
+             * std::vector<kvm_msr_entry> entries;
+             *
+             * for (auto msr : msr_list) {
+             *     kvm_msr_entry entry{msr};
+             *     entries.push_back(entry);
+             * }
+             *
+             * kvm::Msrs msrs{entries};
+             * ```
+             */
+            template <class Container>
+            Msrs(Container& c) : Msrs(c.begin(), c.end()) { }
 
-            kvm_msr_entry* begin()              { return s_->entries; }
-            kvm_msr_entry* end()                { return s_->entries + s_->nmsrs; }
-            kvm_msr_entry const* begin()  const { return s_->entries; }
-            kvm_msr_entry const* end()    const { return s_->entries + s_->nmsrs; }
-            kvm_msr_entry const* cbegin() const { return begin(); }
-            kvm_msr_entry const* cend()   const { return end(); }
+            Msrs(const Msrs& other);
+            Msrs(Msrs&& other) = default;
+            Msrs& operator=(Msrs other);
+
+            uint32_t nmsrs() const;
+
+            kvm_msr_entry* begin();
+            kvm_msr_entry* end();
+            kvm_msr_entry const* begin() const;
+            kvm_msr_entry const* end() const;
+            kvm_msr_entry const* cbegin() const;
+            kvm_msr_entry const* cend() const;
     };
 };

@@ -85,8 +85,11 @@ namespace vmm::kvm {
             auto api_version() -> unsigned int;
             auto vcpu_mmap_size() -> unsigned int;
             auto msr_index_list() -> MsrIndexList;
+            auto msr_feature_list() -> MsrFeatureList;
             auto msr_feature_index_list() -> MsrFeatureList;
-            auto msrs() -> unsigned int;
+
+            auto msrs(Msrs&) -> unsigned int;
+
             auto vm() -> vm;
     };
 
