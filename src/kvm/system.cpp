@@ -162,7 +162,7 @@ namespace vmm::kvm {
      * ```
      */
     auto system::close() -> void {
-        utils::close(-1);
+        utils::close(fd_);
         closed_ = true;
     }
 }
