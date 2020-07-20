@@ -29,6 +29,7 @@ namespace vmm::kvm {
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
+     *
      * if (kvm.api_version() != KVM_API_VERSION)
      *     throw;
      * ```
@@ -48,7 +49,6 @@ namespace vmm::kvm {
      *
      * kvm::system kvm;
      * auto mmap_size {kvm.vcpu_mmap_size()};
-     * TODO
      * ```
      */
     auto system::vcpu_mmap_size() -> unsigned int {
@@ -65,6 +65,8 @@ namespace vmm::kvm {
      *
      * kvm::system kvm;
      * kvm::MsrIndexList msr_list {kvm.msr_index_list()};
+     *
+     * TODO: Use one of those MSRs.
      * ```
      */
     auto system::msr_index_list() -> MsrIndexList {
@@ -82,20 +84,24 @@ namespace vmm::kvm {
      * # Examples
      *
      * ```
+     * #include <iostream>
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
-     * kvm::MsrFeatureList msr_feature_list {kvm.msr_feature_index_list()};
+     * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
+     *
+     * TODO: Validate CPU feature requested by VM
      * ```
      */
-    auto system::msr_feature_index_list() -> MsrFeatureList {
-        MsrFeatureList msr_feature_list;
-        utils::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_feature_list.get());
-        return msr_feature_list;
+    auto system::msr_feature_list() -> MsrFeatureList {
+        MsrFeatureList msr_list;
+        utils::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_list.get());
+        return msr_list;
     }
 
     /**
-     * Reads the values of MSR-based features available for a VM.
+     * Reads the values of MSR-based features available for VMs. Returns the
+     * number of successfully read values.
      *
      * # Examples
      *
@@ -103,9 +109,26 @@ namespace vmm::kvm {
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
-     * kvm::msrs msrs{TODO};
+     * kvm_msr_entry entry{0x174};
+     * kvm::Msrs msrs{entry};
      * auto nmsrs {kvm.msrs(msrs)};
-     * TODO
+     * ```
+     *
+     * ```
+     * #include <vector>
+     * #include <vmm/kvm.hpp>
+     *
+     * kvm::system kvm;
+     * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
+     * std::vector<kvm_msr_entry> entries;
+     *
+     * for (auto msr : msr_list) {
+     *     kvm_msr_entry entry{msr};
+     *     entries.push_back(entry);
+     * }
+     *
+     * kvm::Msrs msrs{entries};
+     * auto nmsrs {kvm.msrs(msrs)};
      * ```
      */
     auto system::msrs(Msrs& msrs) -> unsigned int {
@@ -156,9 +179,11 @@ namespace vmm::kvm {
      *
      * kvm::system kvm;
      *
-     * ...
-     *
-     * kvm.close();
+     * try {
+     *     kvm.close();
+     * }
+     * catch (std::system_error)
+     *     throw;
      * ```
      */
     auto system::close() -> void {
