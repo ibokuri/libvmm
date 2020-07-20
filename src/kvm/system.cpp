@@ -108,12 +108,8 @@ namespace vmm::kvm {
      * TODO
      * ```
      */
-    auto system::msrs() -> unsigned int {
-        auto nmsrs {0};
-
-        //utils::ioctl(fd_, KVM_GET_MSRS, );
-
-        return nmsrs;
+    auto system::msrs(Msrs& msrs) -> unsigned int {
+        return utils::ioctl(fd_, KVM_GET_MSRS, msrs.get());
     }
 
     /**
