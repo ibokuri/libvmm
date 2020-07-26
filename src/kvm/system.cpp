@@ -12,26 +12,16 @@
 
 namespace vmm::kvm {
     /**
-     * Creates a virtual machine and returns a file descriptor.
-     *
-     * This should only be used indirectly through system::vm().
-     */
-    auto system::create_vm() -> unsigned int {
-        return utils::ioctl(fd_, KVM_CREATE_VM);
-    }
-
-    /**
      * Returns the KVM API version.
      *
      * # Examples
      *
      * ```
+     * #include <cassert.
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
-     *
-     * if (kvm.api_version() != KVM_API_VERSION)
-     *     throw;
+     * assert(kvm.api_version() == KVM_API_VERSION))
      * ```
      */
     auto system::api_version() -> unsigned int {
@@ -53,6 +43,27 @@ namespace vmm::kvm {
      */
     auto system::vcpu_mmap_size() -> unsigned int {
         return utils::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
+    }
+
+    /**
+     * Returns a positive integer if a KVM extension is available; 0 otherwise.
+     *
+     * Based on their initialization, different VMs may have different
+     * capabilities. Thus, it's encouraged to use kvm::vm::check_extension() to
+     * query for capabilities.
+     *
+     * # Examples
+     *
+     * ```
+     * #include <cassert>
+     * #include <vmm/kvm.hpp>
+     *
+     * kvm::system kvm;
+     * assert(kvm.check_extension(KVM_CAP_XEN_HVM) > 0);
+     * ```
+     */
+    auto system::check_extension(unsigned int cap) -> unsigned int {
+        return utils::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
     }
 
     /**
@@ -133,6 +144,15 @@ namespace vmm::kvm {
      */
     auto system::msrs(Msrs& msrs) -> unsigned int {
         return utils::ioctl(fd_, KVM_GET_MSRS, msrs.get());
+    }
+
+    /**
+     * Creates a virtual machine and returns a file descriptor.
+     *
+     * This should only be used indirectly through system::vm().
+     */
+    auto system::create_vm() -> unsigned int {
+        return utils::ioctl(fd_, KVM_CREATE_VM);
     }
 
     /**
