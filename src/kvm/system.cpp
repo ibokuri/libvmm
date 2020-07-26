@@ -29,23 +29,6 @@ namespace vmm::kvm {
     }
 
     /**
-     * Returns the size of the shared memory region used to communicate with
-     * userspace by the KVM_RUN ioctl.
-     *
-     * # Examples
-     *
-     * ```
-     * #include <vmm/kvm.hpp>
-     *
-     * kvm::system kvm;
-     * auto mmap_size {kvm.vcpu_mmap_size()};
-     * ```
-     */
-    auto system::vcpu_mmap_size() -> unsigned int {
-        return utils::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
-    }
-
-    /**
      * Returns a positive integer if a KVM extension is available; 0 otherwise.
      *
      * Based on their initialization, different VMs may have different
@@ -64,6 +47,23 @@ namespace vmm::kvm {
      */
     auto system::check_extension(unsigned int cap) -> unsigned int {
         return utils::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
+    }
+
+    /**
+     * Returns the size of the shared memory region used to communicate with
+     * userspace by the KVM_RUN ioctl.
+     *
+     * # Examples
+     *
+     * ```
+     * #include <vmm/kvm.hpp>
+     *
+     * kvm::system kvm;
+     * auto mmap_size {kvm.vcpu_mmap_size()};
+     * ```
+     */
+    auto system::vcpu_mmap_size() -> unsigned int {
+        return utils::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
     }
 
     /**
