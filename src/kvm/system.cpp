@@ -67,6 +67,15 @@ namespace vmm::kvm {
     }
 
     /**
+     * Returns a list of supported TODO
+     */
+    auto system::supported_cpuid() -> Cpuid {
+        Cpuid cpuid;
+        utils::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuid.get());
+        return cpuid;
+    }
+
+    /**
      * Returns a list of supported MSRs (host & KVM-specific).
      *
      * # Examples

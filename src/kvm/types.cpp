@@ -6,6 +6,34 @@
 
 namespace vmm::kvm {
     /**
+     * Internal MsrIndexList/MsrFeatureList constructor.
+     *
+     * Relevant struct:
+     *
+     *     struct kvm_msr_list {
+     *         __u32 nmsrs;
+     *         __u32 indices[0];
+     *     };
+     *
+     * Buffer size computations:
+     *
+     *     N + sizeof(__u32)
+     */
+    MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) {
+        ptr_->nmsrs = n;
+    }
+
+    uint32_t MsrIndexList::nmsrs() const { return ptr_->nmsrs; }
+
+    uint32_t* MsrIndexList::begin() { return ptr_->indices; }
+    uint32_t* MsrIndexList::end() { return ptr_->indices + ptr_->nmsrs; }
+    uint32_t const* MsrIndexList::begin() const { return ptr_->indices; }
+    uint32_t const* MsrIndexList::end() const { return ptr_->indices + ptr_->nmsrs; }
+    uint32_t const* MsrIndexList::cbegin() const { return begin(); }
+    uint32_t const* MsrIndexList::cend() const { return end(); }
+
+
+    /**
      * Internal Msrs constructor.
      *
      * Relevant structs:
@@ -72,32 +100,42 @@ namespace vmm::kvm {
     kvm_msr_entry const* Msrs::cbegin() const { return begin(); }
     kvm_msr_entry const* Msrs::cend()   const { return end(); }
 
-
-
-    /**
-     * Internal MsrIndexList/MsrFeatureList constructor.
+    /*
+     * Constructor.
      *
-     * Relevant struct:
+     * Relevant structs:
      *
-     *     struct kvm_msr_list {
-     *         __u32 nmsrs;
-     *         __u32 indices[0];
-     *     };
+     * struct kvm_cpuid2 {
+     *     __u32 nent;
+     *     __u32 padding;
+     *     struct kvm_cpuid_entry2 entries[0];
+     * };
      *
-     * Buffer size computations:
+     * struct kvm_cpuid_entry2 {
+     *     __u32 function;
+     *     __u32 index;
+     *     __u32 flags;
+     *     __u32 eax;
+     *     __u32 ebx;
+     *     __u32 ecx;
+     *     __u32 edx;
+     *     __u32 padding[3];
+     * };
      *
-     *     N + sizeof(__u32);
+     * Buffer size computation:
+     *
+     *     N * sizeof(kvm_cpuid_entry2) + 2 * sizeof(__u32)
      */
-    MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) {
-        ptr_->nmsrs = n;
+    Cpuid::Cpuid(const uint32_t n) : FamStruct(n * sizeof(kvm_cpuid_entry2) + 2) {
+        ptr_->nent = n;
     }
 
-    uint32_t MsrIndexList::nmsrs() const { return ptr_->nmsrs; }
+    uint32_t Cpuid::nent() const { return ptr_->nent; }
 
-    uint32_t* MsrIndexList::begin() { return ptr_->indices; }
-    uint32_t* MsrIndexList::end() { return ptr_->indices + ptr_->nmsrs; }
-    uint32_t const* MsrIndexList::begin() const { return ptr_->indices; }
-    uint32_t const* MsrIndexList::end() const { return ptr_->indices + ptr_->nmsrs; }
-    uint32_t const* MsrIndexList::cbegin() const { return begin(); }
-    uint32_t const* MsrIndexList::cend() const { return end(); }
+    kvm_cpuid_entry2* Cpuid::begin() { return ptr_->entries; }
+    kvm_cpuid_entry2* Cpuid::end() { return ptr_->entries + ptr_->nent; }
+    kvm_cpuid_entry2 const* Cpuid::begin() const { return ptr_->entries; }
+    kvm_cpuid_entry2 const* Cpuid::end() const { return ptr_->entries + ptr_->nent; }
+    kvm_cpuid_entry2 const* Cpuid::cbegin() const { return begin(); }
+    kvm_cpuid_entry2 const* Cpuid::cend() const { return end(); }
 };

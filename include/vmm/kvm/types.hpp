@@ -18,6 +18,14 @@
  */
 #define MAX_IO_MSRS_FEATURES 22
 
+/**
+ * Defined in linux/arch/x86/include/asm/kvm_host.h
+ */
+#define MAX_CPUID_ENTRIES 80
+
+/**
+ * Light wrapper around C FAM structs.
+ */
 template<class Struct, class Buffer>
 class FamStruct {
     protected:
@@ -117,5 +125,21 @@ namespace vmm::kvm {
             kvm_msr_entry const* end() const;
             kvm_msr_entry const* cbegin() const;
             kvm_msr_entry const* cend() const;
+    };
+
+    class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
+        private:
+            Cpuid(const uint32_t n);
+        public:
+            Cpuid() : Cpuid(MAX_CPUID_ENTRIES) {}
+
+            uint32_t nent() const;
+
+            kvm_cpuid_entry2* begin();
+            kvm_cpuid_entry2* end();
+            kvm_cpuid_entry2 const* begin() const;
+            kvm_cpuid_entry2 const* end() const;
+            kvm_cpuid_entry2 const* cbegin() const;
+            kvm_cpuid_entry2 const* cend() const;
     };
 };
