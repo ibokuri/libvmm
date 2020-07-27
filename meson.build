@@ -10,6 +10,7 @@ project(
 )
 
 project_description = 'Modular VMM and hypervisor components'
+sources = []
 
 warnings = [
     # extra
@@ -31,8 +32,7 @@ add_project_arguments(
     language: 'cpp',
 )
 
-subdir('include')
-subdir('src')
+subdir('vmm')
 
 target = shared_library(
   'vmm',

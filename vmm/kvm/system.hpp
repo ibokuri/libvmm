@@ -7,8 +7,8 @@
 #include <filesystem>
 #include <memory>
 
-#include "types.hpp"
-#include "../utils.hpp"
+#include "vmm/kvm/types.hpp"
+#include "vmm/utility/utility.hpp"
 
 namespace vmm::kvm {
     class vm;

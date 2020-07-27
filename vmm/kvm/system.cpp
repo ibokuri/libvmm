@@ -2,10 +2,10 @@
  * kvm.cpp - KVM ioctls
  */
 
-#include "../../include/vmm/kvm/system.hpp"
-#include "../../include/vmm/kvm/vm.hpp"
-#include "../../include/vmm/kvm/types.hpp"
-#include "../../include/vmm/utils/utils.hpp"
+#include "vmm/kvm/system.hpp"
+#include "vmm/kvm/vm.hpp"
+#include "vmm/kvm/types.hpp"
+#include "vmm/utility/utility.hpp"
 
 #include <linux/kvm.h>
 #include <sys/stat.h>
@@ -17,7 +17,7 @@ namespace vmm::kvm {
      * # Examples
      *
      * ```
-     * #include <cassert>
+     * #include <cassert.
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
@@ -25,7 +25,7 @@ namespace vmm::kvm {
      * ```
      */
     auto system::api_version() -> unsigned int {
-        return utils::ioctl(fd_, KVM_GET_API_VERSION);
+        return utility::ioctl(fd_, KVM_GET_API_VERSION);
     }
 
     /**
@@ -46,7 +46,7 @@ namespace vmm::kvm {
      * ```
      */
     auto system::check_extension(unsigned int cap) -> unsigned int {
-        return utils::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
+        return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
     }
 
     /**
@@ -63,7 +63,7 @@ namespace vmm::kvm {
      * ```
      */
     auto system::vcpu_mmap_size() -> unsigned int {
-        return utils::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
+        return utility::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
     }
 
     /**
@@ -71,7 +71,7 @@ namespace vmm::kvm {
      */
     auto system::supported_cpuid() -> Cpuid {
         Cpuid cpuid;
-        utils::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuid.get());
+        utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuid.get());
         return cpuid;
     }
 
@@ -91,7 +91,7 @@ namespace vmm::kvm {
      */
     auto system::msr_index_list() -> MsrIndexList {
         MsrIndexList msr_list;
-        utils::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msr_list.get());
+        utility::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msr_list.get());
         return msr_list;
     }
 
@@ -115,7 +115,7 @@ namespace vmm::kvm {
      */
     auto system::msr_feature_list() -> MsrFeatureList {
         MsrFeatureList msr_list;
-        utils::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_list.get());
+        utility::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_list.get());
         return msr_list;
     }
 
@@ -152,7 +152,7 @@ namespace vmm::kvm {
      * ```
      */
     auto system::msrs(Msrs& msrs) -> unsigned int {
-        return utils::ioctl(fd_, KVM_GET_MSRS, msrs.get());
+        return utility::ioctl(fd_, KVM_GET_MSRS, msrs.get());
     }
 
     /**
@@ -161,7 +161,7 @@ namespace vmm::kvm {
      * This should only be used indirectly through system::vm().
      */
     auto system::create_vm() -> unsigned int {
-        return utils::ioctl(fd_, KVM_CREATE_VM);
+        return utility::ioctl(fd_, KVM_CREATE_VM);
     }
 
     /**
@@ -188,7 +188,7 @@ namespace vmm::kvm {
     system::~system() noexcept {
         if (!closed_) {
             try {
-                utils::close(fd_);
+                utility::close(fd_);
             }
             catch (std::system_error& e) {
                 /* TODO: log error */
@@ -199,7 +199,7 @@ namespace vmm::kvm {
     /**
      * Closes the KVM subsystem handle.
      *
-     * Use this if you'd like to handle possible failures of `utils::close()`.
+     * Use this if you'd like to handle possible failures of `utility::close()`.
      *
      * # Examples
      *
@@ -216,7 +216,7 @@ namespace vmm::kvm {
      * ```
      */
     auto system::close() -> void {
-        utils::close(fd_);
+        utility::close(fd_);
         closed_ = true;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * utils.hpp - System utilities
+ * utility.hpp - System utilities
  */
 
 #pragma once
@@ -11,7 +11,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-namespace vmm::utils {
+namespace vmm::utility {
+//namespace vmm::utils {
     /**
      * Runs an ioctl.
      *
