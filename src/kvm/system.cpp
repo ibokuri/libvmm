@@ -17,7 +17,7 @@ namespace vmm::kvm {
      * # Examples
      *
      * ```
-     * #include <cassert.
+     * #include <cassert>
      * #include <vmm/kvm.hpp>
      *
      * kvm::system kvm;
@@ -86,7 +86,7 @@ namespace vmm::kvm {
      * kvm::system kvm;
      * kvm::MsrIndexList msr_list {kvm.msr_index_list()};
      *
-     * TODO: Use one of those MSRs.
+     * TODO
      * ```
      */
     auto system::msr_index_list() -> MsrIndexList {

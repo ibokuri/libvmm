@@ -65,7 +65,7 @@ namespace vmm::kvm {
             * ```
             * #include <vmm/kvm.hpp>
             *
-            * auto fd {kvm::system::open()};
+            * auto fd {kvm::system::open(false)};
             * kvm::system kvm{fd};
             * ```
             */
