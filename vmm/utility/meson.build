@@ -1,5 +1,5 @@
-headers = [
+utility_headers = files(
   'utility.hpp',
-]
+)
 
-install_headers(headers, subdir: 'vmm/utility')
+install_headers(utility_headers, subdir: 'vmm/utility')

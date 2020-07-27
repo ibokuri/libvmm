@@ -4,10 +4,10 @@
 
 #pragma once
 
-namespace vmm::kvm {
-    class vcpu {
-        private:
-        public:
+namespace vmm {
+    //class vcpu {
+        //private:
+        //public:
             /**
              * Reads the values of the MSRs provided.
              *
@@ -46,6 +46,6 @@ namespace vmm::kvm {
              * auto nmsrs {vcpu.msrs(msrs)};
              * ```
              */
-            auto msrs() -> unsigned int;
-    };
-}
+            //auto msrs() -> unsigned int;
+    //};
+} // namespace vmm

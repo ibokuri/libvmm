@@ -1,5 +1,5 @@
 /*
- * kvm.hpp - KVM ioctls
+ * system.hpp - KVM ioctls
  */
 
 #pragma once
@@ -7,10 +7,10 @@
 #include <filesystem>
 #include <memory>
 
-#include "vmm/kvm/types.hpp"
+#include "vmm/kvm/internal/types.hpp"
 #include "vmm/utility/utility.hpp"
 
-namespace vmm::kvm {
+namespace vmm::kvm_internal {
     class vm;
 
     class system final {
@@ -94,5 +94,4 @@ namespace vmm::kvm {
 
             auto vm() -> vm;
     };
-
-}
+}  // namespace vmm::kvm_internal

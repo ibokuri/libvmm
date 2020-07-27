@@ -38,7 +38,7 @@ target = shared_library(
   'vmm',
   sources,
   install: true,
-  include_directories : public_headers,
+  include_directories : include_dirs,
 )
 
 pkgc = import('pkgconfig')

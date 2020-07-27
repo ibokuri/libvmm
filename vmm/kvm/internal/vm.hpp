@@ -1,8 +1,8 @@
 #pragma once
 
-#include "vmm/kvm/system.hpp"
+#include "vmm/kvm/internal/system.hpp"
 
-namespace vmm::kvm {
+namespace vmm::kvm_internal {
     class vm final {
         private:
             unsigned int fd_;

@@ -1,19 +1,7 @@
-headers = files(
-  [
-    'types.hpp',
-    'system.hpp',
-    'vcpu.hpp',
-    'vm.hpp',
-  ]
+subdir('internal')
+
+kvm_headers = files(
+    'kvm.hpp',
 )
 
-sources += files(
-  [
-    'types.cpp',
-    'system.cpp',
-    #'vcpu.cpp',
-    'vm.cpp',
-  ]
-)
-
-install_headers(headers, subdir: 'vmm/kvm')
+install_headers(kvm_headers, subdir: 'vmm/kvm')

@@ -1,4 +1,4 @@
+include_dirs = include_directories('utility', 'kvm')
+
 subdir('utility')
 subdir('kvm')
-
-public_headers = include_directories('utility', 'kvm')
