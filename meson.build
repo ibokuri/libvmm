@@ -32,6 +32,11 @@ add_project_arguments(
     language: 'cpp',
 )
 
+add_project_link_arguments(
+  '-lstdc++fs',
+  language: 'cpp',
+)
+
 subdir('vmm')
 
 target = shared_library(
