@@ -1,0 +1,10 @@
+image: archlinux
+sources:
+  - https://git.sr.ht/~satchmo/libvmm
+tasks:
+  - setup: |
+      cd libvmm
+      meson build
+  - build: |
+      cd libvmm
+      ninja -C build
