@@ -1,6 +1,8 @@
 image: archlinux
 sources:
   - https://git.sr.ht/~satchmo/libvmm
+secrets:
+  - a6eeb31f-6075-4866-a6e0-929056201f78
 tasks:
   - setup: |
       cd libvmm
