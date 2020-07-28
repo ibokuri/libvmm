@@ -1,5 +1,5 @@
 /*
- * kvm.cpp - KVM ioctls
+ * system.cpp - KVM ioctls
  */
 
 #include "vmm/kvm/internal/system.hpp"
@@ -16,7 +16,7 @@ namespace vmm::kvm_internal {
  * # Examples
  *
  * ```
- * #include <cassert.
+ * #include <cassert>
  * #include <vmm/kvm.hpp>
  *
  * kvm::system kvm;
