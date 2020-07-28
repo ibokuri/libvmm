@@ -1,4 +1,7 @@
 image: archlinux
+packages:
+  - meson
+  - ninja
 sources:
   - https://git.sr.ht/~satchmo/libvmm
 secrets:
