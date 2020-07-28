@@ -1,7 +1,7 @@
 # Contributing to Libvmm
 
 Contributions to Libvmm are very welcome! This document provides some
-guidelines, information, and instructions to help you get started.
+guidelines and information to help you get started.
 
 ## Workflow
 
@@ -10,5 +10,5 @@ For more information, see the [Workflow](docs/contributing/workflow.md) page.
 
 ## Style
 
-There is also a [Style Guide](docs/contributing/style.md), which provides some
-guidelines you should follow to preserve code quality and consistency.
+There is also a [Style Guide](docs/contributing/style.md) that provides some
+guidelines on how to preserve code quality and consistency.

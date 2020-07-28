@@ -3,11 +3,11 @@
 Libvmm provides common virtualization components for Virtual Machine Monitor
 (VMM) and hypervisor development.
 
-Despite VMMs and hypervisors often sharing certain primitives and components
+VMMs and hypervisors often share a large portion of their core functionality
 (e.g., VM lifecycle/resource management via KVM, I/O virtualization via
-virtio), these shared pieces are typically reimplemented for each project,
-resulting in duplicated efforts and boring drudge work. The goal of Libvmm is
-to prevent this redundancy.
+virtio). However, these shared components are typically reimplemented for each
+project, resulting in duplicated efforts and unecessary drudge work. Libvmm
+aims to help developers avoid this sort of redundancy.
 
 ## Installation
 
@@ -27,13 +27,13 @@ sudo ninja -C build install
 <!--this, simply add the library path to `ldconfig`'s configuration file:-->
 
 <!--```-->
-<!--$ echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/local.conf-->
-<!--$ sudo ldconfig-->
+<!--echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/local.conf-->
+<!--sudo ldconfig-->
 <!--```-->
 
 #### Packages
 
-Libvmm is available in many Linux distributions (as `libvmm`), including:
+Libvmm is available on many Linux distributions (as `libvmm`), including:
 
 * Arch Linux
 * CentOS
