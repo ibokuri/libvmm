@@ -90,7 +90,7 @@ namespace vmm::kvm_internal {
             auto msr_feature_list() -> MsrFeatureList;
             auto msr_feature_index_list() -> MsrFeatureList;
 
-            auto msrs(Msrs&) -> unsigned int;
+            auto read_msrs(Msrs&) -> unsigned int;
 
             auto vm() -> vm;
     };

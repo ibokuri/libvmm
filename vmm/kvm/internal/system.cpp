@@ -130,7 +130,7 @@ auto system::msr_feature_list() -> MsrFeatureList {
  * kvm::system kvm;
  * kvm_msr_entry entry{0x174};
  * kvm::Msrs msrs{entry};
- * auto nmsrs {kvm.msrs(msrs)};
+ * auto nmsrs {kvm.read_msrs(msrs)};
  * ```
  *
  * ```
@@ -147,10 +147,10 @@ auto system::msr_feature_list() -> MsrFeatureList {
  * }
  *
  * kvm::Msrs msrs{entries};
- * auto nmsrs {kvm.msrs(msrs)};
+ * auto nmsrs {kvm.read_msrs(msrs)};
  * ```
  */
-auto system::msrs(Msrs& msrs) -> unsigned int {
+auto system::read_msrs(Msrs& msrs) -> unsigned int {
     return utility::ioctl(fd_, KVM_GET_MSRS, msrs.get());
 }
 
