@@ -1,5 +1,6 @@
 image: archlinux
 packages:
+  - catch2
   - meson
   - ninja
 sources:
@@ -13,3 +14,6 @@ tasks:
   - build: |
       cd libvmm
       ninja -C build
+  - test: |
+      cd libvmm
+      ninja -C build test
