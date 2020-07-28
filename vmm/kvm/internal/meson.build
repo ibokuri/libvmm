@@ -1,9 +1,11 @@
-sources += files(
+kvm_internal_sources = files(
     'types.cpp',
     'system.cpp',
     #'vcpu.cpp',
     'vm.cpp',
 )
+
+sources += kvm_internal_sources
 
 kvm_internal_headers = files(
   'kvm.hpp',

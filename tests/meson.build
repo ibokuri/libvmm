@@ -1,6 +1,4 @@
-test_deps = [
-  dependency('catch2'),
-]
+test_dep = dependency('catch2')
+test_sources = []
 
-tkvm = executable('kvm', 'kvm.cpp', include_directories : inc, dependencies : test_deps)
-test('kvm test', tkvm)
+subdir('kvm')
