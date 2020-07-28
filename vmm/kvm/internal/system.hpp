@@ -13,7 +13,7 @@
 namespace vmm::kvm_internal {
     class vm;
 
-    class system final {
+    class system {
         private:
             unsigned int fd_;
             bool closed_;
@@ -94,4 +94,5 @@ namespace vmm::kvm_internal {
 
             auto vm() -> vm;
     };
+
 }  // namespace vmm::kvm_internal
