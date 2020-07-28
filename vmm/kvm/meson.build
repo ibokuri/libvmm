@@ -4,4 +4,4 @@ kvm_headers = files(
     'kvm.hpp',
 )
 
-install_headers(kvm_headers, subdir: 'vmm/kvm')
+install_headers(kvm_headers, subdir: 'vmm')
