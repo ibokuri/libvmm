@@ -77,15 +77,16 @@ project_dep = declare_dependency(
 # Unit Tests
 #
 if not meson.is_subproject()
+  test_suites = {}
+
   subdir('tests')
 
-  test(
-    'all_tests',
-    executable(
-      'run_tests',
-      test_sources,
-      dependencies : [project_dep, test_dep],
-      install : false
-    )
-  )
+  foreach n_suite, s : test_suites
+    foreach n_test, f : s
+      test(n_test, executable(n_test,
+                              f,
+                              dependencies : [project_dep, test_dep],
+                              install : false))
+    endforeach
+  endforeach
 endif
