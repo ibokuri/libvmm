@@ -47,9 +47,9 @@ class system {
         explicit system(unsigned int fd) noexcept : fd_{fd}, closed_{false} {};
         ~system() noexcept;
 
-        system(const system& other) = default;
+        system(const system& other) = delete;
         system(system&& other) = default;
-        system& operator=(const system& other) = default;
+        system& operator=(const system& other) = delete;
         system& operator=(system& other) = default;
 
         /**
