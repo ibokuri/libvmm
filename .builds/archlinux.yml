@@ -15,5 +15,5 @@ tasks:
       cd libvmm
       ninja -C build
   - test: |
-      cd libvmm
-      ninja -C build test
+      cd libvmm/build
+      meson test -v
