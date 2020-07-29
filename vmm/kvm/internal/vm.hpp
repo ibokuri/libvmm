@@ -22,7 +22,7 @@ class vm {
          * that calls this method.
          */
         vm(const unsigned int fd, const unsigned int mmap_size) : fd_{fd}, mmap_size_{mmap_size} {}
-        friend vm system::vm();
+        friend vm system::vm(unsigned int);
     public:
         ~vm() noexcept { close(fd_); }
 

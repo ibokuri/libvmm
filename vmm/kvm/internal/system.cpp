@@ -200,15 +200,41 @@ auto system::read_msrs(Msrs& msrs) -> unsigned int {
  *
  * This should only be used indirectly through system::vm().
  */
-auto system::create_vm() -> unsigned int {
-    return utility::ioctl(fd_, KVM_CREATE_VM);
+auto system::create_vm(unsigned int machine_type) -> unsigned int {
+    return utility::ioctl(fd_, KVM_CREATE_VM, machine_type);
 }
 
 /**
- * Creates a virtual machine.
+ * Creates a virtual machine (custom IPA size) and returns a file descriptor.
  *
- * This function will also initialize the size of the vCPU mmap area with
- * the KVM_GET_VCPU_MMAP_SIZE ioctl's result.
+ * This will also initialize the size of the vCPU mmap area with the
+ * KVM_GET_VCPU_MMAP_SIZE ioctl's result.
+ *
+ * By default, the physical address size for a VM (IPA Size limit) on arm64 is
+ * limited to 40-bits. However, this limit can be configured if the host
+ * supports the KVM_CAP_ARM_VM_IPA_SIZE extension. When supported, use
+ * KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+ * identifier, where IPA_Bits is the maximum width of any physical address used
+ * by the VM.
+ *
+ * # Examples
+ *
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * kvm::system kvm;
+ * kvm::vm {kvm.vm(KVM_VM_TYPE_ARM_IPA_SIZE(48)};
+ * ```
+ */
+auto system::vm(unsigned int machine_type) -> vmm::kvm_internal::vm {
+    return vmm::kvm_internal::vm{create_vm(machine_type), vcpu_mmap_size()};
+}
+
+/**
+ * Creates a virtual machine (default IPA size) and returns a file descriptor.
+ *
+ * This will also initialize the size of the vcpu mmap area with the
+ * KVM_GET_VCPU_MMAP_SIZE ioctl's result.
  *
  * # Examples
  *
@@ -218,13 +244,9 @@ auto system::create_vm() -> unsigned int {
  * kvm::system kvm;
  * kvm::vm {kvm.vm()};
  * ```
- *
- * TODO
  */
 auto system::vm() -> vmm::kvm_internal::vm {
-    const auto mmap_size {vcpu_mmap_size()};
-    const auto fd {create_vm()};
-    return vmm::kvm_internal::vm{fd, mmap_size};
+    return vm(0);
 }
 
 system::~system() noexcept {

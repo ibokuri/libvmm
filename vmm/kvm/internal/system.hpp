@@ -19,7 +19,7 @@ class system {
         unsigned int fd_;
         bool closed_;
 
-        auto create_vm() -> unsigned int;
+        auto create_vm(unsigned int machine_type) -> unsigned int;
     public:
         system() : fd_{open()}, closed_{false} {}
 
@@ -92,7 +92,8 @@ class system {
         auto msr_feature_list() -> MsrFeatureList;
         auto msr_feature_index_list() -> MsrFeatureList;
         auto read_msrs(Msrs&) -> unsigned int;
-        auto vm() -> vm;
+        auto vm(unsigned int machine_type) -> vmm::kvm_internal::vm;
+        auto vm() -> vmm::kvm_internal::vm;
 };
 
 }  // namespace vmm::kvm_internal
