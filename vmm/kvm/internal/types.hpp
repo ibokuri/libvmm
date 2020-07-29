@@ -67,50 +67,50 @@ class Msrs : public FamStruct<kvm_msrs, uint64_t> {
         Msrs(kvm_msr_entry entry);
 
         /**
-            * Range constructor.
-            *
-            * # Examples
-            *
-            * ```
-            * #include <vmm/kvm.hpp>
-            *
-            * kvm::system kvm;
-            * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
-            * std::vector<kvm_msr_entry> entries;
-            *
-            * for (auto msr : msr_list) {
-            *     kvm_msr_entry entry{msr};
-            *     entries.push_back(entry);
-            * }
-            *
-            * kvm::Msrs msrs{entries.begin(), entries.end()};
-            * ```
-            */
+         * Range constructor.
+         *
+         * # Examples
+         *
+         * ```
+         * #include <vmm/kvm.hpp>
+         *
+         * kvm::system kvm;
+         * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
+         * std::vector<kvm_msr_entry> entries;
+         *
+         * for (auto msr : msr_list) {
+         *     kvm_msr_entry entry{msr};
+         *     entries.push_back(entry);
+         * }
+         *
+         * kvm::Msrs msrs{entries.begin(), entries.end()};
+         * ```
+         */
         template <class Iterator>
         Msrs(Iterator first, Iterator last) : Msrs(std::distance(first, last)) {
             std::copy_if(first, last, ptr_->entries, [](kvm_msr_entry) { return true; });
         }
 
         /**
-            * Container constructor.
-            *
-            * # Examples
-            *
-            * ```
-            * #include <vmm/kvm.hpp>
-            *
-            * kvm::system kvm;
-            * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
-            * std::vector<kvm_msr_entry> entries;
-            *
-            * for (auto msr : msr_list) {
-            *     kvm_msr_entry entry{msr};
-            *     entries.push_back(entry);
-            * }
-            *
-            * kvm::Msrs msrs{entries};
-            * ```
-            */
+         * Container constructor.
+         *
+         * # Examples
+         *
+         * ```
+         * #include <vmm/kvm.hpp>
+         *
+         * kvm::system kvm;
+         * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
+         * std::vector<kvm_msr_entry> entries;
+         *
+         * for (auto msr : msr_list) {
+         *     kvm_msr_entry entry{msr};
+         *     entries.push_back(entry);
+         * }
+         *
+         * kvm::Msrs msrs{entries};
+         * ```
+         */
         template <class Container>
         Msrs(Container& c) : Msrs(c.begin(), c.end()) { }
 
@@ -133,6 +133,43 @@ class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
         Cpuid(const uint32_t n);
     public:
         Cpuid() : Cpuid(MAX_CPUID_ENTRIES) {}
+        Cpuid(kvm_cpuid_entry2 entry);
+
+        /**
+         * Range constructor.
+         *
+         * # Examples
+         *
+         * ```
+         * #include <vmm/kvm.hpp>
+         *
+         * kvm::system kvm;
+         * TODO
+         * ```
+         */
+        template <class Iterator>
+        Cpuid(Iterator first, Iterator last) : Cpuid(std::distance(first, last)) {
+            std::copy_if(first, last, ptr_->entries, [](kvm_cpuid_entry2) { return true; });
+        }
+
+        /**
+         * Container constructor.
+         *
+         * # Examples
+         *
+         * ```
+         * #include <vmm/kvm.hpp>
+         *
+         * kvm::system kvm;
+         * TODO
+         * ```
+         */
+        template <class Container>
+        Cpuid(Container& c) : Cpuid(c.begin(), c.end()) { }
+
+        Cpuid(const Cpuid& other);
+        Cpuid(Cpuid&& other) = default;
+        Cpuid& operator=(Cpuid other);
 
         uint32_t nent() const;
 

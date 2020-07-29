@@ -132,6 +132,26 @@ Cpuid::Cpuid(const uint32_t n) : FamStruct(n * sizeof(kvm_cpuid_entry2) + 2) {
     ptr_->nent = n;
 }
 
+/**
+ * Constructor for a single cpuid entry.
+ */
+Cpuid::Cpuid(kvm_cpuid_entry2 entry) : Cpuid(1) {
+    ptr_->entries[0] = entry;
+}
+
+/*
+ * Copy constructor.
+ */
+Cpuid::Cpuid(const Cpuid& other) : Cpuid(other.begin(), other.end()) {}
+
+/**
+ * Copy/move assignment operator.
+ */
+Cpuid& Cpuid::operator=(Cpuid other) {
+    other.ptr_.swap(this->ptr_);
+    return *this;
+}
+
 uint32_t Cpuid::nent() const { return ptr_->nent; }
 
 kvm_cpuid_entry2* Cpuid::begin() { return ptr_->entries; }
