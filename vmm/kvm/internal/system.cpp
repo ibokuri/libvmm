@@ -41,7 +41,7 @@ auto system::api_version() -> unsigned int {
  * #include <vmm/kvm.hpp>
  *
  * kvm::system kvm;
- * assert(kvm.check_extension(KVM_CAP_XEN_HVM) > 0);
+ * assert(kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
 auto system::check_extension(unsigned int cap) -> unsigned int {
@@ -65,12 +65,53 @@ auto system::vcpu_mmap_size() -> unsigned int {
     return utility::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
 }
 
+/* AArch64 specific call to get the host Intermediate Physical Address (IPA)
+ * space limit.
+ *
+ * Returns 0 if the capability is not available and an integer larger than 32
+ * otherwise.
+ */
+auto system::host_ipa_limit() -> unsigned int {
+    return check_extension(KVM_CAP_ARM_VM_IPA_SIZE);
+}
+
 /**
- * Returns a list of supported TODO
+ * Returns a list of host-supported x86 cpuid features.
+ *
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * kvm::system kvm;
+ * TODO
  */
 auto system::supported_cpuid() -> Cpuid {
     Cpuid cpuid;
     utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuid.get());
+    return cpuid;
+}
+
+/**
+ * Returns a list of KVM-emulated x86 cpuid features.
+ *
+ * The struct used is essentially the same, but the padding field is now
+ * used for specifying flags.
+ *
+ * struct kvm_cpuid2 {
+ *     __u32 nent;
+ *     __u32 flags;
+ *     struct kvm_cpuid_entry2 entries[0];
+ * };
+ *
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * kvm::system kvm;
+ * TODO
+ * ```
+ */
+auto system::emulated_cpuid() -> Cpuid {
+    Cpuid cpuid;
+    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, cpuid.get());
     return cpuid;
 }
 
@@ -109,7 +150,7 @@ auto system::msr_index_list() -> MsrIndexList {
  * kvm::system kvm;
  * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
  *
- * TODO: Validate CPU feature requested by VM
+ * TODO
  * ```
  */
 auto system::msr_feature_list() -> MsrFeatureList {
@@ -177,6 +218,8 @@ auto system::create_vm() -> unsigned int {
  * kvm::system kvm;
  * kvm::vm {kvm.vm()};
  * ```
+ *
+ * TODO
  */
 auto system::vm() -> vmm::kvm_internal::vm {
     const auto mmap_size {vcpu_mmap_size()};
@@ -190,7 +233,7 @@ system::~system() noexcept {
             utility::close(fd_);
         }
         catch (std::system_error& e) {
-            /* TODO: log error */
+            // TODO
         }
     }
 }

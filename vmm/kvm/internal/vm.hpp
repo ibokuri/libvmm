@@ -25,6 +25,10 @@ class vm {
         friend vm system::vm();
     public:
         ~vm() noexcept { close(fd_); }
+
+        //auto nr_vcpus() -> unsigned int;
+        //auto max_vcpus() -> unsigned int;
+        //auto nr_memslots() -> unsigned int;
 };
 
 }  // namespace vmm:vm

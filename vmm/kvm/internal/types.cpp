@@ -101,8 +101,9 @@ kvm_msr_entry const* Msrs::end()    const { return ptr_->entries + ptr_->nmsrs; 
 kvm_msr_entry const* Msrs::cbegin() const { return begin(); }
 kvm_msr_entry const* Msrs::cend()   const { return end(); }
 
+
 /*
- * Constructor.
+ * Internal constructor.
  *
  * Relevant structs:
  *
