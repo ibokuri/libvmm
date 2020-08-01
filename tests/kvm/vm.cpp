@@ -5,6 +5,16 @@
 
 namespace kvm = vmm::kvm;
 
-//TEST_CASE("KVM getters", "[api]") {
-	//kvm::system kvm;
-//}
+TEST_CASE("VM creation", "[api]") {
+    kvm::system kvm;
+    kvm::vm vm {kvm.vm()};
+}
+
+TEST_CASE("VM vcpu and memory slots", "[api]") {
+    kvm::system kvm;
+    kvm::vm vm {kvm.vm()};
+
+    REQUIRE(vm.nr_vcpus() >= 4);
+    REQUIRE(vm.max_vcpus() >= vm.nr_vcpus());
+    REQUIRE(vm.nr_memslots() >= 32);
+}
