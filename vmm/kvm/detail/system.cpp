@@ -4,6 +4,7 @@
 
 #include "vmm/kvm/detail/system.hpp"
 #include "vmm/kvm/detail/vm.hpp"
+#include "vmm/utility/utility.hpp"
 
 #include <linux/kvm.h>
 #include <sys/stat.h>

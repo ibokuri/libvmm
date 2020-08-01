@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include "vmm/kvm/detail/types.hpp"
+
 #include <filesystem>
 #include <memory>
 
-#include "vmm/kvm/detail/types.hpp"
-#include "vmm/utility/utility.hpp"
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace vmm::kvm::detail {
 

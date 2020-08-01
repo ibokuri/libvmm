@@ -18,17 +18,19 @@ class vm {
          *
          * To prevent users from constructing VMs using arbitrary file
          * descriptors and to restrict VM construction to occur through
-         * existing `kvm objects, system::vm() should be the only function
+         * existing kvm objects, system::vm() should be the only function
          * that calls this method.
          */
-        vm(const unsigned int fd, const unsigned int mmap_size) : fd_{fd}, mmap_size_{mmap_size} {}
+        vm(const unsigned int fd, const unsigned int mmap_size)
+            : fd_{fd}, mmap_size_{mmap_size} {}
         friend vm system::vm(unsigned int);
     public:
         ~vm() noexcept { close(fd_); }
 
-        //auto nr_vcpus() -> unsigned int;
-        //auto max_vcpus() -> unsigned int;
-        //auto nr_memslots() -> unsigned int;
+        auto check_extension(unsigned int cap) -> unsigned int;
+        auto nr_vcpus() -> unsigned int;
+        auto max_vcpus() -> unsigned int;
+        auto nr_memslots() -> unsigned int;
 };
 
 }  // namespace vmm:vm
