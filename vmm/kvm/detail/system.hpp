@@ -7,10 +7,10 @@
 #include <filesystem>
 #include <memory>
 
-#include "vmm/kvm/internal/types.hpp"
+#include "vmm/kvm/detail/types.hpp"
 #include "vmm/utility/utility.hpp"
 
-namespace vmm::kvm_internal {
+namespace vmm::kvm::detail {
 
 class vm;
 
@@ -26,21 +26,23 @@ class system {
         /**
          * Constructs a kvm object from a file descriptor.
          *
-         * The passed file descriptor must have O_RDWR permissions for
-         * things to work. It is also encouraged to have O_CLOEXEC set,
-         * on the descriptor, though the flag may be omitted as needed.
+         * The passed file descriptor should have O_RDWR permissions for things
+         * to work. It is also encouraged to have O_CLOEXEC set, though it may
+         * be omitted as needed.
          *
-         * Note that the passed file descriptor is of type unsigned int.
-         * As such, users must use kvm::system::open() to create a `kvm`
-         * object unless they're willing to do cast's on C's open(). This
-         * ensures that `fd` is both a valid handle and one that contains a
-         * proper amount of permissions for subsequent KVM operations.
+         * Note that the passed file descriptor is of type unsigned int. As
+         * such, users are encouraged use `kvm::system::open()` to create a
+         * system object unless they're willing to do casts on a C-style
+         * open(). This provides a bit more assurance that the handle used
+         * byt the system object will be a valid, proper kvm handle.
          *
-         * # Safety
+         * Safety
+         * ======
          *
          * Ownership of `fd` is transferred over to the created Kvm object.
          *
-         * # Examples
+         * Examples
+         * ========
          *
          * See kvm::system::open().
          */
@@ -55,13 +57,13 @@ class system {
         /**
          * Opens /dev/kvm and returns a file descriptor.
          *
-         * Use cases for opening /dev/kvm without O_CLOEXEC typically
-         * involve using or passing the resulting file handle to another
-         * process. For example, a program may open /dev/kvm only to
-         * exec() into another program with seccomp filters that blacklist
-         * certain syscalls.
+         * Use cases for opening /dev/kvm without O_CLOEXEC typically involve
+         * using or passing the resulting file handle to another process. For
+         * example, a program may open /dev/kvm only to exec() into another
+         * program with seccomp filters.
          *
-         * # Examples
+         * Examples
+         * ========
          *
          * ```
          * #include <vmm/kvm.hpp>
@@ -91,9 +93,9 @@ class system {
         auto msr_index_list() -> MsrIndexList;
         auto msr_feature_list() -> MsrFeatureList;
         auto msr_feature_index_list() -> MsrFeatureList;
-        auto read_msrs(Msrs&) -> unsigned int;
-        auto vm(unsigned int machine_type) -> vmm::kvm_internal::vm;
-        auto vm() -> vmm::kvm_internal::vm;
+        auto read_msrs(Msrs& msrs) -> unsigned int;
+        auto vm(unsigned int machine_type) -> vmm::kvm::detail::vm;
+        auto vm() -> vmm::kvm::detail::vm;
 };
 
-}  // namespace vmm::kvm_internal
+}  // namespace vmm::kvm::detail

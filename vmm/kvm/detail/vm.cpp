@@ -2,7 +2,7 @@
  * vm.cpp - VM ioctls
  */
 
-namespace vmm::kvm_internal {
+namespace vmm::kvm::detail {
 
 //auto vm::nr_vcpus() -> unsigned int {
     //auto ret {check_extension(KVM_CAP_NR_VCPUS)};
@@ -19,4 +19,4 @@ namespace vmm::kvm_internal {
     //return ret > 0 ? ret : 32;
 //}
 
-}  // namespace vmm::kvm_internal
+}  // namespace vmm::kvm::detail

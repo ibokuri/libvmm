@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "vmm/kvm/internal/system.hpp"
+#include "vmm/kvm/detail/system.hpp"
 
-namespace vmm::kvm_internal {
+namespace vmm::kvm::detail {
 
 class vm {
     private:

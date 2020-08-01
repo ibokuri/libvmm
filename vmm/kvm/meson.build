@@ -1,4 +1,4 @@
-subdir('internal')
+subdir('detail')
 
 kvm_headers = files(
     'kvm.hpp',

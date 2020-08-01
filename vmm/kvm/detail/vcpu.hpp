@@ -3,7 +3,3 @@
  */
 
 #pragma once
-
-namespace vmm {
-
-} // namespace vmm

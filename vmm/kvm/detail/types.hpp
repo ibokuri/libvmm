@@ -23,7 +23,7 @@
  */
 #define MAX_CPUID_ENTRIES 80
 
-namespace vmm::kvm_internal {
+namespace vmm::kvm::detail {
 
 /**
  * Light wrapper around C FAM structs.
@@ -181,4 +181,4 @@ class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
         kvm_cpuid_entry2 const* cend() const;
 };
 
-}  // namespace vmm::kvm_internal
+}  // namespace vmm::kvm::detail

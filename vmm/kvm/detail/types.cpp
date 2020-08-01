@@ -2,9 +2,9 @@
  * types.cpp - KVM types
  */
 
-#include "vmm/kvm/internal/types.hpp"
+#include "vmm/kvm/detail/types.hpp"
 
-namespace vmm::kvm_internal {
+namespace vmm::kvm::detail {
 
 /**
  * Internal MsrIndexList/MsrFeatureList constructor.
@@ -161,4 +161,4 @@ kvm_cpuid_entry2 const* Cpuid::end() const { return ptr_->entries + ptr_->nent; 
 kvm_cpuid_entry2 const* Cpuid::cbegin() const { return begin(); }
 kvm_cpuid_entry2 const* Cpuid::cend() const { return end(); }
 
-} // namespace vmm::kvm_internal
+} // namespace vmm::kvm::detail

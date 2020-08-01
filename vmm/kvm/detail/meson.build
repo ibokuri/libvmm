@@ -15,4 +15,4 @@ kvm_internal_headers = files(
   'vm.hpp',
 )
 
-install_headers(kvm_internal_headers, subdir: 'vmm/kvm/internal')
+install_headers(kvm_internal_headers, subdir: 'vmm/kvm/detail')
