@@ -8,6 +8,8 @@
 #include <memory>
 #include <linux/kvm.h>
 
+namespace vmm::kvm::detail {
+
 /**
  * Size of reserved range for KVM-specific MSRs (0x4b564d00 to 0x4b564dff)
  */
@@ -22,8 +24,6 @@
  * Defined in linux/arch/x86/include/asm/kvm_host.h
  */
 #define MAX_CPUID_ENTRIES 80
-
-namespace vmm::kvm::detail {
 
 /**
  * Light wrapper around C FAM structs.
