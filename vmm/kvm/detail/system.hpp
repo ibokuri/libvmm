@@ -38,12 +38,10 @@ class system {
          *
          * Safety
          * ======
-         *
          * Ownership of `fd` is transferred over to the created Kvm object.
          *
          * Examples
          * ========
-         *
          * See kvm::system::open().
          */
         explicit system(unsigned int fd) noexcept : fd_{fd}, closed_{false} {};
@@ -64,7 +62,6 @@ class system {
          *
          * Examples
          * ========
-         *
          * ```
          * #include <vmm/kvm.hpp>
          *

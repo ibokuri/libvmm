@@ -18,8 +18,8 @@ namespace vmm::utility {
  *
  * By default, the ioctl ran is equivalent to one with no arguments.
  *
- * # Examples
- *
+ * Examples
+ * ========
  * ```
  * #include <vmm/utility.hpp>
  *
@@ -44,8 +44,8 @@ auto ioctl(const int fd, const unsigned long req, T arg=T{}) -> unsigned int {
 /**
  * Closes a file descriptor.
  *
- * # Examples
- *
+ * Examples
+ * ========
  * ```
  * #include <vmm/utility.hpp>
  *

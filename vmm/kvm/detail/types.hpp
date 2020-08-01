@@ -33,8 +33,9 @@ class FamStruct {
     protected:
         std::unique_ptr<Struct, void(*)(Struct*)> ptr_;
 
-        FamStruct(const size_t n) : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
-                                         [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
+        FamStruct(const size_t n)
+            : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
+                   [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
     public:
         Struct* get() { return ptr_.get(); }
 };
@@ -69,8 +70,8 @@ class Msrs : public FamStruct<kvm_msrs, uint64_t> {
         /**
          * Range constructor.
          *
-         * # Examples
-         *
+         * Examples
+         * ========
          * ```
          * #include <vmm/kvm.hpp>
          *
@@ -94,8 +95,8 @@ class Msrs : public FamStruct<kvm_msrs, uint64_t> {
         /**
          * Container constructor.
          *
-         * # Examples
-         *
+         * Examples
+         * ========
          * ```
          * #include <vmm/kvm.hpp>
          *
@@ -138,8 +139,8 @@ class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
         /**
          * Range constructor.
          *
-         * # Examples
-         *
+         * Examples
+         * ========
          * ```
          * #include <vmm/kvm.hpp>
          *
@@ -155,8 +156,8 @@ class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
         /**
          * Container constructor.
          *
-         * # Examples
-         *
+         * Examples
+         * ========
          * ```
          * #include <vmm/kvm.hpp>
          *

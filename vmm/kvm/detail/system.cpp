@@ -67,7 +67,6 @@ auto system::check_extension(unsigned int cap) -> unsigned int {
  *
  * Examples
  * ========
- *
  * ```
  * #include <vmm/kvm.hpp>
  *
@@ -114,7 +113,7 @@ auto system::host_ipa_limit() -> unsigned int {
  *
  * Architectures
  * =============
- * x86.
+ * x86
  *
  * Examples
  * ========
@@ -125,6 +124,7 @@ auto system::host_ipa_limit() -> unsigned int {
  * vmm::kvm::Cpuid cpuid {kvm.supported_cpuid()};
  *
  * // Print CPU's manufacturer ID string
+ * TODO
  * ```
  */
 auto system::supported_cpuid() -> Cpuid {
@@ -134,20 +134,11 @@ auto system::supported_cpuid() -> Cpuid {
 }
 
 /**
- * Returns a list of KVM-emulated x86 cpuid features.
+ * Returns a list of kvm-emulated x86 cpuid features.
  *
  * Architectures
  * =============
- * x86.
- *
- * The struct used is essentially the same, but the padding field is now
- * used for specifying flags.
- *
- * struct kvm_cpuid2 {
- *     __u32 nent;
- *     __u32 flags;
- *     struct kvm_cpuid_entry2 entries[0];
- * };
+ * x86
  *
  * Examples
  * ========
@@ -165,11 +156,10 @@ auto system::emulated_cpuid() -> Cpuid {
 }
 
 /**
- * Returns a list of supported MSRs (host & KVM-specific).
+ * Returns a list of host-supported and kvm-specific MSRs.
  *
  * Examples
  * ========
- *
  * ```
  * #include <vmm/kvm.hpp>
  *
@@ -193,7 +183,6 @@ auto system::msr_index_list() -> MsrIndexList {
  *
  * Examples
  * ========
- *
  * ```
  * #include <iostream>
  * #include <vmm/kvm.hpp>
@@ -216,7 +205,6 @@ auto system::msr_feature_list() -> MsrFeatureList {
  *
  * Examples
  * ========
- *
  * ```
  * #include <vmm/kvm.hpp>
  *
@@ -248,22 +236,22 @@ auto system::read_msrs(Msrs& msrs) -> unsigned int {
 }
 
 /**
- * Creates a virtual machine and returns a file descriptor.
+ * Returns a file descriptor associated with a newly created VM.
  *
- * This should only be used indirectly through system::vm().
+ * This method should only be used indirectly by `system::vm()`.
  */
 auto system::create_vm(unsigned int machine_type) -> unsigned int {
     return utility::ioctl(fd_, KVM_CREATE_VM, machine_type);
 }
 
 /**
- * Creates a virtual machine (custom IPA size) and returns a file descriptor.
+ * Creates and returns a virtual machine (with a custom machine type).
  *
- * This will also initialize the size of the vCPU mmap area with the
- * KVM_GET_VCPU_MMAP_SIZE ioctl's result.
+ * The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
+ * ioctl's result.
  *
- * By default, the physical address size for a VM (IPA Size limit) on arm64 is
- * limited to 40-bits. However, this limit can be configured if the host
+ * By default, the physical address size for a VM (IPA Size limit) on AArch64
+ * is limited to 40-bits. However, this limit can be configured if the host
  * supports the KVM_CAP_ARM_VM_IPA_SIZE extension. When supported, use
  * KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
  * identifier, where IPA_Bits is the maximum width of any physical address used
@@ -271,7 +259,6 @@ auto system::create_vm(unsigned int machine_type) -> unsigned int {
  *
  * Examples
  * ========
- *
  * ```
  * #include <vmm/kvm.hpp>
  *
@@ -284,14 +271,13 @@ auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
 }
 
 /**
- * Creates a virtual machine (default IPA size) and returns a file descriptor.
+ * Creates a and returns a virtual machine.
  *
- * This will also initialize the size of the vcpu mmap area with the
- * KVM_GET_VCPU_MMAP_SIZE ioctl's result.
+ * The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
+ * ioctl's result.
  *
  * Examples
  * ========
- *
  * ```
  * #include <vmm/kvm.hpp>
  *
@@ -321,7 +307,6 @@ system::~system() noexcept {
  *
  * Examples
  * ========
- *
  * ```
  * #include <vmm/kvm.hpp>
  *
