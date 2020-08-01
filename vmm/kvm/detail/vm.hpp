@@ -12,6 +12,7 @@ class vm {
     private:
         unsigned int fd_;
         unsigned int mmap_size_;
+        bool closed_;
 
         /**
          * Constructor reserved for system::vm().
@@ -22,10 +23,11 @@ class vm {
          * that calls this method.
          */
         vm(const unsigned int fd, const unsigned int mmap_size)
-            : fd_{fd}, mmap_size_{mmap_size} {}
+            : fd_{fd}, mmap_size_{mmap_size}, closed_{false} {}
         friend vm system::vm(unsigned int);
     public:
-        ~vm() noexcept { close(fd_); }
+        ~vm() noexcept;
+        auto close() -> void;
 
         auto check_extension(unsigned int cap) -> unsigned int;
         auto nr_vcpus() -> unsigned int;

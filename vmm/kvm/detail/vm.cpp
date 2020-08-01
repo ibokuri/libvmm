@@ -41,4 +41,40 @@ auto vm::nr_memslots() -> unsigned int {
     return ret > 0 ? ret : 32;
 }
 
+vm::~vm() noexcept {
+    if (!closed_) {
+        try {
+            utility::close(fd_);
+        }
+        catch (std::system_error& e) {
+            // TODO
+        }
+    }
+}
+
+/**
+ * Closes the VM handle.
+ *
+ * Use this if you'd like to handle possible failures of `utility::close()`.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * kvm::system kvm;
+ * kvm::vm vm {kvm.vm()};
+ *
+ * try {
+ *     vm.close();
+ * }
+ * catch (std::system_error)
+ *     throw;
+ * ```
+ */
+auto vm::close() -> void {
+    utility::close(fd_);
+    closed_ = true;
+}
+
 }  // namespace vmm::kvm::detail
