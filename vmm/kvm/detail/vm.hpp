@@ -17,15 +17,11 @@ class vm {
         bool closed_;
 
         /**
-         * Constructor reserved for system::vm().
-         *
-         * To prevent users from constructing VMs via arbitrary descriptors and
-         * to restrict VM construction to occur through existing kvm objects,
-         * system::vm() should be the only function that calls this method.
+         * Restricted constructor for kvm::system objects.
          */
-        vm(const unsigned int fd, const unsigned int mmap_size)
+        vm(const unsigned int fd, const unsigned int mmap_size) noexcept
             : fd_{fd}, mmap_size_{mmap_size}, closed_{false} {}
-        friend vm system::vm(unsigned int);
+        friend vm system::vm(unsigned int machine_type);
     public:
         ~vm() noexcept;
         auto close() -> void;
