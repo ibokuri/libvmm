@@ -45,7 +45,7 @@ TEST_CASE("KVM mmap and IPA size", "[api]") {
 
 TEST_CASE("Host-supported x86 cpuid features", "[api]") {
     kvm::system kvm;
-    auto cpuid = kvm.supported_cpuid();
+    auto cpuid {kvm.supported_cpuid()};
     auto size {std::distance(cpuid.begin(), cpuid.end())};
 
     REQUIRE(size != 0);
@@ -55,8 +55,8 @@ TEST_CASE("Host-supported x86 cpuid features", "[api]") {
 
 TEST_CASE("KVM-emulated x86 cpuid features", "[api]") {
     kvm::system kvm;
-    auto cpuid = kvm.emulated_cpuid();
-    auto size {std::distance(cpuid.begin(), cpuid.end())};
+    auto cpuid {kvm.emulated_cpuid()};
+    auto size  {std::distance(cpuid.begin(), cpuid.end())};
 
     REQUIRE(size != 0);
     REQUIRE(size == cpuid.nent());
@@ -65,14 +65,14 @@ TEST_CASE("KVM-emulated x86 cpuid features", "[api]") {
 
 TEST_CASE("Copying cpuid objects", "[api]") {
     kvm::system kvm;
-    auto cpuid1 = kvm.supported_cpuid();
+    auto cpuid1 {kvm.supported_cpuid()};
     auto cpuid2 {cpuid1};
-    auto cpuid3 = cpuid1;
+    auto cpuid3 {cpuid1};
 }
 
 TEST_CASE("MSR index list", "[api]") {
     kvm::system kvm;
-    auto msr_list = kvm.msr_index_list();
+    auto msr_list {kvm.msr_index_list()};
     auto size {std::distance(msr_list.begin(), msr_list.end())};
 
     REQUIRE(size > 1);
@@ -81,7 +81,7 @@ TEST_CASE("MSR index list", "[api]") {
 
 TEST_CASE("MSR feature list", "[api]") {
     kvm::system kvm;
-    auto msr_list = kvm.msr_feature_list();
+    auto msr_list {kvm.msr_feature_list()};
     auto size {std::distance(msr_list.begin(), msr_list.end())};
 
     REQUIRE(size > 1);
