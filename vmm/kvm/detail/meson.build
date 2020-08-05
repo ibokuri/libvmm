@@ -1,7 +1,7 @@
 kvm_internal_sources = files(
     'types.cpp',
     'system.cpp',
-    #'vcpu.cpp',
+    'vcpu.cpp',
     'vm.cpp',
 )
 

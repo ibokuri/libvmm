@@ -8,6 +8,8 @@
 
 namespace vmm::kvm::detail {
 
+class vcpu;
+
 class vm {
     private:
         unsigned int fd_;
@@ -29,6 +31,7 @@ class vm {
         auto close() -> void;
 
         void user_memory_region(kvm_userspace_memory_region region);
+        auto vcpu(uint8_t id) -> vmm::kvm::detail::vcpu;
         auto check_extension(unsigned int cap) -> unsigned int;
         auto nr_vcpus() -> unsigned int;
         auto max_vcpus() -> unsigned int;

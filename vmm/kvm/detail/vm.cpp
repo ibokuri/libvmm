@@ -3,6 +3,7 @@
  */
 
 #include "vmm/kvm/detail/vm.hpp"
+#include "vmm/kvm/detail/vcpu.hpp"
 #include "vmm/utility/utility.hpp"
 
 namespace vmm::kvm::detail {
@@ -65,6 +66,24 @@ auto vm::nr_memslots() -> unsigned int {
  */
 void vm::user_memory_region(kvm_userspace_memory_region region) {
     utility::ioctl(fd_, KVM_SET_USER_MEMORY_REGION, &region);
+}
+
+/* Adds a vcpu to a virtual machine.
+ *
+ * See documentation for `KVM_CREATE_VCPU`.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ * auto vcpu {vm.vcpu(0)};
+ * ```
+ */
+auto vm::vcpu(uint8_t id) -> vmm::kvm::detail::vcpu {
+    return vmm::kvm::detail::vcpu{utility::ioctl(fd_, KVM_CREATE_VCPU, id)};
 }
 
 vm::~vm() noexcept {
