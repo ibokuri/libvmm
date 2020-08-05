@@ -41,6 +41,32 @@ auto vm::nr_memslots() -> unsigned int {
     return ret > 0 ? ret : 32;
 }
 
+/* Creates, modifies, or deletes a guest physical memory slot.
+ *
+ * See documentation for `KVM_SET_USER_MEMORY_REGION`.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * vmm::kvm::vm vm {kvm.vm()};
+ * kvm_userspace_memory_region mem_region {
+ *     .slot = 0,
+ *     .flags = 0,
+ *     .guest_phys_addr = 0x10000,
+ *     .memory_size = 0x10000,
+ *     .userspace_addr = 0,
+ * };
+ *
+ * vm.user_memory_region(mem_region);
+ * ```
+ */
+void vm::user_memory_region(kvm_userspace_memory_region region) {
+    utility::ioctl(fd_, KVM_SET_USER_MEMORY_REGION, &region);
+}
+
 vm::~vm() noexcept {
     if (!closed_) {
         try {

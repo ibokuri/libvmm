@@ -29,6 +29,7 @@ class vm {
         ~vm() noexcept;
         auto close() -> void;
 
+        void user_memory_region(kvm_userspace_memory_region region);
         auto check_extension(unsigned int cap) -> unsigned int;
         auto nr_vcpus() -> unsigned int;
         auto max_vcpus() -> unsigned int;
