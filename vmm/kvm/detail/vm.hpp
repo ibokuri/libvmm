@@ -28,6 +28,8 @@ class vm {
 
         void user_memory_region(kvm_userspace_memory_region region);
         void irqchip(void);
+        void set_irqchip(kvm_irqchip *irqchip_p);
+        void get_irqchip(kvm_irqchip *irqchip_p);
         auto vcpu(uint8_t id) -> vmm::kvm::detail::vcpu;
 
         auto check_extension(unsigned int cap) -> unsigned int;

@@ -59,6 +59,63 @@ void vm::irqchip(void) {
 }
 
 /**
+ * Sets the state of a kernel interrupt controller from a buffer provided by
+ * the caller.
+ *
+ * See the documentation for `KVM_SET_IRQCHIP`.
+ *
+ * Architectures
+ * =============
+ * x86
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ * kvm_irqchip irqchip {
+ *     .chip_id = KVM_IRQCHIP_PIC_MASTER,
+ *     .chip.pic.irq_base = 99
+ * };
+ *
+ * vm.irqchip();
+ * vm.set_irqchip(&irqchip);
+ * ```
+ */
+void vm::set_irqchip(kvm_irqchip *irqchip_p) {
+    utility::ioctl(fd_, KVM_SET_IRQCHIP, irqchip_p);
+}
+
+/**
+ * Reads the state of a kernel interrupt controller into a buffer provided by
+ * the caller.
+ *
+ * See the documentation for `KVM_GET_IRQCHIP`.
+ *
+ * Architectures
+ * =============
+ * x86
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ * kvm_irqchip irqchip { .chip_id = KVM_IRQCHIP_PIC_MASTER };
+ *
+ * vm.irqchip();
+ * vm.get_irqchip(&irqchip);
+ * ```
+ */
+void vm::get_irqchip(kvm_irqchip *irqchip_p) {
+    utility::ioctl(fd_, KVM_GET_IRQCHIP, irqchip_p);
+}
+
+/**
  * Adds a vcpu to a virtual machine.
  *
  * See the documentation for KVM_CREATE_VCPU.
