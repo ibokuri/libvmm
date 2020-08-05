@@ -8,9 +8,10 @@
 
 namespace vmm::kvm::detail {
 
-/* Creates, modifies, or deletes a guest physical memory slot.
+/**
+ * Creates, modifies, or deletes a guest physical memory slot.
  *
- * See documentation for `KVM_SET_USER_MEMORY_REGION`.
+ * See the documentation for KVM_SET_USER_MEMORY_REGION.
  *
  * Examples
  * ========
@@ -34,9 +35,33 @@ void vm::user_memory_region(kvm_userspace_memory_region region) {
     utility::ioctl(fd_, KVM_SET_USER_MEMORY_REGION, &region);
 }
 
-/* Adds a vcpu to a virtual machine.
+/**
+ * Creates an interrupt controller model in the kernel
  *
- * See documentation for `KVM_CREATE_VCPU`.
+ * See the documentation for `KVM_CREATE_IRQCHIP`.
+ *
+ * Architectures
+ * =============
+ * x86, x86_64, arm, aarch64
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ * vm.irqchip();
+ * ```
+ */
+void vm::irqchip(void) {
+    utility::ioctl(fd_, KVM_CREATE_IRQCHIP);
+}
+
+/**
+ * Adds a vcpu to a virtual machine.
+ *
+ * See the documentation for KVM_CREATE_VCPU.
  *
  * Examples
  * ========
@@ -82,17 +107,17 @@ auto vm::check_extension(unsigned int cap) -> unsigned int {
     return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
 }
 
-auto vm::nr_vcpus() -> unsigned int {
+auto vm::nr_vcpus(void) -> unsigned int {
     auto ret {check_extension(KVM_CAP_NR_VCPUS)};
     return ret > 0 ? ret : 4;
 }
 
-auto vm::max_vcpus() -> unsigned int {
+auto vm::max_vcpus(void) -> unsigned int {
     auto ret {check_extension(KVM_CAP_MAX_VCPUS)};
     return ret > 0 ? ret : nr_vcpus();
 }
 
-auto vm::nr_memslots() -> unsigned int {
+auto vm::nr_memslots(void) -> unsigned int {
     auto ret {check_extension(KVM_CAP_NR_MEMSLOTS)};
     return ret > 0 ? ret : 32;
 }
@@ -117,7 +142,7 @@ auto vm::nr_memslots() -> unsigned int {
  *     throw;
  * ```
  */
-auto vm::close() -> void {
+auto vm::close(void) -> void {
     utility::close(fd_);
     closed_ = true;
 }

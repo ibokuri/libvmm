@@ -24,14 +24,16 @@ class vm {
         friend vm system::vm(unsigned int machine_type);
     public:
         ~vm() noexcept;
-        auto close() -> void;
+        auto close(void) -> void;
 
         void user_memory_region(kvm_userspace_memory_region region);
+        void irqchip(void);
         auto vcpu(uint8_t id) -> vmm::kvm::detail::vcpu;
+
         auto check_extension(unsigned int cap) -> unsigned int;
-        auto nr_vcpus() -> unsigned int;
-        auto max_vcpus() -> unsigned int;
-        auto nr_memslots() -> unsigned int;
+        auto nr_vcpus(void) -> unsigned int;
+        auto max_vcpus(void) -> unsigned int;
+        auto nr_memslots(void) -> unsigned int;
 };
 
 }  // namespace vmm:vm

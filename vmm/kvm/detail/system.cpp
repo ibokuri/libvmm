@@ -89,7 +89,7 @@ auto system::vcpu_mmap_size() -> unsigned int {
  *
  * Architectures
  * =============
- * AArch64.
+ * aarch64
  *
  * Examples
  * ========
