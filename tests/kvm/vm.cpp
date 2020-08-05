@@ -10,7 +10,7 @@ TEST_CASE("VM creation", "[api]") {
     kvm::vm vm {kvm.vm()};
 }
 
-TEST_CASE("VM vcpu and memory slots", "[api]") {
+TEST_CASE("vcpu and memory slots", "[api]") {
     kvm::system kvm;
     kvm::vm vm {kvm.vm()};
 
