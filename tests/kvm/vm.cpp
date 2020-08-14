@@ -49,7 +49,21 @@ TEST_CASE("IRQ Chip (x86)", "[api]") {
     };
 
     REQUIRE_NOTHROW(vm.set_irqchip(&irqchip1));
-    REQUIRE_NOTHROW(vm.get_irqchip(&irqchip2));
+    REQUIRE_NOTHROW(vm.irqchip(&irqchip2));
 
     REQUIRE(irqchip1.chip.pic.irq_base == irqchip2.chip.pic.irq_base);
+}
+
+TEST_CASE("Clock", "[api]") {
+    vmm::kvm::system kvm;
+    vmm::kvm::vm vm {kvm.vm()};
+    kvm_clock_data other { .clock = 10 };
+
+    REQUIRE_NOTHROW(vm.check_extension(KVM_CAP_ADJUST_CLOCK));
+
+    kvm_clock_data orig {vm.clock()};
+    vm.set_clock(&other);
+
+    REQUIRE(orig.clock > vm.clock().clock);
+    REQUIRE(vm.clock().clock > other.clock);
 }

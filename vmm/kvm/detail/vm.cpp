@@ -9,6 +9,25 @@
 namespace vmm::kvm::detail {
 
 /**
+ * Adds a vcpu to a virtual machine.
+ *
+ * See the documentation for KVM_CREATE_VCPU.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ * auto vcpu {vm.vcpu(0)};
+ * ```
+ */
+auto vm::vcpu(uint8_t id) -> vmm::kvm::detail::vcpu {
+    return vmm::kvm::detail::vcpu{utility::ioctl(fd_, KVM_CREATE_VCPU, id)};
+}
+
+/**
  * Creates, modifies, or deletes a guest physical memory slot.
  *
  * See the documentation for KVM_SET_USER_MEMORY_REGION.
@@ -59,6 +78,33 @@ void vm::irqchip(void) {
 }
 
 /**
+ * Reads the state of a kernel interrupt controller into a buffer provided by
+ * the caller.
+ *
+ * See the documentation for `KVM_GET_IRQCHIP`.
+ *
+ * Architectures
+ * =============
+ * x86
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ * kvm_irqchip irqchip { .chip_id = KVM_IRQCHIP_PIC_MASTER };
+ *
+ * vm.irqchip();
+ * vm.irqchip(&irqchip);
+ * ```
+ */
+void vm::irqchip(kvm_irqchip *irqchip_p) {
+    utility::ioctl(fd_, KVM_GET_IRQCHIP, irqchip_p);
+}
+
+/**
  * Sets the state of a kernel interrupt controller from a buffer provided by
  * the caller.
  *
@@ -89,10 +135,9 @@ void vm::set_irqchip(kvm_irqchip *irqchip_p) {
 }
 
 /**
- * Reads the state of a kernel interrupt controller into a buffer provided by
- * the caller.
+ * Gets the current timestamp of kvmclock as seen by the current guest.
  *
- * See the documentation for `KVM_GET_IRQCHIP`.
+ * See the documentation for `KVM_GET_CLOCK`.
  *
  * Architectures
  * =============
@@ -105,20 +150,23 @@ void vm::set_irqchip(kvm_irqchip *irqchip_p) {
  *
  * vmm::kvm::system kvm;
  * auto vm {kvm.vm()};
- * kvm_irqchip irqchip { .chip_id = KVM_IRQCHIP_PIC_MASTER };
- *
- * vm.irqchip();
- * vm.get_irqchip(&irqchip);
+ * auto clock {vm.clock(&clock)};
  * ```
  */
-void vm::get_irqchip(kvm_irqchip *irqchip_p) {
-    utility::ioctl(fd_, KVM_GET_IRQCHIP, irqchip_p);
+kvm_clock_data vm::clock(void) {
+    kvm_clock_data clock {0};
+    utility::ioctl(fd_, KVM_GET_CLOCK, &clock);
+    return clock;
 }
 
 /**
- * Adds a vcpu to a virtual machine.
+ * Sets the current timestamp of kvmclock.
  *
- * See the documentation for KVM_CREATE_VCPU.
+ * See the documentation for `KVM_SET_CLOCK`.
+ *
+ * Architectures
+ * =============
+ * x86
  *
  * Examples
  * ========
@@ -127,11 +175,13 @@ void vm::get_irqchip(kvm_irqchip *irqchip_p) {
  *
  * vmm::kvm::system kvm;
  * auto vm {kvm.vm()};
- * auto vcpu {vm.vcpu(0)};
+ * kvm_clock_data clock { .clock = 10 };
+ *
+ * vm.set_clock(&clock);
  * ```
  */
-auto vm::vcpu(uint8_t id) -> vmm::kvm::detail::vcpu {
-    return vmm::kvm::detail::vcpu{utility::ioctl(fd_, KVM_CREATE_VCPU, id)};
+void vm::set_clock(kvm_clock_data *clock) {
+    utility::ioctl(fd_, KVM_SET_CLOCK, clock);
 }
 
 vm::~vm() noexcept {

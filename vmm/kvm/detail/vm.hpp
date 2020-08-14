@@ -26,11 +26,14 @@ class vm {
         ~vm() noexcept;
         auto close(void) -> void;
 
+        auto vcpu(uint8_t id) -> vmm::kvm::detail::vcpu;
+
         void user_memory_region(kvm_userspace_memory_region region);
         void irqchip(void);
+        void irqchip(kvm_irqchip *irqchip_p);
         void set_irqchip(kvm_irqchip *irqchip_p);
-        void get_irqchip(kvm_irqchip *irqchip_p);
-        auto vcpu(uint8_t id) -> vmm::kvm::detail::vcpu;
+        kvm_clock_data clock(void);
+        void set_clock(kvm_clock_data *clock);
 
         auto check_extension(unsigned int cap) -> unsigned int;
         auto nr_vcpus(void) -> unsigned int;
