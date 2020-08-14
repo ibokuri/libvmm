@@ -63,7 +63,8 @@ TEST_CASE("Clock", "[api]") {
 
     kvm_clock_data orig {vm.clock()};
     vm.set_clock(&other);
+    kvm_clock_data newtime {vm.clock()};
 
-    REQUIRE(orig.clock > vm.clock().clock);
-    REQUIRE(vm.clock().clock > other.clock);
+    REQUIRE(orig.clock > newtime.clock);
+    REQUIRE(newtime.clock > other.clock);
 }
