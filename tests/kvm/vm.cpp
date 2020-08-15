@@ -37,7 +37,7 @@ TEST_CASE("IRQ Chip (x86)", "[api]") {
     vmm::kvm::system kvm;
     vmm::kvm::vm vm {kvm.vm()};
 
-    REQUIRE_NOTHROW(vm.check_extension(KVM_CAP_IRQCHIP));
+    REQUIRE(vm.check_extension(KVM_CAP_IRQCHIP) > 0);
     REQUIRE_NOTHROW(vm.irqchip());
 
     kvm_irqchip irqchip1 {
@@ -59,7 +59,7 @@ TEST_CASE("Clock", "[api]") {
     vmm::kvm::vm vm {kvm.vm()};
     kvm_clock_data other { .clock = 10 };
 
-    REQUIRE_NOTHROW(vm.check_extension(KVM_CAP_ADJUST_CLOCK));
+    REQUIRE(vm.check_extension(KVM_CAP_ADJUST_CLOCK) > 0);
 
     kvm_clock_data orig {vm.clock()};
     vm.set_clock(&other);
