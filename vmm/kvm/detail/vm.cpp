@@ -23,8 +23,8 @@ namespace vmm::kvm::detail {
  * auto vcpu {vm.vcpu(0)};
  * ```
  */
-auto vm::vcpu(uint8_t id) -> vmm::kvm::detail::vcpu {
-    return vmm::kvm::detail::vcpu{utility::ioctl(fd_, KVM_CREATE_VCPU, id)};
+auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
+    return vmm::kvm::detail::vcpu{utility::ioctl(fd_, KVM_CREATE_VCPU, vcpu_id)};
 }
 
 /**

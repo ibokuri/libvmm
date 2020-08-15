@@ -26,7 +26,8 @@ class vm {
         ~vm() noexcept;
         auto close(void) -> void;
 
-        auto vcpu(uint8_t id) -> vmm::kvm::detail::vcpu;
+        auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
+        void set_boot_cpuid(unsigned long vcpu_id);
 
         void user_memory_region(kvm_userspace_memory_region region);
         void irqchip(void);
