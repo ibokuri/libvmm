@@ -68,3 +68,14 @@ TEST_CASE("Clock", "[api]") {
     REQUIRE(orig.clock > newtime.clock);
     REQUIRE(newtime.clock > other.clock);
 }
+
+TEST_CASE("Bootstrap Processor (BSP)", "[api]") {
+    vmm::kvm::system kvm;
+    vmm::kvm::vm vm {kvm.vm()};
+
+    REQUIRE(vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0);
+
+    REQUIRE_NOTHROW(vm.set_boot_cpuid(0));
+    vm.vcpu(0);
+    REQUIRE_THROWS(vm.set_boot_cpuid(0));
+}

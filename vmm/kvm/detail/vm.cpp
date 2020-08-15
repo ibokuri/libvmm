@@ -28,6 +28,36 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
 }
 
 /**
+ * Defines which vcpu is the Bootstrap Processor (BSP).
+ *
+ * The KVM_SET_BOOT_CPU_ID ioctl must be called before any vcpus are created
+ * for a VM, otherwise the call will fail.
+ *
+ * See the documentation for KVM_SET_BOOT_CPU_ID.
+ *
+ * Architectures
+ * =============
+ * x86
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ *
+ * if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0)
+ *     throw;
+ *
+ * vm.set_boot_cpuid(0);
+ * ```
+ */
+void vm::set_boot_cpuid(unsigned long vcpu_id) {
+    utility::ioctl(fd_, KVM_SET_BOOT_CPU_ID, vcpu_id);
+}
+
+/**
  * Creates, modifies, or deletes a guest physical memory slot.
  *
  * See the documentation for KVM_SET_USER_MEMORY_REGION.
