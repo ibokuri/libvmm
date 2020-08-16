@@ -28,7 +28,7 @@ namespace vmm::kvm::detail {
 /**
  * Light wrapper around C FAM structs.
  */
-template<class Struct, class Buffer>
+template<typename Struct, typename Buffer>
 class FamStruct {
     protected:
         std::unique_ptr<Struct, void(*)(Struct*)> ptr_;
