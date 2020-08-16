@@ -35,7 +35,7 @@ uint32_t const* MsrIndexList::cend() const { return end(); }
 
 
 /**
- * Internal Msrs constructor.
+ * Internal MsrList constructor.
  *
  * Relevant structs:
  *
@@ -55,7 +55,7 @@ uint32_t const* MsrIndexList::cend() const { return end(); }
  *
  *     N * (sizeof(kvm_msr_entry) / sizeof(__u64)) + sizeof(__u64)
  */
-Msrs::Msrs(const size_t n) : FamStruct(n * 2 + 1) {
+MsrList::MsrList(const size_t n) : FamStruct(n * 2 + 1) {
     ptr_->nmsrs = n;
 }
 
@@ -69,17 +69,17 @@ Msrs::Msrs(const size_t n) : FamStruct(n * 2 + 1) {
  *
  * kvm::system kvm;
  * kvm_msr_entry entry{0x174};
- * kvm::Msrs msrs{entry};
+ * kvm::MsrList msrs{entry};
  * ```
  */
-Msrs::Msrs(kvm_msr_entry entry) : Msrs(1) {
+MsrList::MsrList(kvm_msr_entry entry) : MsrList(1) {
     ptr_->entries[0] = entry;
 }
 
 /**
  * Copy constructor.
  */
-Msrs::Msrs(const Msrs& other) : Msrs(other.begin(), other.end()) {}
+MsrList::MsrList(const MsrList& other) : MsrList(other.begin(), other.end()) {}
 
 /**
  * Copy/move assignment operator.
@@ -87,19 +87,19 @@ Msrs::Msrs(const Msrs& other) : Msrs(other.begin(), other.end()) {}
  * By taking `other` by value, the caller decides whether a
  * copy/move is done.
  */
-Msrs& Msrs::operator=(Msrs other) {
+MsrList& MsrList::operator=(MsrList other) {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
-uint32_t Msrs::nmsrs() const { return ptr_->nmsrs; }
+uint32_t MsrList::nmsrs() const { return ptr_->nmsrs; }
 
-kvm_msr_entry* Msrs::begin()              { return ptr_->entries; }
-kvm_msr_entry* Msrs::end()                { return ptr_->entries + ptr_->nmsrs; }
-kvm_msr_entry const* Msrs::begin()  const { return ptr_->entries; }
-kvm_msr_entry const* Msrs::end()    const { return ptr_->entries + ptr_->nmsrs; }
-kvm_msr_entry const* Msrs::cbegin() const { return begin(); }
-kvm_msr_entry const* Msrs::cend()   const { return end(); }
+kvm_msr_entry* MsrList::begin()              { return ptr_->entries; }
+kvm_msr_entry* MsrList::end()                { return ptr_->entries + ptr_->nmsrs; }
+kvm_msr_entry const* MsrList::begin()  const { return ptr_->entries; }
+kvm_msr_entry const* MsrList::end()    const { return ptr_->entries + ptr_->nmsrs; }
+kvm_msr_entry const* MsrList::cbegin() const { return begin(); }
+kvm_msr_entry const* MsrList::cend()   const { return end(); }
 
 
 /*
@@ -128,37 +128,37 @@ kvm_msr_entry const* Msrs::cend()   const { return end(); }
  *
  *     N * sizeof(kvm_cpuid_entry2) + 2 * sizeof(__u32)
  */
-Cpuid::Cpuid(const uint32_t n) : FamStruct(n * sizeof(kvm_cpuid_entry2) + 2) {
+CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(kvm_cpuid_entry2) + 2) {
     ptr_->nent = n;
 }
 
 /**
  * Constructor for a single cpuid entry.
  */
-Cpuid::Cpuid(kvm_cpuid_entry2 entry) : Cpuid(1) {
+CpuidList::CpuidList(kvm_cpuid_entry2 entry) : CpuidList(1) {
     ptr_->entries[0] = entry;
 }
 
 /*
  * Copy constructor.
  */
-Cpuid::Cpuid(const Cpuid& other) : Cpuid(other.begin(), other.end()) {}
+CpuidList::CpuidList(const CpuidList& other) : CpuidList(other.begin(), other.end()) {}
 
 /**
  * Copy/move assignment operator.
  */
-Cpuid& Cpuid::operator=(Cpuid other) {
+CpuidList& CpuidList::operator=(CpuidList other) {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
-uint32_t Cpuid::nent() const { return ptr_->nent; }
+uint32_t CpuidList::nent() const { return ptr_->nent; }
 
-kvm_cpuid_entry2* Cpuid::begin() { return ptr_->entries; }
-kvm_cpuid_entry2* Cpuid::end() { return ptr_->entries + ptr_->nent; }
-kvm_cpuid_entry2 const* Cpuid::begin() const { return ptr_->entries; }
-kvm_cpuid_entry2 const* Cpuid::end() const { return ptr_->entries + ptr_->nent; }
-kvm_cpuid_entry2 const* Cpuid::cbegin() const { return begin(); }
-kvm_cpuid_entry2 const* Cpuid::cend() const { return end(); }
+kvm_cpuid_entry2* CpuidList::begin() { return ptr_->entries; }
+kvm_cpuid_entry2* CpuidList::end() { return ptr_->entries + ptr_->nent; }
+kvm_cpuid_entry2 const* CpuidList::begin() const { return ptr_->entries; }
+kvm_cpuid_entry2 const* CpuidList::end() const { return ptr_->entries + ptr_->nent; }
+kvm_cpuid_entry2 const* CpuidList::cbegin() const { return begin(); }
+kvm_cpuid_entry2 const* CpuidList::cend() const { return end(); }
 
 } // namespace vmm::kvm::detail

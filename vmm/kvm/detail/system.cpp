@@ -122,16 +122,16 @@ auto system::host_ipa_limit() -> unsigned int {
  * #include <vmm/kvm.hpp>
  *
  * vmm::kvm::system kvm;
- * vmm::kvm::Cpuid cpuid {kvm.supported_cpuid()};
+ * vmm::kvm::CpuidList cpuids {kvm.supported_cpuids()};
  *
  * // Print CPU's manufacturer ID string
  * TODO
  * ```
  */
-auto system::supported_cpuid() -> Cpuid {
-    Cpuid cpuid;
-    utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuid.get());
-    return cpuid;
+auto system::supported_cpuids() -> CpuidList {
+    CpuidList CpuidList;
+    utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, CpuidList.get());
+    return CpuidList;
 }
 
 /**
@@ -146,14 +146,16 @@ auto system::supported_cpuid() -> Cpuid {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
+ * vmm::kvm::system kvm;
+ * vmm::kvm::CpuidList cpuids {kvm.emulated_cpuids()};
+ *
  * TODO
  * ```
  */
-auto system::emulated_cpuid() -> Cpuid {
-    Cpuid cpuid;
-    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, cpuid.get());
-    return cpuid;
+auto system::emulated_cpuids() -> CpuidList {
+    CpuidList CpuidList;
+    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, CpuidList.get());
+    return CpuidList;
 }
 
 /**
@@ -211,8 +213,8 @@ auto system::msr_feature_list() -> MsrFeatureList {
  *
  * kvm::system kvm;
  * kvm_msr_entry entry{0x174};
- * kvm::Msrs msrs{entry};
- * auto nmsrs {kvm.read_msrs(msrs)};
+ * kvm::MsrList msrs{entry};
+ * auto nmsrs {kvm.get_msrs(msrs)};
  * ```
  *
  * ```
@@ -228,11 +230,11 @@ auto system::msr_feature_list() -> MsrFeatureList {
  *     entries.push_back(entry);
  * }
  *
- * kvm::Msrs msrs{entries};
- * auto nmsrs {kvm.read_msrs(msrs)};
+ * kvm::MsrList msrs{entries};
+ * auto nmsrs {kvm.get_msrs(msrs)};
  * ```
  */
-auto system::read_msrs(Msrs& msrs) -> unsigned int {
+auto system::get_msrs(MsrList& msrs) -> unsigned int {
     return utility::ioctl(fd_, KVM_GET_MSRS, msrs.get());
 }
 

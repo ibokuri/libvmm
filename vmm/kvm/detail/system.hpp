@@ -85,16 +85,17 @@ class system {
 
         auto api_version() -> unsigned int;
         auto check_extension(unsigned int cap) -> unsigned int;
-        auto vcpu_mmap_size() -> unsigned int;
-        auto host_ipa_limit() -> unsigned int;
-        auto supported_cpuid() -> Cpuid;
-        auto emulated_cpuid() -> Cpuid;
-        auto msr_index_list() -> MsrIndexList;
-        auto msr_feature_list() -> MsrFeatureList;
-        auto msr_feature_index_list() -> MsrFeatureList;
-        auto read_msrs(Msrs& msrs) -> unsigned int;
+
         auto vm(unsigned int machine_type) -> vmm::kvm::detail::vm;
         auto vm() -> vmm::kvm::detail::vm;
+
+        auto vcpu_mmap_size() -> unsigned int;
+        auto host_ipa_limit() -> unsigned int;
+        auto supported_cpuids() -> CpuidList;
+        auto emulated_cpuids() -> CpuidList;
+        auto msr_index_list() -> MsrIndexList;
+        auto msr_feature_list() -> MsrFeatureList;
+        auto get_msrs(MsrList& msrs) -> unsigned int;
 };
 
 }  // namespace vmm::kvm::detail

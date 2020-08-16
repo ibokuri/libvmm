@@ -19,8 +19,8 @@ TEST_CASE("KVM object creation (via bad fd)", "[api]") {
     kvm::system kvm{999};
 
     REQUIRE_THROWS_WITH(kvm.vcpu_mmap_size(), "Bad file descriptor");
-    REQUIRE_THROWS_WITH(kvm.supported_cpuid(), "Bad file descriptor");
-    REQUIRE_THROWS_WITH(kvm.emulated_cpuid(), "Bad file descriptor");
+    REQUIRE_THROWS_WITH(kvm.supported_cpuids(), "Bad file descriptor");
+    REQUIRE_THROWS_WITH(kvm.emulated_cpuids(), "Bad file descriptor");
     REQUIRE_THROWS_WITH(kvm.msr_index_list(), "Bad file descriptor");
     REQUIRE_THROWS_WITH(kvm.msr_feature_list(), "Bad file descriptor");
     REQUIRE_THROWS_WITH(kvm.vm(), "Bad file descriptor");
@@ -45,29 +45,28 @@ TEST_CASE("KVM mmap and IPA size", "[api]") {
 
 TEST_CASE("Host-supported x86 cpuid features", "[api]") {
     kvm::system kvm;
-    auto cpuid {kvm.supported_cpuid()};
-    auto size {std::distance(cpuid.begin(), cpuid.end())};
+    auto cpuids {kvm.supported_cpuids()};
+    auto size {std::distance(cpuids.begin(), cpuids.end())};
 
     REQUIRE(size != 0);
-    REQUIRE(size == cpuid.nent());
+    REQUIRE(size == cpuids.nent());
     REQUIRE(size <= MAX_CPUID_ENTRIES);
 }
 
 TEST_CASE("KVM-emulated x86 cpuid features", "[api]") {
     kvm::system kvm;
-    auto cpuid {kvm.emulated_cpuid()};
-    auto size  {std::distance(cpuid.begin(), cpuid.end())};
+    auto cpuids {kvm.emulated_cpuids()};
+    auto size  {std::distance(cpuids.begin(), cpuids.end())};
 
     REQUIRE(size != 0);
-    REQUIRE(size == cpuid.nent());
+    REQUIRE(size == cpuids.nent());
     REQUIRE(size <= MAX_CPUID_ENTRIES);
 }
 
 TEST_CASE("Copying cpuid objects", "[api]") {
     kvm::system kvm;
-    auto cpuid1 {kvm.supported_cpuid()};
-    auto cpuid2 {cpuid1};
-    auto cpuid3 {cpuid1};
+    auto cpuids1 {kvm.supported_cpuids()};
+    auto cpuids2 {cpuids1};
 }
 
 TEST_CASE("MSR index list", "[api]") {

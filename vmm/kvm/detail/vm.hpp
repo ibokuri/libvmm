@@ -26,20 +26,19 @@ class vm {
         ~vm() noexcept;
         auto close(void) -> void;
 
-        auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
-        void set_boot_cpuid(unsigned long vcpu_id);
-
-        void user_memory_region(kvm_userspace_memory_region region);
-        void irqchip(void);
-        void irqchip(kvm_irqchip *irqchip_p);
-        void set_irqchip(kvm_irqchip *irqchip_p);
-        kvm_clock_data clock(void);
-        void set_clock(kvm_clock_data *clock);
-
         auto check_extension(unsigned int cap) -> unsigned int;
-        auto nr_vcpus(void) -> unsigned int;
+
+        auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
+        void set_bsp(unsigned long vcpu_id);
+        void memslot(kvm_userspace_memory_region region);
+        void irqchip(void);
+        void get_irqchip(kvm_irqchip *irqchip_p);
+        void set_irqchip(kvm_irqchip *irqchip_p);
+        auto get_clock(void) -> kvm_clock_data;
+        void set_clock(kvm_clock_data *clock);
+        auto num_vcpus(void) -> unsigned int;
         auto max_vcpus(void) -> unsigned int;
-        auto nr_memslots(void) -> unsigned int;
+        auto num_memslots(void) -> unsigned int;
 };
 
-}  // namespace vmm:vm
+}  // namespace vmm::kvm::detail

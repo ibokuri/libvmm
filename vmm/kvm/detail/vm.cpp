@@ -50,10 +50,10 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  * if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0)
  *     throw;
  *
- * vm.set_boot_cpuid(0);
+ * vm.set_bsp(0);
  * ```
  */
-void vm::set_boot_cpuid(unsigned long vcpu_id) {
+void vm::set_bsp(unsigned long vcpu_id) {
     utility::ioctl(fd_, KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
@@ -77,10 +77,10 @@ void vm::set_boot_cpuid(unsigned long vcpu_id) {
  *     .userspace_addr = 0,
  * };
  *
- * vm.user_memory_region(mem_region);
+ * vm.memslot(mem_region);
  * ```
  */
-void vm::user_memory_region(kvm_userspace_memory_region region) {
+void vm::memslot(kvm_userspace_memory_region region) {
     utility::ioctl(fd_, KVM_SET_USER_MEMORY_REGION, &region);
 }
 
@@ -127,10 +127,10 @@ void vm::irqchip(void) {
  * kvm_irqchip irqchip { .chip_id = KVM_IRQCHIP_PIC_MASTER };
  *
  * vm.irqchip();
- * vm.irqchip(&irqchip);
+ * vm.getirqchip(&irqchip);
  * ```
  */
-void vm::irqchip(kvm_irqchip *irqchip_p) {
+void vm::get_irqchip(kvm_irqchip *irqchip_p) {
     utility::ioctl(fd_, KVM_GET_IRQCHIP, irqchip_p);
 }
 
@@ -180,10 +180,10 @@ void vm::set_irqchip(kvm_irqchip *irqchip_p) {
  *
  * vmm::kvm::system kvm;
  * auto vm {kvm.vm()};
- * auto clock {vm.clock(&clock)};
+ * auto clock {vm.get_clock(&clock)};
  * ```
  */
-kvm_clock_data vm::clock(void) {
+auto vm::get_clock(void) -> kvm_clock_data {
     kvm_clock_data clock {0};
     utility::ioctl(fd_, KVM_GET_CLOCK, &clock);
     return clock;
@@ -244,17 +244,17 @@ auto vm::check_extension(unsigned int cap) -> unsigned int {
     return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
 }
 
-auto vm::nr_vcpus(void) -> unsigned int {
+auto vm::num_vcpus(void) -> unsigned int {
     auto ret {check_extension(KVM_CAP_NR_VCPUS)};
     return ret > 0 ? ret : 4;
 }
 
 auto vm::max_vcpus(void) -> unsigned int {
     auto ret {check_extension(KVM_CAP_MAX_VCPUS)};
-    return ret > 0 ? ret : nr_vcpus();
+    return ret > 0 ? ret : num_vcpus();
 }
 
-auto vm::nr_memslots(void) -> unsigned int {
+auto vm::num_memslots(void) -> unsigned int {
     auto ret {check_extension(KVM_CAP_NR_MEMSLOTS)};
     return ret > 0 ? ret : 32;
 }

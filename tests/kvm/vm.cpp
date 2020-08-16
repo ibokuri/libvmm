@@ -14,9 +14,9 @@ TEST_CASE("vcpu and memory slots", "[api]") {
     kvm::system kvm;
     kvm::vm vm {kvm.vm()};
 
-    REQUIRE(vm.nr_vcpus() >= 4);
-    REQUIRE(vm.max_vcpus() >= vm.nr_vcpus());
-    REQUIRE(vm.nr_memslots() >= 32);
+    REQUIRE(vm.num_vcpus() >= 4);
+    REQUIRE(vm.max_vcpus() >= vm.num_vcpus());
+    REQUIRE(vm.num_memslots() >= 32);
 }
 
 TEST_CASE("Invalid memory slot", "[api]") {
@@ -30,7 +30,7 @@ TEST_CASE("Invalid memory slot", "[api]") {
         .userspace_addr = 0,
     };
 
-    REQUIRE_THROWS(vm.user_memory_region(mem_region));
+    REQUIRE_THROWS(vm.memslot(mem_region));
 }
 
 TEST_CASE("IRQ Chip (x86)", "[api]") {
@@ -49,7 +49,7 @@ TEST_CASE("IRQ Chip (x86)", "[api]") {
     };
 
     REQUIRE_NOTHROW(vm.set_irqchip(&irqchip1));
-    REQUIRE_NOTHROW(vm.irqchip(&irqchip2));
+    REQUIRE_NOTHROW(vm.get_irqchip(&irqchip2));
 
     REQUIRE(irqchip1.chip.pic.irq_base == irqchip2.chip.pic.irq_base);
 }
@@ -61,9 +61,9 @@ TEST_CASE("Clock", "[api]") {
 
     REQUIRE(vm.check_extension(KVM_CAP_ADJUST_CLOCK) > 0);
 
-    kvm_clock_data orig {vm.clock()};
+    kvm_clock_data orig {vm.get_clock()};
     vm.set_clock(&other);
-    kvm_clock_data newtime {vm.clock()};
+    kvm_clock_data newtime {vm.get_clock()};
 
     REQUIRE(orig.clock > newtime.clock);
     REQUIRE(newtime.clock > other.clock);
@@ -75,7 +75,7 @@ TEST_CASE("Bootstrap Processor (BSP)", "[api]") {
 
     REQUIRE(vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0);
 
-    REQUIRE_NOTHROW(vm.set_boot_cpuid(0));
+    REQUIRE_NOTHROW(vm.set_bsp(0));
     vm.vcpu(0);
-    REQUIRE_THROWS(vm.set_boot_cpuid(0));
+    REQUIRE_THROWS(vm.set_bsp(0));
 }

@@ -61,11 +61,11 @@ class MsrFeatureList : public MsrIndexList {
         MsrFeatureList() : MsrIndexList(MAX_IO_MSRS_FEATURES) {}
 };
 
-class Msrs : public FamStruct<kvm_msrs, uint64_t> {
+class MsrList : public FamStruct<kvm_msrs, uint64_t> {
     private:
-        Msrs(const size_t n);
+        MsrList(const size_t n);
     public:
-        Msrs(kvm_msr_entry entry);
+        MsrList(kvm_msr_entry entry);
 
         /**
          * Range constructor.
@@ -84,11 +84,11 @@ class Msrs : public FamStruct<kvm_msrs, uint64_t> {
          *     entries.push_back(entry);
          * }
          *
-         * kvm::Msrs msrs{entries.begin(), entries.end()};
+         * kvm::MsrList msrs{entries.begin(), entries.end()};
          * ```
          */
         template <class Iterator>
-        Msrs(Iterator first, Iterator last) : Msrs(std::distance(first, last)) {
+        MsrList(Iterator first, Iterator last) : MsrList(std::distance(first, last)) {
             std::copy_if(first, last, ptr_->entries, [](kvm_msr_entry) { return true; });
         }
 
@@ -109,15 +109,15 @@ class Msrs : public FamStruct<kvm_msrs, uint64_t> {
          *     entries.push_back(entry);
          * }
          *
-         * kvm::Msrs msrs{entries};
+         * kvm::MsrList msrs{entries};
          * ```
          */
         template <class Container>
-        Msrs(Container& c) : Msrs(c.begin(), c.end()) { }
+        MsrList(Container& c) : MsrList(c.begin(), c.end()) { }
 
-        Msrs(const Msrs& other);
-        Msrs(Msrs&& other) = default;
-        Msrs& operator=(Msrs other);
+        MsrList(const MsrList& other);
+        MsrList(MsrList&& other) = default;
+        MsrList& operator=(MsrList other);
 
         uint32_t nmsrs() const;
 
@@ -129,12 +129,12 @@ class Msrs : public FamStruct<kvm_msrs, uint64_t> {
         kvm_msr_entry const* cend() const;
 };
 
-class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
+class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
     private:
-        Cpuid(const uint32_t n);
+        CpuidList(const uint32_t n);
     public:
-        Cpuid() : Cpuid(MAX_CPUID_ENTRIES) {}
-        Cpuid(kvm_cpuid_entry2 entry);
+        CpuidList() : CpuidList(MAX_CPUID_ENTRIES) {}
+        CpuidList(kvm_cpuid_entry2 entry);
 
         /**
          * Range constructor.
@@ -149,7 +149,7 @@ class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
          * ```
          */
         template <class Iterator>
-        Cpuid(Iterator first, Iterator last) : Cpuid(std::distance(first, last)) {
+        CpuidList(Iterator first, Iterator last) : CpuidList(std::distance(first, last)) {
             std::copy_if(first, last, ptr_->entries, [](kvm_cpuid_entry2) { return true; });
         }
 
@@ -166,11 +166,11 @@ class Cpuid : public FamStruct<kvm_cpuid2, uint32_t> {
          * ```
          */
         template <class Container>
-        Cpuid(Container& c) : Cpuid(c.begin(), c.end()) { }
+        CpuidList(Container& c) : CpuidList(c.begin(), c.end()) { }
 
-        Cpuid(const Cpuid& other);
-        Cpuid(Cpuid&& other) = default;
-        Cpuid& operator=(Cpuid other);
+        CpuidList(const CpuidList& other);
+        CpuidList(CpuidList&& other) = default;
+        CpuidList& operator=(CpuidList other);
 
         uint32_t nent() const;
 

@@ -12,7 +12,7 @@ using vcpu = vmm::kvm::detail::vcpu;
 /* types */
 using MsrIndexList = vmm::kvm::detail::MsrIndexList;
 using MsrFeatureList = vmm::kvm::detail::MsrFeatureList;
-using Msrs = vmm::kvm::detail::Msrs;
-using Cpuid = vmm::kvm::detail::Cpuid;
+using MsrList = vmm::kvm::detail::MsrList;
+using CpuidList = vmm::kvm::detail::CpuidList;
 
-}  // namespace vmm
+}  // namespace vmm::kvm
