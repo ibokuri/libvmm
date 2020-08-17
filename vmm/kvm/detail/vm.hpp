@@ -26,6 +26,7 @@ class vm : public KvmIoctl {
         auto device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device;
 
         // Control routines
+        auto check_extension(const unsigned int cap) -> unsigned int;
         auto set_bsp(unsigned long vcpu_id) -> void;
         auto memslot(kvm_userspace_memory_region region) -> void;
         auto irqchip(void) -> void;

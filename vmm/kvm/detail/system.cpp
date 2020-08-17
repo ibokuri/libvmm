@@ -31,6 +31,81 @@ auto system::api_version() -> unsigned int {
 }
 
 /**
+ * Returns a file descriptor associated with a newly created VM.
+ *
+ * This method should only be used indirectly by `system::vm()`.
+ */
+auto system::create_vm(unsigned int machine_type) -> unsigned int {
+    return utility::ioctl(fd_, KVM_CREATE_VM, machine_type);
+}
+
+/**
+ * Creates and returns a virtual machine (with a custom machine type).
+ *
+ * The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
+ * ioctl's result.
+ *
+ * By default, the physical address size for a VM (IPA Size limit) on AArch64
+ * is limited to 40-bits. However, this limit can be configured if the host
+ * supports the KVM_CAP_ARM_VM_IPA_SIZE extension. When supported, use
+ * KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+ * identifier, where IPA_Bits is the maximum width of any physical address used
+ * by the VM.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm(KVM_VM_TYPE_ARM_IPA_SIZE(48);
+ * ```
+ */
+auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
+    return vmm::kvm::detail::vm{create_vm(machine_type), vcpu_mmap_size()};
+}
+
+/**
+ * Creates a and returns a virtual machine.
+ *
+ * The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
+ * ioctl's result.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * ```
+ */
+auto system::vm() -> vmm::kvm::detail::vm {
+    return vm(0);
+}
+
+/**
+ * Returns a positive integer if a KVM extension is available; 0 otherwise.
+ *
+ * Based on their initialization, VMs may have different capabilities. Thus,
+ * `kvm::vm::check_extension()` is preferred when querying for most
+ * capabilities.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <cassert>
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * assert(kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
+ * ```
+ */
+auto system::check_extension(const unsigned int cap) -> unsigned int {
+    return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
+}
+
+/**
  * Returns the size of the memory region used by the KVM_RUN ioctl to
  * communicate CPU information to userspace.
  *
@@ -215,60 +290,6 @@ auto system::msr_feature_list() -> MsrFeatureList {
  */
 auto system::get_msrs(MsrList& msrs) -> unsigned int {
     return utility::ioctl(fd_, KVM_GET_MSRS, msrs.get());
-}
-
-/**
- * Returns a file descriptor associated with a newly created VM.
- *
- * This method should only be used indirectly by `system::vm()`.
- */
-auto system::create_vm(unsigned int machine_type) -> unsigned int {
-    return utility::ioctl(fd_, KVM_CREATE_VM, machine_type);
-}
-
-/**
- * Creates and returns a virtual machine (with a custom machine type).
- *
- * The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
- * ioctl's result.
- *
- * By default, the physical address size for a VM (IPA Size limit) on AArch64
- * is limited to 40-bits. However, this limit can be configured if the host
- * supports the KVM_CAP_ARM_VM_IPA_SIZE extension. When supported, use
- * KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
- * identifier, where IPA_Bits is the maximum width of any physical address used
- * by the VM.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto vm = kvm.vm(KVM_VM_TYPE_ARM_IPA_SIZE(48);
- * ```
- */
-auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
-    return vmm::kvm::detail::vm{create_vm(machine_type), vcpu_mmap_size()};
-}
-
-/**
- * Creates a and returns a virtual machine.
- *
- * The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
- * ioctl's result.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto vm = kvm.vm();
- * ```
- */
-auto system::vm() -> vmm::kvm::detail::vm {
-    return vm(0);
 }
 
 }  // namespace vmm::kvm::detail

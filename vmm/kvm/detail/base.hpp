@@ -1,3 +1,7 @@
+/*
+ * base.hpp - Base class for KVM ioctls
+ */
+
 #pragma once
 
 namespace vmm::kvm::detail {
@@ -12,14 +16,11 @@ class KvmIoctl {
     public:
         auto close() -> void;
 
-        // Copy/Move constructors
+        // Copy & move constructors
         KvmIoctl(const KvmIoctl& other) = delete;
         KvmIoctl(KvmIoctl&& other) = default;
         auto operator=(const KvmIoctl& other) -> KvmIoctl& = delete;
         auto operator=(KvmIoctl& other) -> KvmIoctl& = default;
-
-        // Control routines
-        auto check_extension(const unsigned int cap) -> unsigned int;
 };
 
 }  // namespace vmm::kvm::detail

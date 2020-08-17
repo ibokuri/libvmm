@@ -81,6 +81,7 @@ class system : public KvmIoctl {
         auto vm() -> vmm::kvm::detail::vm;
 
         // Control routines
+        auto check_extension(const unsigned int cap) -> unsigned int;
         auto vcpu_mmap_size() -> unsigned int;
         auto host_ipa_limit() -> unsigned int;
         auto supported_cpuids() -> CpuidList;
