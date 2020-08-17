@@ -4,6 +4,7 @@
 
 #include "vmm/kvm/detail/vm.hpp"
 #include "vmm/kvm/detail/vcpu.hpp"
+#include "vmm/kvm/detail/device.hpp"
 #include "vmm/utility/utility.hpp"
 
 namespace vmm::kvm::detail {
@@ -25,6 +26,30 @@ namespace vmm::kvm::detail {
  */
 auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
     return vmm::kvm::detail::vcpu{utility::ioctl(fd_, KVM_CREATE_VCPU, vcpu_id)};
+}
+
+/**
+ * Adds a device to a virtual machine.
+ *
+ * See the documentation for KVM_CREATE_DEVICE.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * vmm::kvm::system kvm;
+ * auto vm {kvm.vm()};
+ * auto device {vm.device(TODO)};
+ * ```
+ */
+auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device {
+    kvm_create_device dev {
+        .type = type,
+        .flags = flags
+    };
+    auto fd {utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev)};
+    return vmm::kvm::detail::device{fd, dev};
 }
 
 /**
@@ -214,17 +239,6 @@ void vm::set_clock(kvm_clock_data *clock) {
     utility::ioctl(fd_, KVM_SET_CLOCK, clock);
 }
 
-vm::~vm() noexcept {
-    if (!closed_) {
-        try {
-            utility::close(fd_);
-        }
-        catch (std::system_error& e) {
-            // TODO
-        }
-    }
-}
-
 /**
  * Returns a positive integer if a KVM extension is available; 0 otherwise.
  *
@@ -257,31 +271,6 @@ auto vm::max_vcpus(void) -> unsigned int {
 auto vm::num_memslots(void) -> unsigned int {
     auto ret {check_extension(KVM_CAP_NR_MEMSLOTS)};
     return ret > 0 ? ret : 32;
-}
-
-/**
- * Closes the VM handle.
- *
- * Use this if you'd like to handle possible failures of `utility::close()`.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * kvm::system kvm;
- * kvm::vm vm {kvm.vm()};
- *
- * try {
- *     vm.close();
- * }
- * catch (std::system_error)
- *     throw;
- * ```
- */
-auto vm::close(void) -> void {
-    utility::close(fd_);
-    closed_ = true;
 }
 
 }  // namespace vmm::kvm::detail

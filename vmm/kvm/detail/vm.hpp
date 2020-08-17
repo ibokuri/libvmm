@@ -5,30 +5,29 @@
 #pragma once
 
 #include "vmm/kvm/detail/system.hpp"
+#include "vmm/kvm/detail/base.hpp"
 
 namespace vmm::kvm::detail {
 
 class vcpu;
+class device;
 
-class vm {
+class vm : public KvmIoctl {
     private:
-        unsigned int fd_;
         unsigned int mmap_size_;
-        bool closed_;
 
         /**
          * Restricted constructor for kvm::system objects.
          */
         vm(const unsigned int fd, const unsigned int mmap_size) noexcept
-            : fd_{fd}, mmap_size_{mmap_size}, closed_{false} {}
+            : KvmIoctl(fd), mmap_size_{mmap_size} {}
         friend vm system::vm(unsigned int machine_type);
     public:
-        ~vm() noexcept;
-        auto close(void) -> void;
-
         auto check_extension(unsigned int cap) -> unsigned int;
 
         auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
+        auto device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device;
+
         void set_bsp(unsigned long vcpu_id);
         void memslot(kvm_userspace_memory_region region);
         void irqchip(void);

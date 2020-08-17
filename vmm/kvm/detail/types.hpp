@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "vmm/utility/utility.hpp"
+
 #include <algorithm>
 #include <memory>
 #include <linux/kvm.h>

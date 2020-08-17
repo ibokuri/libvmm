@@ -5,22 +5,17 @@
 #pragma once
 
 #include "vmm/kvm/detail/vm.hpp"
+#include "vmm/kvm/detail/base.hpp"
 
 namespace vmm::kvm::detail {
 
-class vcpu {
+class vcpu : public KvmIoctl {
     private:
-        unsigned int fd_;
-        bool closed_;
-
         /**
          * Restricted constructor for kvm::vm objects.
          */
-        vcpu(unsigned int fd) noexcept : fd_{fd}, closed_{false} {}
+        vcpu(const unsigned int fd) noexcept : KvmIoctl(fd) {}
         friend vcpu vm::vcpu(unsigned long vcpu_id);
-    public:
-        ~vcpu() noexcept;
-        auto close() -> void;
 };
 
 }  // namespace vmm::kvm::detail

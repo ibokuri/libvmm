@@ -292,39 +292,4 @@ auto system::vm() -> vmm::kvm::detail::vm {
     return vm(0);
 }
 
-system::~system() noexcept {
-    if (!closed_) {
-        try {
-            utility::close(fd_);
-        }
-        catch (std::system_error& e) {
-            // TODO
-        }
-    }
-}
-
-/**
- * Closes the KVM subsystem handle.
- *
- * Use this if you'd like to handle possible failures of `utility::close()`.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * kvm::system kvm;
- *
- * try {
- *     kvm.close();
- * }
- * catch (std::system_error)
- *     throw;
- * ```
- */
-auto system::close() -> void {
-    utility::close(fd_);
-    closed_ = true;
-}
-
 }  // namespace vmm::kvm::detail

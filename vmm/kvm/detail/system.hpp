@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/types.hpp"
 
 #include <filesystem>
 #include <memory>
-
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -16,14 +16,11 @@ namespace vmm::kvm::detail {
 
 class vm;
 
-class system {
+class system : public KvmIoctl {
     private:
-        unsigned int fd_;
-        bool closed_;
-
         auto create_vm(unsigned int machine_type) -> unsigned int;
     public:
-        system() : fd_{open()}, closed_{false} {}
+        system() : KvmIoctl(open()) {}
 
         /**
          * Constructs a kvm object from a file descriptor.
@@ -46,8 +43,7 @@ class system {
          * ========
          * See kvm::system::open().
          */
-        explicit system(unsigned int fd) noexcept : fd_{fd}, closed_{false} {};
-        ~system() noexcept;
+        explicit system(unsigned int fd) noexcept : KvmIoctl(fd) {};
 
         system(const system& other) = delete;
         system(system&& other) = default;
@@ -81,7 +77,6 @@ class system {
                 };
             return fd;
         }
-        auto close() -> void;
 
         auto api_version() -> unsigned int;
         auto check_extension(unsigned int cap) -> unsigned int;

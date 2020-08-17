@@ -1,6 +1,7 @@
 #pragma once
 
-#include "vmm/kvm/detail/kvm.hpp"
+#include "vmm/kvm/detail/vcpu.hpp"
+#include "vmm/kvm/detail/device.hpp"
 
 namespace vmm::kvm {
 
@@ -8,6 +9,7 @@ namespace vmm::kvm {
 using system = vmm::kvm::detail::system;
 using vm = vmm::kvm::detail::vm;
 using vcpu = vmm::kvm::detail::vcpu;
+using device = vmm::kvm::detail::device;
 
 /* types */
 using MsrIndexList = vmm::kvm::detail::MsrIndexList;
