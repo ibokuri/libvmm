@@ -29,10 +29,10 @@ class vm : public KvmIoctl {
         auto set_bsp(unsigned long vcpu_id) -> void;
         auto memslot(kvm_userspace_memory_region region) -> void;
         auto irqchip(void) -> void;
-        auto get_irqchip(kvm_irqchip *irqchip_p) -> void;
-        auto set_irqchip(kvm_irqchip *irqchip_p) -> void;
+        auto get_irqchip(kvm_irqchip &irqchip_p) -> void;
+        auto set_irqchip(kvm_irqchip &irqchip_p) -> void;
         auto get_clock(void) -> kvm_clock_data;
-        auto set_clock(kvm_clock_data *clock) -> void;
+        auto set_clock(kvm_clock_data &clock) -> void;
         auto num_vcpus(void) -> unsigned int;
         auto max_vcpus(void) -> unsigned int;
         auto num_memslots(void) -> unsigned int;

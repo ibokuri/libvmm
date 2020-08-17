@@ -152,8 +152,8 @@ auto vm::irqchip(void) -> void {
  * vm.getirqchip(&irqchip);
  * ```
  */
-auto vm::get_irqchip(kvm_irqchip *irqchip_p) -> void {
-    utility::ioctl(fd_, KVM_GET_IRQCHIP, irqchip_p);
+auto vm::get_irqchip(kvm_irqchip &irqchip_p) -> void {
+    utility::ioctl(fd_, KVM_GET_IRQCHIP, &irqchip_p);
 }
 
 /**
@@ -182,8 +182,8 @@ auto vm::get_irqchip(kvm_irqchip *irqchip_p) -> void {
  * vm.set_irqchip(&irqchip);
  * ```
  */
-auto vm::set_irqchip(kvm_irqchip *irqchip_p) -> void {
-    utility::ioctl(fd_, KVM_SET_IRQCHIP, irqchip_p);
+auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
+    utility::ioctl(fd_, KVM_SET_IRQCHIP, &irqchip_p);
 }
 
 /**
@@ -232,8 +232,8 @@ auto vm::get_clock(void) -> kvm_clock_data {
  * vm.set_clock(&clock);
  * ```
  */
-auto vm::set_clock(kvm_clock_data *clock) -> void {
-    utility::ioctl(fd_, KVM_SET_CLOCK, clock);
+auto vm::set_clock(kvm_clock_data &clock) -> void {
+    utility::ioctl(fd_, KVM_SET_CLOCK, &clock);
 }
 
 auto vm::num_vcpus(void) -> unsigned int {
