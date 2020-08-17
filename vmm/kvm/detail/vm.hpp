@@ -23,7 +23,7 @@ class vm : public KvmIoctl {
     public:
         // Creation routines
         auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
-        auto device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device;
+        auto device(const unsigned int type, const unsigned int flags=0) -> vmm::kvm::detail::device;
 
         // Control routines
         auto check_extension(const unsigned int cap) -> unsigned int;

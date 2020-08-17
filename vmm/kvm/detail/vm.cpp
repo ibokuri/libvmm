@@ -40,12 +40,12 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  *
  * auto kvm = vmm::kvm::system{};
  * auto vm = kvm.vm();
- * auto device = vm.device(TODO);
+ * auto device = vm.device(KVM_DEV_TYPE_VFIO);
  * ```
  */
 auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device {
-    auto dev = kvm_create_device{ .type = type, .flags = flags };
-    auto fd = utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev);
+    auto dev = kvm_create_device{ .type = type, .fd = 0, .flags = flags };
+    const auto fd = utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev);
     return vmm::kvm::detail::device{fd, dev};
 }
 
