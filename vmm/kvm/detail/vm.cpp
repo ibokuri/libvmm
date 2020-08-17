@@ -19,9 +19,9 @@ namespace vmm::kvm::detail {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
- * auto vcpu {vm.vcpu(0)};
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * auto vcpu = vm.vcpu(0);
  * ```
  */
 auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
@@ -38,9 +38,9 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
- * auto device {vm.device(TODO)};
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * auto device = vm.device(TODO);
  * ```
  */
 auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device {
@@ -66,8 +66,8 @@ auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
  *
  * if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0)
  *     throw;
@@ -89,9 +89,9 @@ auto vm::set_bsp(unsigned long vcpu_id) -> void {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * vmm::kvm::vm vm {kvm.vm()};
- * kvm_userspace_memory_region mem_region {
+ * auto kvm = vmm::kvm::system{};
+ * vmm::kvm::vm vm = kvm.vm();
+ * auto mem_region = kvm_userspace_memory_region{
  *     .slot = 0,
  *     .flags = 0,
  *     .guest_phys_addr = 0x10000,
@@ -120,8 +120,8 @@ auto vm::memslot(kvm_userspace_memory_region region) -> void {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
  * vm.irqchip();
  * ```
  */
@@ -144,9 +144,9 @@ auto vm::irqchip(void) -> void {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
- * kvm_irqchip irqchip { .chip_id = KVM_IRQCHIP_PIC_MASTER };
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * auto irqchip = kvm_irqchip{ .chip_id = KVM_IRQCHIP_PIC_MASTER };
  *
  * vm.irqchip();
  * vm.getirqchip(&irqchip);
@@ -171,9 +171,9 @@ auto vm::get_irqchip(kvm_irqchip *irqchip_p) -> void {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
- * kvm_irqchip irqchip {
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * auto irqchip = kvm_irqchip{
  *     .chip_id = KVM_IRQCHIP_PIC_MASTER,
  *     .chip.pic.irq_base = 99
  * };
@@ -200,9 +200,9 @@ auto vm::set_irqchip(kvm_irqchip *irqchip_p) -> void {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
- * auto clock {vm.get_clock(&clock)};
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * auto clock = vm.get_clock(&clock);
  * ```
  */
 auto vm::get_clock(void) -> kvm_clock_data {
@@ -225,9 +225,9 @@ auto vm::get_clock(void) -> kvm_clock_data {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * auto vm {kvm.vm()};
- * kvm_clock_data clock { .clock = 10 };
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * auto clock = kvm_clock_data{ .clock = 10 };
  *
  * vm.set_clock(&clock);
  * ```

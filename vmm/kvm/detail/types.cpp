@@ -66,9 +66,9 @@ MsrList::MsrList(const size_t n) : FamStruct(n * 2 + 1) {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * kvm_msr_entry entry{0x174};
- * kvm::MsrList msrs{entry};
+ * auto kvm = vmm::kvm::system{};
+ * auto entry = kvm_msr_entry{0x174};
+ * auto msrs = vmm::kvm::MsrList{entry};
  * ```
  */
 MsrList::MsrList(kvm_msr_entry entry) : MsrList(1) {

@@ -22,7 +22,7 @@ namespace vmm::kvm::detail {
  * #include <cassert>
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
+ * auto kvm = vmm::kvm::system{};
  * assert(kvm.api_version() == KVM_API_VERSION))
  * ```
  */
@@ -50,8 +50,8 @@ auto system::api_version() -> unsigned int {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * auto mmap_size {kvm.vcpu_mmap_size()};
+ * auto kvm = vmm::kvm::system{};
+ * auto mmap_size = kvm.vcpu_mmap_size();
  * ```
  */
 auto system::vcpu_mmap_size() -> unsigned int {
@@ -75,7 +75,7 @@ auto system::vcpu_mmap_size() -> unsigned int {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
+ * auto kvm = vmm::kvm::system{}};
  * auto ipa_size {kvm.host_ipa_limit()};
  * ```
  */
@@ -100,17 +100,17 @@ auto system::host_ipa_limit() -> unsigned int {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * vmm::kvm::CpuidList cpuids {kvm.supported_cpuids()};
+ * auto kvm = vmm::kvm::system{};
+ * auto cpuids = kvm.supported_cpuids();
  *
  * // Print CPU's manufacturer ID string
  * TODO
  * ```
  */
 auto system::supported_cpuids() -> CpuidList {
-    CpuidList CpuidList;
-    utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, CpuidList.get());
-    return CpuidList;
+    auto cpuids = CpuidList{};
+    utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuids.get());
+    return cpuids;
 }
 
 /**
@@ -125,16 +125,16 @@ auto system::supported_cpuids() -> CpuidList {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * vmm::kvm::system kvm;
- * vmm::kvm::CpuidList cpuids {kvm.emulated_cpuids()};
+ * auto kvm = vmm::kvm::system{};
+ * auto cpuids = kvm.emulated_cpuids();
  *
  * TODO
  * ```
  */
 auto system::emulated_cpuids() -> CpuidList {
-    CpuidList CpuidList;
-    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, CpuidList.get());
-    return CpuidList;
+    auto cpuids = CpuidList{};
+    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, cpuids.get());
+    return cpuids;
 }
 
 /**
@@ -145,14 +145,14 @@ auto system::emulated_cpuids() -> CpuidList {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * kvm::MsrIndexList msr_list {kvm.msr_index_list()};
+ * auto kvm = vmm::kvm::system{};
+ * auto msr_list = kvm.msr_index_list();
  *
  * TODO
  * ```
  */
 auto system::msr_index_list() -> MsrIndexList {
-    MsrIndexList msr_list;
+    auto msr_list = MsrIndexList{};
     utility::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msr_list.get());
     return msr_list;
 }
@@ -169,14 +169,14 @@ auto system::msr_index_list() -> MsrIndexList {
  * #include <iostream>
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
+ * auto kvm = vmm::kvm::system{};
+ * auto msr_list = kvm.msr_feature_list();
  *
  * TODO
  * ```
  */
 auto system::msr_feature_list() -> MsrFeatureList {
-    MsrFeatureList msr_list;
+    auto msr_list = MsrFeatureList{};
     utility::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_list.get());
     return msr_list;
 }
@@ -190,27 +190,27 @@ auto system::msr_feature_list() -> MsrFeatureList {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * kvm_msr_entry entry{0x174};
- * kvm::MsrList msrs{entry};
- * auto nmsrs {kvm.get_msrs(msrs)};
+ * auto kvm = vmm::kvm::system{};
+ * auto entry = kvm_msr_entry{0x174};
+ * auto msrs = vmm::kvm::MsrList{entry};
+ * auto nmsrs = kvm.get_msrs(msrs);
  * ```
  *
  * ```
  * #include <vector>
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
- * std::vector<kvm_msr_entry> entries;
+ * auto kvm = vmm::kvm::system{};
+ * auto msr_list = kvm.msr_feature_list();
+ * auto entries = std::vector<kvm_msr_entry>{};
  *
  * for (auto msr : msr_list) {
- *     kvm_msr_entry entry{msr};
+ *     auto entry = kvm_msr_entry{msr};
  *     entries.push_back(entry);
  * }
  *
- * kvm::MsrList msrs{entries};
- * auto nmsrs {kvm.get_msrs(msrs)};
+ * auto msrs = vmm::kvm::MsrList{entries};
+ * auto nmsrs = kvm.get_msrs(msrs);
  * ```
  */
 auto system::get_msrs(MsrList& msrs) -> unsigned int {
@@ -244,8 +244,8 @@ auto system::create_vm(unsigned int machine_type) -> unsigned int {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * kvm::vm {kvm.vm(KVM_VM_TYPE_ARM_IPA_SIZE(48)};
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm(KVM_VM_TYPE_ARM_IPA_SIZE(48);
  * ```
  */
 auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
@@ -263,8 +263,8 @@ auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
  * ```
  * #include <vmm/kvm.hpp>
  *
- * kvm::system kvm;
- * kvm::vm {kvm.vm()};
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
  * ```
  */
 auto system::vm() -> vmm::kvm::detail::vm {

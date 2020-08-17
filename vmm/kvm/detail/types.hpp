@@ -76,16 +76,16 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
          * ```
          * #include <vmm/kvm.hpp>
          *
-         * kvm::system kvm;
-         * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
-         * std::vector<kvm_msr_entry> entries;
+         * auto kvm = vmm::kvm::system{};
+         * auto msr_list = kvm.msr_feature_list();
+         * auto entries = std::vector<kvm_msr_entry>{};
          *
          * for (auto msr : msr_list) {
-         *     kvm_msr_entry entry{msr};
+         *     auto entry = kvm_msr_entry{msr};
          *     entries.push_back(entry);
          * }
          *
-         * kvm::MsrList msrs{entries.begin(), entries.end()};
+         * auto msrs = kvm::MsrList{entries.begin(), entries.end()};
          * ```
          */
         template <class Iterator>
@@ -101,16 +101,16 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
          * ```
          * #include <vmm/kvm.hpp>
          *
-         * kvm::system kvm;
-         * kvm::MsrFeatureList msr_list {kvm.msr_feature_list()};
-         * std::vector<kvm_msr_entry> entries;
+         * auto kvm = vmm::kvm::system{};
+         * auto msr_list = kvm.msr_feature_list();
+         * auto entries = std::vector<kvm_msr_entry>{};
          *
          * for (auto msr : msr_list) {
-         *     kvm_msr_entry entry{msr};
+         *     auto entry = kvm_msr_entry{msr};
          *     entries.push_back(entry);
          * }
          *
-         * kvm::MsrList msrs{entries};
+         * auto msrs = kvm::MsrList{entries};
          * ```
          */
         template <class Container>
@@ -145,7 +145,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
          * ```
          * #include <vmm/kvm.hpp>
          *
-         * kvm::system kvm;
+         * auto kvm = vmm::kvm::system{};
          * TODO
          * ```
          */
@@ -162,7 +162,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
          * ```
          * #include <vmm/kvm.hpp>
          *
-         * kvm::system kvm;
+         * auto kvm = vmm::kvm::system{};
          * TODO
          * ```
          */

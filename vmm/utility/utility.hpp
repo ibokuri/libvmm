@@ -20,16 +20,13 @@ namespace vmm::utility {
  * ========
  * ```
  * #include <vmm/utility.hpp>
- *
  * #include <fcntl.h>
  * #include <linux/kvm.h>
  * #include <sys/stat.h>
  *
- * using ioctl = vmm::utility::ioctl;
- *
- * auto kvm_fd    {open("/dev/kvm", O_RDWR | O_CLOEXEC)};
- * auto version   {ioctl(kvm_fd, KVM_GET_API_VERSION)};
- * auto supported {ioctl(kvm_fd, KVM_CHECK_EXTENSION, KVM_CAP_USER_MEMORY)};
+ * auto fd = open("/dev/kvm", O_RDWR | O_CLOEXEC);
+ * auto version = vmm::utility::ioctl(fd, KVM_GET_API_VERSION);
+ * auto supported = vmm::utility::ioctl(fd, KVM_CHECK_EXTENSION, KVM_CAP_USER_MEMORY);
  * ```
  */
 template<typename T=int>

@@ -13,7 +13,7 @@ namespace vmm::utility {
  * ```
  * #include <vmm/utility.hpp>
  *
- * int kvm_fd {open("/dev/kvm", O_RDWR | O_CLOEXEC)};
+ * auto fd = open("/dev/kvm", O_RDWR | O_CLOEXEC);
  *
  * ...
  *

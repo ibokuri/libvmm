@@ -58,8 +58,8 @@ class system : public KvmIoctl {
          * ```
          * #include <vmm/kvm.hpp>
          *
-         * auto fd {kvm::system::open(false)};
-         * kvm::system kvm{fd};
+         * auto fd = vmm::kvm::system::open(false);
+         * auto kvm = vmm::kvm::system{fd};
          * ```
          */
         static auto open(const bool cloexec=true) -> unsigned int {
