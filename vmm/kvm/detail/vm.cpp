@@ -44,8 +44,8 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  * ```
  */
 auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device {
-    auto dev {kvm_create_device{ .type = type, .flags = flags }};
-    auto fd {utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev)};
+    auto dev = kvm_create_device{ .type = type, .flags = flags };
+    auto fd = utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev);
     return vmm::kvm::detail::device{fd, dev};
 }
 
@@ -228,7 +228,7 @@ auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
  * ```
  */
 auto vm::get_clock(void) -> kvm_clock_data {
-    kvm_clock_data clock {0};
+    auto clock = kvm_clock_data{0};
     utility::ioctl(fd_, KVM_GET_CLOCK, &clock);
     return clock;
 }
@@ -259,17 +259,17 @@ auto vm::set_clock(kvm_clock_data &clock) -> void {
 }
 
 auto vm::num_vcpus(void) -> unsigned int {
-    auto ret {check_extension(KVM_CAP_NR_VCPUS)};
+    auto ret = check_extension(KVM_CAP_NR_VCPUS);
     return ret > 0 ? ret : 4;
 }
 
 auto vm::max_vcpus(void) -> unsigned int {
-    auto ret {check_extension(KVM_CAP_MAX_VCPUS)};
+    auto ret = check_extension(KVM_CAP_MAX_VCPUS);
     return ret > 0 ? ret : num_vcpus();
 }
 
 auto vm::num_memslots(void) -> unsigned int {
-    auto ret {check_extension(KVM_CAP_NR_MEMSLOTS)};
+    auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
     return ret > 0 ? ret : 32;
 }
 
