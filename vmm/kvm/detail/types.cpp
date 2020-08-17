@@ -24,15 +24,14 @@ MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) {
     ptr_->nmsrs = n;
 }
 
-uint32_t MsrIndexList::nmsrs() const { return ptr_->nmsrs; }
+auto MsrIndexList::nmsrs() const -> unsigned int { return ptr_->nmsrs; }
 
-uint32_t* MsrIndexList::begin() { return ptr_->indices; }
-uint32_t* MsrIndexList::end() { return ptr_->indices + ptr_->nmsrs; }
-uint32_t const* MsrIndexList::begin() const { return ptr_->indices; }
-uint32_t const* MsrIndexList::end() const { return ptr_->indices + ptr_->nmsrs; }
-uint32_t const* MsrIndexList::cbegin() const { return begin(); }
-uint32_t const* MsrIndexList::cend() const { return end(); }
-
+auto MsrIndexList::begin() -> uint32_t* { return ptr_->indices; }
+auto MsrIndexList::end() -> uint32_t* { return ptr_->indices + ptr_->nmsrs; }
+auto MsrIndexList::begin() const -> uint32_t const* { return ptr_->indices; }
+auto MsrIndexList::end() const -> uint32_t const* { return ptr_->indices + ptr_->nmsrs; }
+auto MsrIndexList::cbegin() const -> uint32_t const* { return begin(); }
+auto MsrIndexList::cend() const -> uint32_t const* { return end(); }
 
 /**
  * Internal MsrList constructor.
@@ -87,19 +86,19 @@ MsrList::MsrList(const MsrList& other) : MsrList(other.begin(), other.end()) {}
  * By taking `other` by value, the caller decides whether a
  * copy/move is done.
  */
-MsrList& MsrList::operator=(MsrList other) {
+auto MsrList::operator=(MsrList other) -> MsrList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
-uint32_t MsrList::nmsrs() const { return ptr_->nmsrs; }
+auto MsrList::nmsrs() const -> uint32_t { return ptr_->nmsrs; }
 
-kvm_msr_entry* MsrList::begin()              { return ptr_->entries; }
-kvm_msr_entry* MsrList::end()                { return ptr_->entries + ptr_->nmsrs; }
-kvm_msr_entry const* MsrList::begin()  const { return ptr_->entries; }
-kvm_msr_entry const* MsrList::end()    const { return ptr_->entries + ptr_->nmsrs; }
-kvm_msr_entry const* MsrList::cbegin() const { return begin(); }
-kvm_msr_entry const* MsrList::cend()   const { return end(); }
+auto MsrList::begin() -> kvm_msr_entry* { return ptr_->entries; }
+auto MsrList::end() -> kvm_msr_entry* { return ptr_->entries + ptr_->nmsrs; }
+auto MsrList::begin() const -> kvm_msr_entry const* { return ptr_->entries; }
+auto MsrList::end() const -> kvm_msr_entry const* { return ptr_->entries + ptr_->nmsrs; }
+auto MsrList::cbegin() const-> kvm_msr_entry const* { return begin(); }
+auto MsrList::cend() const -> kvm_msr_entry const* { return end(); }
 
 
 /*
@@ -147,18 +146,18 @@ CpuidList::CpuidList(const CpuidList& other) : CpuidList(other.begin(), other.en
 /**
  * Copy/move assignment operator.
  */
-CpuidList& CpuidList::operator=(CpuidList other) {
+auto CpuidList::operator=(CpuidList other) -> CpuidList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
-uint32_t CpuidList::nent() const { return ptr_->nent; }
+auto CpuidList::nent() const -> uint32_t { return ptr_->nent; }
 
-kvm_cpuid_entry2* CpuidList::begin() { return ptr_->entries; }
-kvm_cpuid_entry2* CpuidList::end() { return ptr_->entries + ptr_->nent; }
-kvm_cpuid_entry2 const* CpuidList::begin() const { return ptr_->entries; }
-kvm_cpuid_entry2 const* CpuidList::end() const { return ptr_->entries + ptr_->nent; }
-kvm_cpuid_entry2 const* CpuidList::cbegin() const { return begin(); }
-kvm_cpuid_entry2 const* CpuidList::cend() const { return end(); }
+auto CpuidList::begin() -> kvm_cpuid_entry2* { return ptr_->entries; }
+auto CpuidList::end() -> kvm_cpuid_entry2* { return ptr_->entries + ptr_->nent; }
+auto CpuidList::begin() const -> kvm_cpuid_entry2 const* { return ptr_->entries; }
+auto CpuidList::end() const -> kvm_cpuid_entry2 const* { return ptr_->entries + ptr_->nent; }
+auto CpuidList::cbegin() const-> kvm_cpuid_entry2 const* { return begin(); }
+auto CpuidList::cend() const -> kvm_cpuid_entry2 const* { return end(); }
 
 } // namespace vmm::kvm::detail

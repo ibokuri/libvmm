@@ -15,8 +15,8 @@ class KvmIoctl {
         // Copy/Move constructors
         KvmIoctl(const KvmIoctl& other) = delete;
         KvmIoctl(KvmIoctl&& other) = default;
-        KvmIoctl& operator=(const KvmIoctl& other) = delete;
-        KvmIoctl& operator=(KvmIoctl& other) = default;
+        auto operator=(const KvmIoctl& other) -> KvmIoctl& = delete;
+        auto operator=(KvmIoctl& other) -> KvmIoctl& = default;
 
         // Control routines
         auto check_extension(const unsigned int cap) -> unsigned int;

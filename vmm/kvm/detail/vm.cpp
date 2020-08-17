@@ -44,10 +44,7 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  * ```
  */
 auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device {
-    kvm_create_device dev {
-        .type = type,
-        .flags = flags
-    };
+    auto dev {kvm_create_device{ .type = type, .flags = flags }};
     auto fd {utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev)};
     return vmm::kvm::detail::device{fd, dev};
 }
@@ -78,7 +75,7 @@ auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::
  * vm.set_bsp(0);
  * ```
  */
-void vm::set_bsp(unsigned long vcpu_id) {
+auto vm::set_bsp(unsigned long vcpu_id) -> void {
     utility::ioctl(fd_, KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
@@ -105,7 +102,7 @@ void vm::set_bsp(unsigned long vcpu_id) {
  * vm.memslot(mem_region);
  * ```
  */
-void vm::memslot(kvm_userspace_memory_region region) {
+auto vm::memslot(kvm_userspace_memory_region region) -> void {
     utility::ioctl(fd_, KVM_SET_USER_MEMORY_REGION, &region);
 }
 
@@ -128,7 +125,7 @@ void vm::memslot(kvm_userspace_memory_region region) {
  * vm.irqchip();
  * ```
  */
-void vm::irqchip(void) {
+auto vm::irqchip(void) -> void {
     utility::ioctl(fd_, KVM_CREATE_IRQCHIP);
 }
 
@@ -155,7 +152,7 @@ void vm::irqchip(void) {
  * vm.getirqchip(&irqchip);
  * ```
  */
-void vm::get_irqchip(kvm_irqchip *irqchip_p) {
+auto vm::get_irqchip(kvm_irqchip *irqchip_p) -> void {
     utility::ioctl(fd_, KVM_GET_IRQCHIP, irqchip_p);
 }
 
@@ -185,7 +182,7 @@ void vm::get_irqchip(kvm_irqchip *irqchip_p) {
  * vm.set_irqchip(&irqchip);
  * ```
  */
-void vm::set_irqchip(kvm_irqchip *irqchip_p) {
+auto vm::set_irqchip(kvm_irqchip *irqchip_p) -> void {
     utility::ioctl(fd_, KVM_SET_IRQCHIP, irqchip_p);
 }
 

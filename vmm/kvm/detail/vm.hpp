@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "vmm/kvm/detail/system.hpp"
 #include "vmm/kvm/detail/base.hpp"
+#include "vmm/kvm/detail/system.hpp"
 
 namespace vmm::kvm::detail {
 
@@ -16,9 +16,7 @@ class vm : public KvmIoctl {
     private:
         unsigned int mmap_size_;
 
-        /**
-         * Restricted constructor for kvm::system objects.
-         */
+        // Restricted constructor for kvm::system objects.
         vm(const unsigned int fd, const unsigned int mmap_size) noexcept
             : KvmIoctl(fd), mmap_size_{mmap_size} {}
         friend vm system::vm(unsigned int machine_type);
@@ -27,13 +25,14 @@ class vm : public KvmIoctl {
         auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
         auto device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device;
 
-        void set_bsp(unsigned long vcpu_id);
-        void memslot(kvm_userspace_memory_region region);
-        void irqchip(void);
-        void get_irqchip(kvm_irqchip *irqchip_p);
-        void set_irqchip(kvm_irqchip *irqchip_p);
+        // Control routines
+        auto set_bsp(unsigned long vcpu_id) -> void;
+        auto memslot(kvm_userspace_memory_region region) -> void;
+        auto irqchip(void) -> void;
+        auto get_irqchip(kvm_irqchip *irqchip_p) -> void;
+        auto set_irqchip(kvm_irqchip *irqchip_p) -> void;
         auto get_clock(void) -> kvm_clock_data;
-        void set_clock(kvm_clock_data *clock);
+        auto set_clock(kvm_clock_data *clock) -> void;
         auto num_vcpus(void) -> unsigned int;
         auto max_vcpus(void) -> unsigned int;
         auto num_memslots(void) -> unsigned int;

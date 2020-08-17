@@ -39,7 +39,7 @@ class FamStruct {
             : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
                    [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
     public:
-        Struct* get() { return ptr_.get(); }
+        auto get() -> Struct* { return ptr_.get(); }
 };
 
 class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
@@ -48,14 +48,13 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
     public:
         MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
 
-        uint32_t nmsrs() const;
-
-        uint32_t* begin();
-        uint32_t* end();
-        uint32_t const* begin() const;
-        uint32_t const* end() const;
-        uint32_t const* cbegin() const;
-        uint32_t const* cend() const;
+        auto nmsrs() const -> uint32_t;
+        auto begin() -> uint32_t*;
+        auto end() -> uint32_t*;
+        auto begin() const -> uint32_t const*;
+        auto end() const -> uint32_t const*;
+        auto cbegin() const -> uint32_t const*;
+        auto cend() const -> uint32_t const*;
 };
 
 class MsrFeatureList : public MsrIndexList {
@@ -119,16 +118,16 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
 
         MsrList(const MsrList& other);
         MsrList(MsrList&& other) = default;
-        MsrList& operator=(MsrList other);
+        auto operator=(MsrList other) -> MsrList&;
 
-        uint32_t nmsrs() const;
+        auto nmsrs() const -> uint32_t;
 
-        kvm_msr_entry* begin();
-        kvm_msr_entry* end();
-        kvm_msr_entry const* begin() const;
-        kvm_msr_entry const* end() const;
-        kvm_msr_entry const* cbegin() const;
-        kvm_msr_entry const* cend() const;
+        auto begin() -> kvm_msr_entry*;
+        auto end() -> kvm_msr_entry*;
+        auto begin() const -> kvm_msr_entry const*;
+        auto end() const -> kvm_msr_entry const*;
+        auto cbegin() const -> kvm_msr_entry const*;
+        auto cend() const -> kvm_msr_entry const*;
 };
 
 class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
@@ -172,16 +171,16 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
 
         CpuidList(const CpuidList& other);
         CpuidList(CpuidList&& other) = default;
-        CpuidList& operator=(CpuidList other);
+        auto operator=(CpuidList other) -> CpuidList&;
 
-        uint32_t nent() const;
+        auto nent() const -> uint32_t;
 
-        kvm_cpuid_entry2* begin();
-        kvm_cpuid_entry2* end();
-        kvm_cpuid_entry2 const* begin() const;
-        kvm_cpuid_entry2 const* end() const;
-        kvm_cpuid_entry2 const* cbegin() const;
-        kvm_cpuid_entry2 const* cend() const;
+        auto begin() -> kvm_cpuid_entry2*;
+        auto end() -> kvm_cpuid_entry2*;
+        auto begin() const -> kvm_cpuid_entry2 const*;
+        auto end() const -> kvm_cpuid_entry2 const*;
+        auto cbegin() const -> kvm_cpuid_entry2 const*;
+        auto cend() const -> kvm_cpuid_entry2 const*;
 };
 
 }  // namespace vmm::kvm::detail
