@@ -31,27 +31,6 @@ auto system::api_version() -> unsigned int {
 }
 
 /**
- * Returns a positive integer if a KVM extension is available; 0 otherwise.
- *
- * Based on their initialization, VMs may have different capabilities. Thus,
- * `kvm::vm::check_extension()` is preferred when querying for most
- * capabilities.
- *
- * Examples
- * ========
- * ```
- * #include <cassert>
- * #include <vmm/kvm.hpp>
- *
- * kvm::system kvm;
- * assert(kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
- * ```
- */
-auto system::check_extension(unsigned int cap) -> unsigned int {
-    return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
-}
-
-/**
  * Returns the size of the memory region used by the KVM_RUN ioctl to
  * communicate CPU information to userspace.
  *

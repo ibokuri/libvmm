@@ -23,8 +23,7 @@ class vm : public KvmIoctl {
             : KvmIoctl(fd), mmap_size_{mmap_size} {}
         friend vm system::vm(unsigned int machine_type);
     public:
-        auto check_extension(unsigned int cap) -> unsigned int;
-
+        // Creation routines
         auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
         auto device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device;
 

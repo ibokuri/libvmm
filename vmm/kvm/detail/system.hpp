@@ -45,11 +45,6 @@ class system : public KvmIoctl {
          */
         explicit system(unsigned int fd) noexcept : KvmIoctl(fd) {};
 
-        system(const system& other) = delete;
-        system(system&& other) = default;
-        system& operator=(const system& other) = delete;
-        system& operator=(system& other) = default;
-
         /**
          * Opens /dev/kvm and returns a file descriptor.
          *
@@ -78,12 +73,14 @@ class system : public KvmIoctl {
             return fd;
         }
 
+        // General routines
         auto api_version() -> unsigned int;
-        auto check_extension(unsigned int cap) -> unsigned int;
 
+        // Creation routines
         auto vm(unsigned int machine_type) -> vmm::kvm::detail::vm;
         auto vm() -> vmm::kvm::detail::vm;
 
+        // Control routines
         auto vcpu_mmap_size() -> unsigned int;
         auto host_ipa_limit() -> unsigned int;
         auto supported_cpuids() -> CpuidList;

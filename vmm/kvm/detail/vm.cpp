@@ -235,27 +235,8 @@ auto vm::get_clock(void) -> kvm_clock_data {
  * vm.set_clock(&clock);
  * ```
  */
-void vm::set_clock(kvm_clock_data *clock) {
+auto vm::set_clock(kvm_clock_data *clock) -> void {
     utility::ioctl(fd_, KVM_SET_CLOCK, clock);
-}
-
-/**
- * Returns a positive integer if a KVM extension is available; 0 otherwise.
- *
- * Examples
- * ========
- * ```
- * #include <cassert>
- * #include <vmm/kvm.hpp>
- *
- * vmm::kvm::system kvm;
- * vmm::kvm::vm vm {kvm.vm()};
- *
- * assert(vm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
- * ```
- */
-auto vm::check_extension(unsigned int cap) -> unsigned int {
-    return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
 }
 
 auto vm::num_vcpus(void) -> unsigned int {
