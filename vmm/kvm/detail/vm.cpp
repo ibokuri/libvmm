@@ -45,8 +45,8 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  */
 auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device {
     auto dev = kvm_create_device{ .type = type, .fd = 0, .flags = flags };
-    const auto fd = utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev);
-    return vmm::kvm::detail::device{fd, dev};
+    utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev);
+    return vmm::kvm::detail::device{dev};
 }
 
 /**

@@ -14,8 +14,8 @@ class device : public KvmIoctl {
         unsigned int type_;
         unsigned int flags_;
 
-        device(const unsigned int fd, const kvm_create_device dev) noexcept
-            : KvmIoctl(fd), type_{dev.type}, flags_{dev.flags} {}
+        device(const kvm_create_device dev) noexcept
+            : KvmIoctl(dev.fd), type_{dev.type}, flags_{dev.flags} {}
         friend device vm::device(unsigned int type, unsigned int flags);
     public:
         auto get_attr(kvm_device_attr &attr) -> void;
