@@ -31,7 +31,7 @@ namespace vmm::utility {
  */
 template<typename T=int>
 auto ioctl(const int fd, const unsigned long req, T arg=T{}) -> unsigned int {
-    const auto ret {::ioctl(fd, req, arg)};
+    const auto ret = ::ioctl(fd, req, arg);
     if (ret < 0) throw std::system_error{errno, std::system_category()};
     return ret;
 }

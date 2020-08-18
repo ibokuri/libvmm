@@ -24,14 +24,27 @@ MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) {
     ptr_->nmsrs = n;
 }
 
-auto MsrIndexList::nmsrs() const -> unsigned int { return ptr_->nmsrs; }
+/**
+ * Default MsrIndexList constructor.
+ */
+MsrIndexList::MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
 
+auto MsrIndexList::nmsrs() const -> unsigned int { return ptr_->nmsrs; }
 auto MsrIndexList::begin() -> uint32_t* { return ptr_->indices; }
 auto MsrIndexList::end() -> uint32_t* { return ptr_->indices + ptr_->nmsrs; }
 auto MsrIndexList::begin() const -> uint32_t const* { return ptr_->indices; }
 auto MsrIndexList::end() const -> uint32_t const* { return ptr_->indices + ptr_->nmsrs; }
 auto MsrIndexList::cbegin() const -> uint32_t const* { return begin(); }
 auto MsrIndexList::cend() const -> uint32_t const* { return end(); }
+
+
+
+/**
+ * Default MsrFeatureList constructor.
+ */
+MsrFeatureList::MsrFeatureList() : MsrIndexList(MAX_IO_MSRS_FEATURES) {}
+
+
 
 /**
  * Internal MsrList constructor.
@@ -92,13 +105,13 @@ auto MsrList::operator=(MsrList other) -> MsrList& {
 }
 
 auto MsrList::nmsrs() const -> uint32_t { return ptr_->nmsrs; }
-
 auto MsrList::begin() -> kvm_msr_entry* { return ptr_->entries; }
 auto MsrList::end() -> kvm_msr_entry* { return ptr_->entries + ptr_->nmsrs; }
 auto MsrList::begin() const -> kvm_msr_entry const* { return ptr_->entries; }
 auto MsrList::end() const -> kvm_msr_entry const* { return ptr_->entries + ptr_->nmsrs; }
 auto MsrList::cbegin() const-> kvm_msr_entry const* { return begin(); }
 auto MsrList::cend() const -> kvm_msr_entry const* { return end(); }
+
 
 
 /*
@@ -132,6 +145,11 @@ CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(kvm_cpuid_entry2) 
 }
 
 /**
+ * Default CpuidList constructor.
+ */
+CpuidList::CpuidList() : CpuidList(MAX_CPUID_ENTRIES) {}
+
+/**
  * Constructor for a single cpuid entry.
  */
 CpuidList::CpuidList(kvm_cpuid_entry2 entry) : CpuidList(1) {
@@ -152,7 +170,6 @@ auto CpuidList::operator=(CpuidList other) -> CpuidList& {
 }
 
 auto CpuidList::nent() const -> uint32_t { return ptr_->nent; }
-
 auto CpuidList::begin() -> kvm_cpuid_entry2* { return ptr_->entries; }
 auto CpuidList::end() -> kvm_cpuid_entry2* { return ptr_->entries + ptr_->nent; }
 auto CpuidList::begin() const -> kvm_cpuid_entry2 const* { return ptr_->entries; }

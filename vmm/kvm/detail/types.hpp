@@ -28,7 +28,7 @@ namespace vmm::kvm::detail {
 #define MAX_CPUID_ENTRIES 80
 
 /**
- * Light wrapper around C FAM structs.
+ * Basic wrapper around C FAM structs.
  */
 template<typename Struct, typename Buffer>
 class FamStruct {
@@ -46,7 +46,7 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
     protected:
         MsrIndexList(const size_t n);
     public:
-        MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
+        MsrIndexList();
 
         auto nmsrs() const -> uint32_t;
         auto begin() -> uint32_t*;
@@ -59,7 +59,7 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
 
 class MsrFeatureList : public MsrIndexList {
     public:
-        MsrFeatureList() : MsrIndexList(MAX_IO_MSRS_FEATURES) {}
+        MsrFeatureList();
 };
 
 class MsrList : public FamStruct<kvm_msrs, uint64_t> {
@@ -88,7 +88,7 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
          * auto msrs = kvm::MsrList{entries.begin(), entries.end()};
          * ```
          */
-        template <class Iterator>
+        template <typename Iterator>
         MsrList(Iterator first, Iterator last) : MsrList(std::distance(first, last)) {
             std::copy_if(first, last, ptr_->entries, [](kvm_msr_entry) { return true; });
         }
@@ -116,12 +116,12 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
         template <class Container>
         MsrList(Container& c) : MsrList(c.begin(), c.end()) { }
 
+
         MsrList(const MsrList& other);
         MsrList(MsrList&& other) = default;
         auto operator=(MsrList other) -> MsrList&;
 
         auto nmsrs() const -> uint32_t;
-
         auto begin() -> kvm_msr_entry*;
         auto end() -> kvm_msr_entry*;
         auto begin() const -> kvm_msr_entry const*;
@@ -134,7 +134,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
     private:
         CpuidList(const uint32_t n);
     public:
-        CpuidList() : CpuidList(MAX_CPUID_ENTRIES) {}
+        CpuidList();
         CpuidList(kvm_cpuid_entry2 entry);
 
         /**
@@ -174,7 +174,6 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
         auto operator=(CpuidList other) -> CpuidList&;
 
         auto nent() const -> uint32_t;
-
         auto begin() -> kvm_cpuid_entry2*;
         auto end() -> kvm_cpuid_entry2*;
         auto begin() const -> kvm_cpuid_entry2 const*;
