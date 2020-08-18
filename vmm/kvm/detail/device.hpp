@@ -20,7 +20,7 @@ class device : public KvmIoctl {
     public:
         auto get_attr(kvm_device_attr &attr) -> void;
         auto set_attr(kvm_device_attr &attr) -> void;
-        auto has_attr(kvm_device_attr &attr) -> void;
+        auto has_attr(kvm_device_attr &attr) -> bool;
 };
 
 }  // namespace vmm::kvm::detail
