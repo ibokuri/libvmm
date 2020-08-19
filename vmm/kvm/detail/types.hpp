@@ -182,4 +182,37 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
         auto cend() const -> kvm_cpuid_entry2 const*;
 };
 
+class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
+    private:
+        IrqRoutingList(const uint32_t n);
+    public:
+        IrqRoutingList(kvm_irq_routing_entry entry);
+
+        /**
+         * Range constructor.
+         */
+        template <class Iterator>
+        IrqRoutingList(Iterator first, Iterator last) : IrqRoutingList(std::distance(first, last)) {
+            std::copy_if(first, last, ptr_->entries, [](kvm_irq_routing_entry) { return true; });
+        }
+
+        /**
+         * Container constructor.
+         */
+        template <class Container>
+        IrqRoutingList(Container& c) : IrqRoutingList(c.begin(), c.end()) { }
+
+        IrqRoutingList(const IrqRoutingList& other);
+        IrqRoutingList(IrqRoutingList&& other) = default;
+        auto operator=(IrqRoutingList other) -> IrqRoutingList&;
+
+        auto nr() const -> uint32_t;
+        auto begin() -> kvm_irq_routing_entry*;
+        auto end() -> kvm_irq_routing_entry*;
+        auto begin() const -> kvm_irq_routing_entry const*;
+        auto end() const -> kvm_irq_routing_entry const*;
+        auto cbegin() const -> kvm_irq_routing_entry const*;
+        auto cend() const -> kvm_irq_routing_entry const*;
+};
+
 }  // namespace vmm::kvm::detail

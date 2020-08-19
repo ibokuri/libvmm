@@ -16,5 +16,6 @@ using MsrIndexList = vmm::kvm::detail::MsrIndexList;
 using MsrFeatureList = vmm::kvm::detail::MsrFeatureList;
 using MsrList = vmm::kvm::detail::MsrList;
 using CpuidList = vmm::kvm::detail::CpuidList;
+using IrqRoutingList = vmm::kvm::detail::IrqRoutingList;
 
 }  // namespace vmm::kvm

@@ -115,7 +115,7 @@ auto MsrList::cend() const -> kvm_msr_entry const* { return end(); }
 
 
 /*
- * Internal constructor.
+ * Internal CpuidList constructor.
  *
  * Relevant structs:
  *
@@ -176,5 +176,67 @@ auto CpuidList::begin() const -> kvm_cpuid_entry2 const* { return ptr_->entries;
 auto CpuidList::end() const -> kvm_cpuid_entry2 const* { return ptr_->entries + ptr_->nent; }
 auto CpuidList::cbegin() const-> kvm_cpuid_entry2 const* { return begin(); }
 auto CpuidList::cend() const -> kvm_cpuid_entry2 const* { return end(); }
+
+
+
+/**
+ * Internal IrqRoutingList constructor.
+ *
+ * Relevant structs:
+ *
+ * struct kvm_irq_routing {
+ *       __u32 nr;
+ *       __u32 flags;
+ *       struct kvm_irq_routing_entry entries[0];
+ * };
+ *
+ * struct kvm_irq_routing_entry {
+ *       __u32 gsi;
+ *       __u32 type;
+ *       __u32 flags;
+ *       __u32 pad;
+ *       union {
+ *               struct kvm_irq_routing_irqchip irqchip;
+ *               struct kvm_irq_routing_msi msi;
+ *               struct kvm_irq_routing_s390_adapter adapter;
+ *               struct kvm_irq_routing_hv_sint hv_sint;
+ *               __u32 pad[8];
+ *       } u;
+ * };
+ */
+IrqRoutingList::IrqRoutingList(const uint32_t n)
+    : FamStruct(n * (sizeof(kvm_irq_routing_entry) / 2) + 1) {
+    ptr_->nr = n;
+    ptr_->flags = 0;
+}
+
+/**
+ * Constructor for a single cpuid entry.
+ */
+IrqRoutingList::IrqRoutingList(kvm_irq_routing_entry entry) : IrqRoutingList(1) {
+    ptr_->entries[0] = entry;
+}
+
+/*
+ * Copy constructor.
+ */
+IrqRoutingList::IrqRoutingList(const IrqRoutingList& other)
+    : IrqRoutingList(other.begin(), other.end()) {}
+
+/**
+ * Copy/move assignment operator.
+ */
+auto IrqRoutingList::operator=(IrqRoutingList other) -> IrqRoutingList& {
+    other.ptr_.swap(this->ptr_);
+    return *this;
+}
+
+auto IrqRoutingList::nr() const -> uint32_t { return ptr_->nr; }
+auto IrqRoutingList::begin() -> kvm_irq_routing_entry* { return ptr_->entries; }
+auto IrqRoutingList::end() -> kvm_irq_routing_entry* { return ptr_->entries + ptr_->nr; }
+auto IrqRoutingList::begin() const -> kvm_irq_routing_entry const* { return ptr_->entries; }
+auto IrqRoutingList::end() const -> kvm_irq_routing_entry const* { return ptr_->entries + ptr_->nr; }
+auto IrqRoutingList::cbegin() const-> kvm_irq_routing_entry const* { return begin(); }
+auto IrqRoutingList::cend() const -> kvm_irq_routing_entry const* { return end(); }
 
 } // namespace vmm::kvm::detail
