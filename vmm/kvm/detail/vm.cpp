@@ -258,16 +258,38 @@ auto vm::set_clock(kvm_clock_data &clock) -> void {
     utility::ioctl(fd_, KVM_SET_CLOCK, &clock);
 }
 
+/**
+ * Sets the GSI routing table entries, overwriting any previously set entries.
+ *
+ * See the documentation for `KVM_SET_GSI_ROUTING`.
+ *
+ * Architectures
+ * =============
+ * x86, s390, arm, arm64
+ */
+auto vm::gsi_routing(IrqRoutingList &routing_list) -> void {
+    utility::ioctl(fd_, KVM_SET_GSI_ROUTING, &routing_list);
+}
+
+/**
+ * Returns the recommended number for max_vcpus.
+ */
 auto vm::num_vcpus(void) -> unsigned int {
     auto ret = check_extension(KVM_CAP_NR_VCPUS);
     return ret > 0 ? ret : 4;
 }
 
+/**
+ * Returns the maximum possible value for max_vcpus.
+ */
 auto vm::max_vcpus(void) -> unsigned int {
     auto ret = check_extension(KVM_CAP_MAX_VCPUS);
     return ret > 0 ? ret : num_vcpus();
 }
 
+/**
+ * Returns the maximum number of allowed memory slots for a VM.
+ */
 auto vm::num_memslots(void) -> unsigned int {
     auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
     return ret > 0 ? ret : 32;

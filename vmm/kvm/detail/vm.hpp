@@ -34,6 +34,9 @@ class vm : public KvmIoctl {
         auto set_irqchip(kvm_irqchip &irqchip_p) -> void;
         auto get_clock(void) -> kvm_clock_data;
         auto set_clock(kvm_clock_data &clock) -> void;
+        auto gsi_routing(IrqRoutingList &routing_list) -> void;
+
+        // Convenient routines
         auto num_vcpus(void) -> unsigned int;
         auto max_vcpus(void) -> unsigned int;
         auto num_memslots(void) -> unsigned int;
