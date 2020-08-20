@@ -28,12 +28,12 @@ auto MsrIndexList::size() const noexcept -> unsigned int { return ptr_->nmsrs; }
 auto MsrIndexList::max_size() const noexcept -> unsigned int { return MAX_IO_MSRS; }
 
 // Iterators
-auto MsrIndexList::begin() noexcept -> uint32_t* { return ptr_->indices; }
-auto MsrIndexList::end() noexcept -> uint32_t* { return ptr_->indices + ptr_->nmsrs; }
-auto MsrIndexList::begin() const noexcept -> uint32_t const* { return ptr_->indices; }
-auto MsrIndexList::end() const noexcept -> uint32_t const* { return ptr_->indices + ptr_->nmsrs; }
-auto MsrIndexList::cbegin() const noexcept -> uint32_t const* { return begin(); }
-auto MsrIndexList::cend() const noexcept -> uint32_t const* { return end(); }
+auto MsrIndexList::begin() noexcept -> iterator { return ptr_->indices; }
+auto MsrIndexList::end() noexcept -> iterator { return ptr_->indices + ptr_->nmsrs; }
+auto MsrIndexList::begin() const noexcept -> const_iterator { return ptr_->indices; }
+auto MsrIndexList::end() const noexcept -> const_iterator { return ptr_->indices + ptr_->nmsrs; }
+auto MsrIndexList::cbegin() const noexcept -> const_iterator { return begin(); }
+auto MsrIndexList::cend() const noexcept -> const_iterator { return end(); }
 
 
 /**
@@ -59,21 +59,27 @@ auto MsrIndexList::cend() const noexcept -> uint32_t const* { return end(); }
  */
 MsrList::MsrList(const size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
 MsrFeatureList::MsrFeatureList() : MsrIndexList(MAX_IO_MSRS_FEATURES) {}
-MsrList::MsrList(kvm_msr_entry entry) : MsrList(1) { ptr_->entries[0] = entry; }
+MsrList::MsrList(value_type entry) : MsrList(1) { ptr_->entries[0] = entry; }
+
+/* Copy constructor */
 MsrList::MsrList(const MsrList& other) : MsrList(other.begin(), other.end()) {}
 
+/* Copy/move assignment operator */
 auto MsrList::operator=(MsrList other) -> MsrList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
+// Capacity
 auto MsrList::size() const noexcept -> uint32_t { return ptr_->nmsrs; }
-auto MsrList::begin() noexcept -> kvm_msr_entry* { return ptr_->entries; }
-auto MsrList::end() noexcept -> kvm_msr_entry* { return ptr_->entries + ptr_->nmsrs; }
-auto MsrList::begin() const noexcept -> kvm_msr_entry const* { return ptr_->entries; }
-auto MsrList::end() const noexcept -> kvm_msr_entry const* { return ptr_->entries + ptr_->nmsrs; }
-auto MsrList::cbegin() const noexcept -> kvm_msr_entry const* { return begin(); }
-auto MsrList::cend() const noexcept -> kvm_msr_entry const* { return end(); }
+
+// Iterators
+auto MsrList::begin() noexcept -> iterator { return ptr_->entries; }
+auto MsrList::end() noexcept -> iterator { return ptr_->entries + ptr_->nmsrs; }
+auto MsrList::begin() const noexcept -> const_iterator { return ptr_->entries; }
+auto MsrList::end() const noexcept -> const_iterator { return ptr_->entries + ptr_->nmsrs; }
+auto MsrList::cbegin() const noexcept -> const_iterator { return begin(); }
+auto MsrList::cend() const noexcept -> const_iterator { return end(); }
 
 
 /*
@@ -102,24 +108,27 @@ auto MsrList::cend() const noexcept -> kvm_msr_entry const* { return end(); }
  *
  *     N * sizeof(kvm_cpuid_entry2) + 2 * sizeof(__u32)
  */
-CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(kvm_cpuid_entry2) + 2) { ptr_->nent = n; }
+CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(value_type) + 2) { ptr_->nent = n; }
 CpuidList::CpuidList() : CpuidList(MAX_CPUID_ENTRIES) {}
-CpuidList::CpuidList(kvm_cpuid_entry2 entry) : CpuidList(1) { ptr_->entries[0] = entry; }
-CpuidList::CpuidList(const CpuidList& other) : CpuidList(other.begin(), other.end()) {}
+CpuidList::CpuidList(value_type entry) : CpuidList(1) { ptr_->entries[0] = entry; }
 
+/* Copy constructor */
+CpuidList::CpuidList(const CpuidList& other) : CpuidList(other.begin(), other.end()) {}
 auto CpuidList::operator=(CpuidList other) -> CpuidList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
-// Iterators
+// Capacity
 auto CpuidList::size() const noexcept -> uint32_t { return ptr_->nent; }
-auto CpuidList::begin() noexcept -> kvm_cpuid_entry2* { return ptr_->entries; }
-auto CpuidList::end() noexcept -> kvm_cpuid_entry2* { return ptr_->entries + ptr_->nent; }
-auto CpuidList::begin() const noexcept -> kvm_cpuid_entry2 const* { return ptr_->entries; }
-auto CpuidList::end() const noexcept -> kvm_cpuid_entry2 const* { return ptr_->entries + ptr_->nent; }
-auto CpuidList::cbegin() const noexcept -> kvm_cpuid_entry2 const* { return begin(); }
-auto CpuidList::cend() const noexcept -> kvm_cpuid_entry2 const* { return end(); }
+
+// Iterators
+auto CpuidList::begin() noexcept -> iterator { return ptr_->entries; }
+auto CpuidList::end() noexcept -> iterator { return ptr_->entries + ptr_->nent; }
+auto CpuidList::begin() const noexcept -> const_iterator { return ptr_->entries; }
+auto CpuidList::end() const noexcept -> const_iterator { return ptr_->entries + ptr_->nent; }
+auto CpuidList::cbegin() const noexcept -> const_iterator { return begin(); }
+auto CpuidList::cend() const noexcept -> const_iterator { return end(); }
 
 
 /**
@@ -147,26 +156,30 @@ auto CpuidList::cend() const noexcept -> kvm_cpuid_entry2 const* { return end();
  *       } u;
  * };
  */
-IrqRoutingList::IrqRoutingList(const uint32_t n)
-    : FamStruct(n * (sizeof(kvm_irq_routing_entry) / 2) + 1) {
+IrqRoutingList::IrqRoutingList(const uint32_t n) : FamStruct(n * (sizeof(value_type) / 2) + 1) {
     ptr_->nr = n;
     ptr_->flags = 0;
 }
-IrqRoutingList::IrqRoutingList(kvm_irq_routing_entry entry) : IrqRoutingList(1) { ptr_->entries[0] = entry; }
+IrqRoutingList::IrqRoutingList(value_type entry) : IrqRoutingList(1) { ptr_->entries[0] = entry; }
+
+/* Copy constructor */
 IrqRoutingList::IrqRoutingList(const IrqRoutingList& other) : IrqRoutingList(other.begin(), other.end()) {}
 
+/* Copy/move assignment operator */
 auto IrqRoutingList::operator=(IrqRoutingList other) -> IrqRoutingList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
-// Iterators
+// Capacity
 auto IrqRoutingList::size() const noexcept -> uint32_t { return ptr_->nr; }
-auto IrqRoutingList::begin() noexcept -> kvm_irq_routing_entry* { return ptr_->entries; }
-auto IrqRoutingList::end() noexcept -> kvm_irq_routing_entry* { return ptr_->entries + ptr_->nr; }
-auto IrqRoutingList::begin() const noexcept -> kvm_irq_routing_entry const* { return ptr_->entries; }
-auto IrqRoutingList::end() const noexcept -> kvm_irq_routing_entry const* { return ptr_->entries + ptr_->nr; }
-auto IrqRoutingList::cbegin() const noexcept -> kvm_irq_routing_entry const* { return begin(); }
-auto IrqRoutingList::cend() const noexcept -> kvm_irq_routing_entry const* { return end(); }
+
+// Iterators
+auto IrqRoutingList::begin() noexcept -> iterator { return ptr_->entries; }
+auto IrqRoutingList::end() noexcept -> iterator { return ptr_->entries + ptr_->nr; }
+auto IrqRoutingList::begin() const noexcept -> const_iterator { return ptr_->entries; }
+auto IrqRoutingList::end() const noexcept -> const_iterator { return ptr_->entries + ptr_->nr; }
+auto IrqRoutingList::cbegin() const noexcept -> const_iterator { return begin(); }
+auto IrqRoutingList::cend() const noexcept -> const_iterator { return end(); }
 
 } // namespace vmm::kvm::detail

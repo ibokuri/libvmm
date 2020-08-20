@@ -30,7 +30,7 @@ namespace vmm::kvm::detail {
 /**
  * Basic wrapper around C FAM structs.
  */
-template<typename Struct, typename Buffer>
+template<typename Struct, typename Buffer, typename Entry>
 class FamStruct {
     protected:
         std::unique_ptr<Struct, void(*)(Struct*)> ptr_;
@@ -38,11 +38,21 @@ class FamStruct {
         FamStruct(const size_t n)
             : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
                    [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
+
+        using value_type = Entry;
+        using pointer = Entry*;
+        using const_pointer = const Entry*;
+        using reference = Entry&;
+        using const_reference = const value_type&;
+        using iterator = pointer;
+        using const_iterator = const_pointer;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     public:
         auto get() -> Struct* { return ptr_.get(); }
 };
 
-class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
+class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
     protected:
         MsrIndexList(const size_t n);
     public:
@@ -53,12 +63,12 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
         auto max_size() const noexcept-> uint32_t;
 
         // Iterators (TODO: rbegin, crbegin, rend, crend)
-        auto begin() noexcept -> uint32_t*;
-        auto end() noexcept -> uint32_t*;
-        auto begin() const noexcept -> uint32_t const*;
-        auto end() const noexcept -> uint32_t const*;
-        auto cbegin() const noexcept -> uint32_t const*;
-        auto cend() const noexcept -> uint32_t const*;
+        auto begin() noexcept -> iterator;
+        auto end() noexcept -> iterator;
+        auto begin() const noexcept -> const_iterator;
+        auto end() const noexcept -> const_iterator;
+        auto cbegin() const noexcept -> const_iterator;
+        auto cend() const noexcept -> const_iterator;
 };
 
 class MsrFeatureList : public MsrIndexList {
@@ -66,11 +76,11 @@ class MsrFeatureList : public MsrIndexList {
         MsrFeatureList();
 };
 
-class MsrList : public FamStruct<kvm_msrs, uint64_t> {
+class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
     private:
         MsrList(const size_t n);
     public:
-        MsrList(kvm_msr_entry entry);
+        MsrList(value_type entry);
 
         /**
          * Range constructor.
@@ -94,7 +104,7 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
          */
         template <typename Iterator>
         MsrList(Iterator first, Iterator last) : MsrList(std::distance(first, last)) {
-            std::copy_if(first, last, ptr_->entries, [](kvm_msr_entry) { return true; });
+            std::copy_if(first, last, ptr_->entries, [](value_type) { return true; });
         }
 
         /**
@@ -124,33 +134,30 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
         MsrList(MsrList&& other) = default;
         auto operator=(MsrList other) -> MsrList&;
 
+        // Capacity
         auto size() const noexcept -> uint32_t;
-        auto begin() noexcept -> kvm_msr_entry*;
-        auto end() noexcept -> kvm_msr_entry*;
-        auto begin() const noexcept -> kvm_msr_entry const*;
-        auto end() const noexcept -> kvm_msr_entry const*;
-        auto cbegin() const noexcept -> kvm_msr_entry const*;
-        auto cend() const noexcept -> kvm_msr_entry const*;
+
+        // Iterators
+        auto begin() noexcept -> iterator;
+        auto end() noexcept -> iterator;
+        auto begin() const noexcept -> const_iterator;
+        auto end() const noexcept -> const_iterator;
+        auto cbegin() const noexcept -> const_iterator;
+        auto cend() const noexcept -> const_iterator;
 };
 
-class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
+class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
     private:
         CpuidList(const uint32_t n);
     public:
         CpuidList();
-        CpuidList(kvm_cpuid_entry2 entry);
+        CpuidList(value_type entry);
 
-        /**
-         * Range constructor.
-         */
         template <typename Iterator>
         CpuidList(Iterator first, Iterator last) : CpuidList(std::distance(first, last)) {
-            std::copy_if(first, last, ptr_->entries, [](kvm_cpuid_entry2) { return true; });
+            std::copy_if(first, last, ptr_->entries, [](value_type) { return true; });
         }
 
-        /**
-         * Container constructor.
-         */
         template <typename Container>
         CpuidList(Container& c) : CpuidList(c.begin(), c.end()) { }
 
@@ -158,32 +165,29 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
         CpuidList(CpuidList&& other) = default;
         auto operator=(CpuidList other) -> CpuidList&;
 
+        // Capacity
         auto size() const noexcept -> uint32_t;
-        auto begin() noexcept -> kvm_cpuid_entry2*;
-        auto end() noexcept -> kvm_cpuid_entry2*;
-        auto begin() const noexcept -> kvm_cpuid_entry2 const*;
-        auto end() const noexcept -> kvm_cpuid_entry2 const*;
-        auto cbegin() const noexcept -> kvm_cpuid_entry2 const*;
-        auto cend() const noexcept -> kvm_cpuid_entry2 const*;
+
+        // Iterators
+        auto begin() noexcept -> iterator;
+        auto end() noexcept -> iterator;
+        auto begin() const noexcept -> const_iterator;
+        auto end() const noexcept -> const_iterator;
+        auto cbegin() const noexcept -> const_iterator;
+        auto cend() const noexcept -> const_iterator;
 };
 
-class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
+class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routing_entry> {
     private:
         IrqRoutingList(const uint32_t n);
     public:
-        IrqRoutingList(kvm_irq_routing_entry entry);
+        IrqRoutingList(value_type entry);
 
-        /**
-         * Range constructor.
-         */
         template <typename Iterator>
         IrqRoutingList(Iterator first, Iterator last) : IrqRoutingList(std::distance(first, last)) {
-            std::copy_if(first, last, ptr_->entries, [](kvm_irq_routing_entry) { return true; });
+            std::copy_if(first, last, ptr_->entries, [](value_type) { return true; });
         }
 
-        /**
-         * Container constructor.
-         */
         template <typename Container>
         IrqRoutingList(Container& c) : IrqRoutingList(c.begin(), c.end()) { }
 
@@ -191,13 +195,16 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
         IrqRoutingList(IrqRoutingList&& other) = default;
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;
 
+        // Capacity
         auto size() const noexcept -> uint32_t;
-        auto begin() noexcept -> kvm_irq_routing_entry*;
-        auto end() noexcept -> kvm_irq_routing_entry*;
-        auto begin() const noexcept -> kvm_irq_routing_entry const*;
-        auto end() const noexcept -> kvm_irq_routing_entry const*;
-        auto cbegin() const noexcept -> kvm_irq_routing_entry const*;
-        auto cend() const noexcept -> kvm_irq_routing_entry const*;
+
+        // Iterators
+        auto begin() noexcept -> iterator;
+        auto end() noexcept -> iterator;
+        auto begin() const noexcept -> const_iterator;
+        auto end() const noexcept -> const_iterator;
+        auto cbegin() const noexcept -> const_iterator;
+        auto cend() const noexcept -> const_iterator;
 };
 
 }  // namespace vmm::kvm::detail
