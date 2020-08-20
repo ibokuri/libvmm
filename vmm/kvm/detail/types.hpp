@@ -48,13 +48,17 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
     public:
         MsrIndexList();
 
-        auto size() const -> uint32_t;
-        auto begin() -> uint32_t*;
-        auto end() -> uint32_t*;
-        auto begin() const -> uint32_t const*;
-        auto end() const -> uint32_t const*;
-        auto cbegin() const -> uint32_t const*;
-        auto cend() const -> uint32_t const*;
+        // Capacity
+        auto size() const noexcept -> uint32_t;
+        auto max_size() const noexcept-> uint32_t;
+
+        // Iterators (TODO: rbegin, crbegin, rend, crend)
+        auto begin() noexcept -> uint32_t*;
+        auto end() noexcept -> uint32_t*;
+        auto begin() const noexcept -> uint32_t const*;
+        auto end() const noexcept -> uint32_t const*;
+        auto cbegin() const noexcept -> uint32_t const*;
+        auto cend() const noexcept -> uint32_t const*;
 };
 
 class MsrFeatureList : public MsrIndexList {
@@ -120,13 +124,13 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
         MsrList(MsrList&& other) = default;
         auto operator=(MsrList other) -> MsrList&;
 
-        auto size() const -> uint32_t;
-        auto begin() -> kvm_msr_entry*;
-        auto end() -> kvm_msr_entry*;
-        auto begin() const -> kvm_msr_entry const*;
-        auto end() const -> kvm_msr_entry const*;
-        auto cbegin() const -> kvm_msr_entry const*;
-        auto cend() const -> kvm_msr_entry const*;
+        auto size() const noexcept -> uint32_t;
+        auto begin() noexcept -> kvm_msr_entry*;
+        auto end() noexcept -> kvm_msr_entry*;
+        auto begin() const noexcept -> kvm_msr_entry const*;
+        auto end() const noexcept -> kvm_msr_entry const*;
+        auto cbegin() const noexcept -> kvm_msr_entry const*;
+        auto cend() const noexcept -> kvm_msr_entry const*;
 };
 
 class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
@@ -154,13 +158,13 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
         CpuidList(CpuidList&& other) = default;
         auto operator=(CpuidList other) -> CpuidList&;
 
-        auto size() const -> uint32_t;
-        auto begin() -> kvm_cpuid_entry2*;
-        auto end() -> kvm_cpuid_entry2*;
-        auto begin() const -> kvm_cpuid_entry2 const*;
-        auto end() const -> kvm_cpuid_entry2 const*;
-        auto cbegin() const -> kvm_cpuid_entry2 const*;
-        auto cend() const -> kvm_cpuid_entry2 const*;
+        auto size() const noexcept -> uint32_t;
+        auto begin() noexcept -> kvm_cpuid_entry2*;
+        auto end() noexcept -> kvm_cpuid_entry2*;
+        auto begin() const noexcept -> kvm_cpuid_entry2 const*;
+        auto end() const noexcept -> kvm_cpuid_entry2 const*;
+        auto cbegin() const noexcept -> kvm_cpuid_entry2 const*;
+        auto cend() const noexcept -> kvm_cpuid_entry2 const*;
 };
 
 class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
@@ -187,13 +191,13 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
         IrqRoutingList(IrqRoutingList&& other) = default;
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;
 
-        auto size() const -> uint32_t;
-        auto begin() -> kvm_irq_routing_entry*;
-        auto end() -> kvm_irq_routing_entry*;
-        auto begin() const -> kvm_irq_routing_entry const*;
-        auto end() const -> kvm_irq_routing_entry const*;
-        auto cbegin() const -> kvm_irq_routing_entry const*;
-        auto cend() const -> kvm_irq_routing_entry const*;
+        auto size() const noexcept -> uint32_t;
+        auto begin() noexcept -> kvm_irq_routing_entry*;
+        auto end() noexcept -> kvm_irq_routing_entry*;
+        auto begin() const noexcept -> kvm_irq_routing_entry const*;
+        auto end() const noexcept -> kvm_irq_routing_entry const*;
+        auto cbegin() const noexcept -> kvm_irq_routing_entry const*;
+        auto cend() const noexcept -> kvm_irq_routing_entry const*;
 };
 
 }  // namespace vmm::kvm::detail
