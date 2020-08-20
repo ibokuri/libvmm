@@ -113,7 +113,7 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
          * auto msrs = kvm::MsrList{entries};
          * ```
          */
-        template <class Container>
+        template <typename Container>
         MsrList(Container& c) : MsrList(c.begin(), c.end()) { }
 
         MsrList(const MsrList& other);
@@ -139,7 +139,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
         /**
          * Range constructor.
          */
-        template <class Iterator>
+        template <typename Iterator>
         CpuidList(Iterator first, Iterator last) : CpuidList(std::distance(first, last)) {
             std::copy_if(first, last, ptr_->entries, [](kvm_cpuid_entry2) { return true; });
         }
@@ -147,7 +147,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
         /**
          * Container constructor.
          */
-        template <class Container>
+        template <typename Container>
         CpuidList(Container& c) : CpuidList(c.begin(), c.end()) { }
 
         CpuidList(const CpuidList& other);
@@ -172,7 +172,7 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
         /**
          * Range constructor.
          */
-        template <class Iterator>
+        template <typename Iterator>
         IrqRoutingList(Iterator first, Iterator last) : IrqRoutingList(std::distance(first, last)) {
             std::copy_if(first, last, ptr_->entries, [](kvm_irq_routing_entry) { return true; });
         }
@@ -180,7 +180,7 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
         /**
          * Container constructor.
          */
-        template <class Container>
+        template <typename Container>
         IrqRoutingList(Container& c) : IrqRoutingList(c.begin(), c.end()) { }
 
         IrqRoutingList(const IrqRoutingList& other);
