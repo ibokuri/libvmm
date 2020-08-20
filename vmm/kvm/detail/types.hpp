@@ -48,7 +48,7 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t> {
     public:
         MsrIndexList();
 
-        auto nmsrs() const -> uint32_t;
+        auto size() const -> uint32_t;
         auto begin() -> uint32_t*;
         auto end() -> uint32_t*;
         auto begin() const -> uint32_t const*;
@@ -116,12 +116,11 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t> {
         template <class Container>
         MsrList(Container& c) : MsrList(c.begin(), c.end()) { }
 
-
         MsrList(const MsrList& other);
         MsrList(MsrList&& other) = default;
         auto operator=(MsrList other) -> MsrList&;
 
-        auto nmsrs() const -> uint32_t;
+        auto size() const -> uint32_t;
         auto begin() -> kvm_msr_entry*;
         auto end() -> kvm_msr_entry*;
         auto begin() const -> kvm_msr_entry const*;
@@ -139,15 +138,6 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
 
         /**
          * Range constructor.
-         *
-         * Examples
-         * ========
-         * ```
-         * #include <vmm/kvm.hpp>
-         *
-         * auto kvm = vmm::kvm::system{};
-         * TODO
-         * ```
          */
         template <class Iterator>
         CpuidList(Iterator first, Iterator last) : CpuidList(std::distance(first, last)) {
@@ -156,15 +146,6 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
 
         /**
          * Container constructor.
-         *
-         * Examples
-         * ========
-         * ```
-         * #include <vmm/kvm.hpp>
-         *
-         * auto kvm = vmm::kvm::system{};
-         * TODO
-         * ```
          */
         template <class Container>
         CpuidList(Container& c) : CpuidList(c.begin(), c.end()) { }
@@ -173,7 +154,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t> {
         CpuidList(CpuidList&& other) = default;
         auto operator=(CpuidList other) -> CpuidList&;
 
-        auto nent() const -> uint32_t;
+        auto size() const -> uint32_t;
         auto begin() -> kvm_cpuid_entry2*;
         auto end() -> kvm_cpuid_entry2*;
         auto begin() const -> kvm_cpuid_entry2 const*;
@@ -206,7 +187,7 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t> {
         IrqRoutingList(IrqRoutingList&& other) = default;
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;
 
-        auto nr() const -> uint32_t;
+        auto size() const -> uint32_t;
         auto begin() -> kvm_irq_routing_entry*;
         auto end() -> kvm_irq_routing_entry*;
         auto begin() const -> kvm_irq_routing_entry const*;

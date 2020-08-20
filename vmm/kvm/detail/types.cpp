@@ -29,7 +29,7 @@ MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) {
  */
 MsrIndexList::MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
 
-auto MsrIndexList::nmsrs() const -> unsigned int { return ptr_->nmsrs; }
+auto MsrIndexList::size() const -> unsigned int { return ptr_->nmsrs; }
 auto MsrIndexList::begin() -> uint32_t* { return ptr_->indices; }
 auto MsrIndexList::end() -> uint32_t* { return ptr_->indices + ptr_->nmsrs; }
 auto MsrIndexList::begin() const -> uint32_t const* { return ptr_->indices; }
@@ -104,7 +104,7 @@ auto MsrList::operator=(MsrList other) -> MsrList& {
     return *this;
 }
 
-auto MsrList::nmsrs() const -> uint32_t { return ptr_->nmsrs; }
+auto MsrList::size() const -> uint32_t { return ptr_->nmsrs; }
 auto MsrList::begin() -> kvm_msr_entry* { return ptr_->entries; }
 auto MsrList::end() -> kvm_msr_entry* { return ptr_->entries + ptr_->nmsrs; }
 auto MsrList::begin() const -> kvm_msr_entry const* { return ptr_->entries; }
@@ -169,7 +169,7 @@ auto CpuidList::operator=(CpuidList other) -> CpuidList& {
     return *this;
 }
 
-auto CpuidList::nent() const -> uint32_t { return ptr_->nent; }
+auto CpuidList::size() const -> uint32_t { return ptr_->nent; }
 auto CpuidList::begin() -> kvm_cpuid_entry2* { return ptr_->entries; }
 auto CpuidList::end() -> kvm_cpuid_entry2* { return ptr_->entries + ptr_->nent; }
 auto CpuidList::begin() const -> kvm_cpuid_entry2 const* { return ptr_->entries; }
@@ -231,7 +231,7 @@ auto IrqRoutingList::operator=(IrqRoutingList other) -> IrqRoutingList& {
     return *this;
 }
 
-auto IrqRoutingList::nr() const -> uint32_t { return ptr_->nr; }
+auto IrqRoutingList::size() const -> uint32_t { return ptr_->nr; }
 auto IrqRoutingList::begin() -> kvm_irq_routing_entry* { return ptr_->entries; }
 auto IrqRoutingList::end() -> kvm_irq_routing_entry* { return ptr_->entries + ptr_->nr; }
 auto IrqRoutingList::begin() const -> kvm_irq_routing_entry const* { return ptr_->entries; }
