@@ -9,14 +9,10 @@
 namespace vmm::kvm::detail {
 
 /**
- * Internal MsrIndexList/MsrFeatureList constructor.
- *
- * Relevant struct:
- *
- *     struct kvm_msr_list {
- *         __u32 nmsrs;
- *         __u32 indices[0];
- *     };
+ * struct kvm_msr_list {
+ *     __u32 nmsrs;
+ *     __u32 indices[0];
+ * };
  *
  * Buffer size computation:
  *
@@ -50,25 +46,22 @@ auto MsrIndexList::cbegin() const noexcept -> const_iterator { return begin(); }
 auto MsrIndexList::cend() const noexcept -> const_iterator { return end(); }
 
 
+// Constructors
 MsrFeatureList::MsrFeatureList(const size_t n) : MsrIndexList(n) {}
 
 
 /**
- * Internal MsrList constructor.
+ * struct kvm_msrs {
+ *     __u32 nmsrs;
+ *     __u32 pad;
+ *     struct kvm_msr_entry entries[0];
+ * };
  *
- * Relevant structs:
- *
- *     struct kvm_msrs {
- *         __u32 nmsrs;
- *         __u32 pad;
- *         struct kvm_msr_entry entries[0];
- *     };
- *
- *     struct kvm_msr_entry {
- *         __u32 index;
- *         __u32 reserved;
- *         __u64 data;
- *     };
+ * struct kvm_msr_entry {
+ *     __u32 index;
+ *     __u32 reserved;
+ *     __u64 data;
+ * };
  *
  * Buffer size computation:
  *
@@ -110,10 +103,6 @@ auto MsrList::cend() const noexcept -> const_iterator { return end(); }
 
 
 /*
- * Internal CpuidList constructor.
- *
- * Relevant structs:
- *
  * struct kvm_cpuid2 {
  *     __u32 nent;
  *     __u32 padding;
@@ -171,10 +160,6 @@ auto CpuidList::cend() const noexcept -> const_iterator { return end(); }
 
 
 /**
- * Internal IrqRoutingList constructor.
- *
- * Relevant structs:
- *
  * struct kvm_irq_routing {
  *       __u32 nr;
  *       __u32 flags;

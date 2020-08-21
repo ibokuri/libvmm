@@ -54,6 +54,7 @@ class FamStruct {
 
 class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
     public:
+        // Constructors
         MsrIndexList(const size_t n);
 
         // Element access
@@ -84,53 +85,14 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
     private:
         MsrList(const size_t n);
     public:
+        // Constructors
         MsrList(value_type entry);
 
-        /**
-         * Range constructor.
-         *
-         * Examples
-         * ========
-         * ```
-         * #include <vmm/kvm.hpp>
-         *
-         * auto kvm = vmm::kvm::system{};
-         * auto msr_list = kvm.msr_feature_list();
-         * auto entries = std::vector<kvm_msr_entry>{};
-         *
-         * for (auto msr : msr_list) {
-         *     auto entry = kvm_msr_entry{msr};
-         *     entries.push_back(entry);
-         * }
-         *
-         * auto msrs = kvm::MsrList{entries.begin(), entries.end()};
-         * ```
-         */
         template <typename Iterator>
         MsrList(Iterator first, Iterator last) : MsrList(std::distance(first, last)) {
             std::copy_if(first, last, data(), [](value_type) { return true; });
         }
 
-        /**
-         * Container constructor.
-         *
-         * Examples
-         * ========
-         * ```
-         * #include <vmm/kvm.hpp>
-         *
-         * auto kvm = vmm::kvm::system{};
-         * auto msr_list = kvm.msr_feature_list();
-         * auto entries = std::vector<kvm_msr_entry>{};
-         *
-         * for (auto msr : msr_list) {
-         *     auto entry = kvm_msr_entry{msr};
-         *     entries.push_back(entry);
-         * }
-         *
-         * auto msrs = kvm::MsrList{entries};
-         * ```
-         */
         template <typename Container>
         MsrList(Container& c) : MsrList(c.begin(), c.end()) { }
 
@@ -160,6 +122,7 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
 
 class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
     public:
+        // Constructors
         CpuidList(const uint32_t n);
         CpuidList(value_type entry);
 
@@ -199,6 +162,7 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routi
     private:
         IrqRoutingList(const uint32_t n);
     public:
+        // Constructors
         IrqRoutingList(value_type entry);
 
         template <typename Iterator>
