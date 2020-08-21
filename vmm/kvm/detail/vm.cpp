@@ -272,6 +272,13 @@ auto vm::gsi_routing(IrqRoutingList &routing_list) -> void {
 }
 
 /**
+ * Returns KVM_RUN's shared memory region size.
+ */
+auto vm::mmap_size(void) -> unsigned int {
+    return mmap_size_;
+}
+
+/**
  * Returns the recommended number for max_vcpus.
  */
 auto vm::num_vcpus(void) -> unsigned int {

@@ -40,6 +40,7 @@ class vm : public KvmIoctl {
         auto gsi_routing(IrqRoutingList &routing_list) -> void;
 
         // Convenient routines
+        auto mmap_size(void) -> unsigned int;
         auto num_vcpus(void) -> unsigned int;
         auto max_vcpus(void) -> unsigned int;
         auto num_memslots(void) -> unsigned int;
