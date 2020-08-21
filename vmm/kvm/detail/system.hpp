@@ -86,6 +86,8 @@ class system : public KvmIoctl {
         auto host_ipa_limit() -> unsigned int;
         auto supported_cpuids() -> CpuidList;
         auto emulated_cpuids() -> CpuidList;
+        auto supported_cpuids(CpuidList& cpuids) -> void;
+        auto emulated_cpuids(CpuidList& cpuids) -> void;
         auto msr_index_list() -> MsrIndexList;
         auto msr_feature_list() -> MsrFeatureList;
         auto msr_index_list(MsrIndexList& msrs) -> void;

@@ -183,9 +183,30 @@ auto system::host_ipa_limit() -> unsigned int {
  * ```
  */
 auto system::supported_cpuids() -> CpuidList {
-    auto cpuids = CpuidList{};
-    utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuids.get());
+    auto cpuids = CpuidList{MAX_CPUID_ENTRIES};
+    supported_cpuids(cpuids);
     return cpuids;
+}
+
+/**
+ * Obtains a list of host- and kvm-supported x86 cpuid features.
+ *
+ * Architectures
+ * =============
+ * x86
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * auto cpuids = vmm::kvm::CpuidList{MAX_CPUID_ENTRIES};
+ * kvm.supported_cpuids(cpuids);
+ * ```
+ */
+auto system::supported_cpuids(CpuidList& cpuids) -> void {
+    utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuids.get());
 }
 
 /**
@@ -202,14 +223,33 @@ auto system::supported_cpuids() -> CpuidList {
  *
  * auto kvm = vmm::kvm::system{};
  * auto cpuids = kvm.emulated_cpuids();
- *
- * TODO
  * ```
  */
 auto system::emulated_cpuids() -> CpuidList {
-    auto cpuids = CpuidList{};
-    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, cpuids.get());
+    auto cpuids = CpuidList{MAX_CPUID_ENTRIES};
+    emulated_cpuids(cpuids);
     return cpuids;
+}
+
+/**
+ * Obtains a list of kvm-emulated x86 cpuid features.
+ *
+ * Architectures
+ * =============
+ * x86
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * auto cpuids = vmm::kvm::CpuidList{MAX_CPUID_ENTRIES};
+ * kvm.emulated_cpuids(cpuids);
+ * ```
+ */
+auto system::emulated_cpuids(CpuidList& cpuids) -> void {
+    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, cpuids.get());
 }
 
 /**

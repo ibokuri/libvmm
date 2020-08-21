@@ -132,6 +132,7 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
         template <typename Container>
         MsrList(Container& c) : MsrList(c.begin(), c.end()) { }
 
+        // Copy/move assignment
         MsrList(const MsrList& other);
         MsrList(MsrList&& other) = default;
         auto operator=(MsrList other) -> MsrList&;
@@ -153,10 +154,8 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
 };
 
 class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
-    private:
-        CpuidList(const uint32_t n);
     public:
-        CpuidList();
+        CpuidList(const uint32_t n);
         CpuidList(value_type entry);
 
         template <typename Iterator>
@@ -167,6 +166,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
         template <typename Container>
         CpuidList(Container& c) : CpuidList(c.begin(), c.end()) { }
 
+        // Copy/move assignment
         CpuidList(const CpuidList& other);
         CpuidList(CpuidList&& other) = default;
         auto operator=(CpuidList other) -> CpuidList&;
@@ -201,6 +201,7 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routi
         template <typename Container>
         IrqRoutingList(Container& c) : IrqRoutingList(c.begin(), c.end()) { }
 
+        // Copy/move assignment
         IrqRoutingList(const IrqRoutingList& other);
         IrqRoutingList(IrqRoutingList&& other) = default;
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;

@@ -120,7 +120,6 @@ auto MsrList::cend() const noexcept -> const_iterator { return end(); }
  *     N * sizeof(kvm_cpuid_entry2) + 2 * sizeof(__u32)
  */
 CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(value_type) + 2) { ptr_->nent = n; }
-CpuidList::CpuidList() : CpuidList(MAX_CPUID_ENTRIES) {}
 CpuidList::CpuidList(value_type entry) : CpuidList(1) { data()[0] = entry; }
 
 /* Copy constructor */
