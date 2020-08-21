@@ -76,21 +76,28 @@ MsrFeatureList::MsrFeatureList(const size_t n) : MsrIndexList(n) {}
  */
 MsrList::MsrList(const size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
 MsrList::MsrList(value_type entry) : MsrList(1) { data()[0] = entry; }
-
-/* Copy constructor */
 MsrList::MsrList(const MsrList& other) : MsrList(other.begin(), other.end()) {}
 
-/* Copy/move assignment operator */
 auto MsrList::operator=(MsrList other) -> MsrList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
 // Element access
+auto MsrList::operator[](size_t pos) -> reference {
+    assert(pos < size());
+    return data()[pos];
+}
+auto MsrList::operator[](size_t pos) const -> const_reference {
+    assert(pos < size());
+    return data()[pos];
+}
+
 auto MsrList::data() noexcept -> pointer { return ptr_->entries; }
 auto MsrList::data() const noexcept -> const_pointer { return ptr_->entries; }
 
 // Capacity
+auto MsrList::empty() const noexcept -> bool { return size() == 0; }
 auto MsrList::size() const noexcept -> uint32_t { return ptr_->nmsrs; }
 
 // Iterators
@@ -130,19 +137,28 @@ auto MsrList::cend() const noexcept -> const_iterator { return end(); }
  */
 CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(value_type) + 2) { ptr_->nent = n; }
 CpuidList::CpuidList(value_type entry) : CpuidList(1) { data()[0] = entry; }
-
-/* Copy constructor */
 CpuidList::CpuidList(const CpuidList& other) : CpuidList(other.begin(), other.end()) {}
+
 auto CpuidList::operator=(CpuidList other) -> CpuidList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
 // Element access
+auto CpuidList::operator[](size_t pos) -> reference {
+    assert(pos < size());
+    return data()[pos];
+}
+auto CpuidList::operator[](size_t pos) const -> const_reference {
+    assert(pos < size());
+    return data()[pos];
+}
+
 auto CpuidList::data() noexcept -> pointer { return ptr_->entries; }
 auto CpuidList::data() const noexcept -> const_pointer { return ptr_->entries; }
 
 // Capacity
+auto CpuidList::empty() const noexcept -> bool { return size() == 0; }
 auto CpuidList::size() const noexcept -> uint32_t { return ptr_->nent; }
 
 // Iterators
@@ -184,21 +200,28 @@ IrqRoutingList::IrqRoutingList(const uint32_t n) : FamStruct(n * (sizeof(value_t
     ptr_->flags = 0;
 }
 IrqRoutingList::IrqRoutingList(value_type entry) : IrqRoutingList(1) { data()[0] = entry; }
-
-/* Copy constructor */
 IrqRoutingList::IrqRoutingList(const IrqRoutingList& other) : IrqRoutingList(other.begin(), other.end()) {}
 
-/* Copy/move assignment operator */
 auto IrqRoutingList::operator=(IrqRoutingList other) -> IrqRoutingList& {
     other.ptr_.swap(this->ptr_);
     return *this;
 }
 
 // Element access
+auto IrqRoutingList::operator[](size_t pos) -> reference {
+    assert(pos < size());
+    return data()[pos];
+}
+auto IrqRoutingList::operator[](size_t pos) const -> const_reference {
+    assert(pos < size());
+    return data()[pos];
+}
+
 auto IrqRoutingList::data() noexcept -> pointer { return ptr_->entries; }
 auto IrqRoutingList::data() const noexcept -> const_pointer { return ptr_->entries; }
 
 // Capacity
+auto IrqRoutingList::empty() const noexcept -> bool { return size() == 0; }
 auto IrqRoutingList::size() const noexcept -> uint32_t { return ptr_->nr; }
 
 // Iterators

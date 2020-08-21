@@ -140,10 +140,13 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
         auto operator=(MsrList other) -> MsrList&;
 
         // Element access
+        auto operator[](size_t pos) -> reference;
+        auto operator[](size_t pos) const -> const_reference;
         auto data() noexcept -> pointer;
         auto data() const noexcept -> const_pointer;
 
         // Capacity
+        auto empty() const noexcept -> bool;
         auto size() const noexcept -> uint32_t;
 
         // Iterators
@@ -174,10 +177,13 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
         auto operator=(CpuidList other) -> CpuidList&;
 
         // Element access
+        auto operator[](size_t pos) -> reference;
+        auto operator[](size_t pos) const -> const_reference;
         auto data() noexcept -> pointer;
         auto data() const noexcept -> const_pointer;
 
         // Capacity
+        auto empty() const noexcept -> bool;
         auto size() const noexcept -> uint32_t;
 
         // Iterators
@@ -209,10 +215,13 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routi
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;
 
         // Element access
+        auto operator[](size_t pos) -> reference;
+        auto operator[](size_t pos) const -> const_reference;
         auto data() noexcept -> pointer;
         auto data() const noexcept -> const_pointer;
 
         // Capacity
+        auto empty() const noexcept -> bool;
         auto size() const noexcept -> uint32_t;
 
         // Iterators
