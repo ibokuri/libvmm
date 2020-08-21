@@ -77,8 +77,7 @@ class system : public KvmIoctl {
         auto api_version() -> unsigned int;
 
         // Creation routines
-        auto vm(unsigned int machine_type) -> vmm::kvm::detail::vm;
-        auto vm() -> vmm::kvm::detail::vm;
+        auto vm(unsigned int machine_type = 0) -> vmm::kvm::detail::vm;
 
         // Control routines
         auto check_extension(const unsigned int cap) -> unsigned int;

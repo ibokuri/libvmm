@@ -66,25 +66,6 @@ auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
 }
 
 /**
- * Creates a and returns a virtual machine.
- *
- * The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
- * ioctl's result.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto vm = kvm.vm();
- * ```
- */
-auto system::vm() -> vmm::kvm::detail::vm {
-    return vm(0);
-}
-
-/**
  * Returns a positive integer if a KVM extension is available; 0 otherwise.
  *
  * Based on their initialization, VMs may have different capabilities. Thus,
