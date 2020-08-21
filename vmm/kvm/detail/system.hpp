@@ -88,6 +88,8 @@ class system : public KvmIoctl {
         auto emulated_cpuids() -> CpuidList;
         auto msr_index_list() -> MsrIndexList;
         auto msr_feature_list() -> MsrFeatureList;
+        auto msr_index_list(MsrIndexList& msrs) -> void;
+        auto msr_feature_list(MsrFeatureList& msrs) -> void;
         auto get_msrs(MsrList& msrs) -> unsigned int;
 };
 

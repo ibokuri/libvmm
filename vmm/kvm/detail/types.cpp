@@ -36,6 +36,9 @@ auto MsrIndexList::cbegin() const noexcept -> const_iterator { return begin(); }
 auto MsrIndexList::cend() const noexcept -> const_iterator { return end(); }
 
 
+MsrFeatureList::MsrFeatureList(const size_t n) : MsrIndexList(n) {}
+
+
 /**
  * Internal MsrList constructor.
  *
@@ -58,7 +61,6 @@ auto MsrIndexList::cend() const noexcept -> const_iterator { return end(); }
  *     N * (sizeof(kvm_msr_entry) / sizeof(__u64)) + sizeof(__u64)
  */
 MsrList::MsrList(const size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
-MsrFeatureList::MsrFeatureList() : MsrIndexList(MAX_IO_MSRS_FEATURES) {}
 MsrList::MsrList(value_type entry) : MsrList(1) { ptr_->entries[0] = entry; }
 
 /* Copy constructor */

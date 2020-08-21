@@ -78,7 +78,7 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
 
 class MsrFeatureList : public MsrIndexList {
     public:
-        MsrFeatureList();
+        MsrFeatureList(const size_t n);
 };
 
 class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {

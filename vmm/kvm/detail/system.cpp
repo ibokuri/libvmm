@@ -222,21 +222,33 @@ auto system::emulated_cpuids() -> CpuidList {
  *
  * auto kvm = vmm::kvm::system{};
  * auto msr_list = kvm.msr_index_list();
- *
- * TODO
  * ```
  */
 auto system::msr_index_list() -> MsrIndexList {
-    auto msr_list = MsrIndexList{};
-    utility::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msr_list.get());
-    return msr_list;
+    auto msrs = MsrIndexList{MAX_IO_MSRS};
+    msr_index_list(msrs);
+    return msrs;
+}
+
+/**
+ * Obtains a list of host-supported and kvm-specific MSRs.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * auto msr_list = vmm::kvm::MsrIndexList{MAX_IO_MSRS};
+ * kvm.msr_index_list(msr_list);
+ * ```
+ */
+auto system::msr_index_list(MsrIndexList& msrs) -> void {
+    utility::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msrs.get());
 }
 
 /**
  * Returns a list of MSRs exposing MSR-based CPU features.
- *
- * This can be used, for instance, by a hypervisor to validate requested
- * CPU features.
  *
  * Examples
  * ========
@@ -246,14 +258,29 @@ auto system::msr_index_list() -> MsrIndexList {
  *
  * auto kvm = vmm::kvm::system{};
  * auto msr_list = kvm.msr_feature_list();
- *
- * TODO
  * ```
  */
 auto system::msr_feature_list() -> MsrFeatureList {
-    auto msr_list = MsrFeatureList{};
-    utility::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msr_list.get());
-    return msr_list;
+    auto msrs = MsrFeatureList{MAX_IO_MSRS_FEATURES};
+    msr_feature_list(msrs);
+    return msrs;
+}
+
+/**
+ * Obtains a list of MSRs exposing MSR-based CPU features.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * auto msr_list = vmm::kvm::MsrFeatureList{MAX_IO_MSRS_FEATURES};
+ * kvm.msr_feature_list(msr_list);
+ * ```
+ */
+auto system::msr_feature_list(MsrFeatureList& msrs) -> void {
+    utility::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msrs.get());
 }
 
 /**
