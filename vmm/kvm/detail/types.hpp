@@ -40,10 +40,10 @@ class FamStruct {
                    [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
 
         using value_type = Entry;
-        using pointer = Entry*;
-        using const_pointer = const Entry*;
-        using reference = Entry&;
-        using const_reference = const value_type&;
+        using pointer = value_type*;
+        using const_pointer = const pointer;
+        using reference = value_type&;
+        using const_reference = const reference;
         using iterator = pointer;
         using const_iterator = const_pointer;
         using reverse_iterator = std::reverse_iterator<iterator>;
@@ -58,7 +58,12 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
     public:
         MsrIndexList();
 
+        // Element access
+        auto first() -> reference;
+        auto last() -> reference;
+
         // Capacity
+        auto empty() const noexcept -> bool;
         auto size() const noexcept -> uint32_t;
         auto max_size() const noexcept-> uint32_t;
 
