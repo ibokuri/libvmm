@@ -57,6 +57,8 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
         MsrIndexList(const size_t n);
 
         // Element access
+        auto operator[](size_t pos) -> reference;
+        auto operator[](size_t pos) const -> const_reference;
         auto data() noexcept -> pointer;
         auto data() const noexcept -> const_pointer;
 

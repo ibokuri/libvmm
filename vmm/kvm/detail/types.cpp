@@ -25,6 +25,15 @@ namespace vmm::kvm::detail {
 MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) { ptr_->nmsrs = n; }
 
 // Element access
+auto MsrIndexList::operator[](size_t pos) -> reference {
+    assert(pos < size());
+    return data()[pos];
+}
+auto MsrIndexList::operator[](size_t pos) const -> const_reference {
+    assert(pos < size());
+    return data()[pos];
+}
+
 auto MsrIndexList::data() noexcept -> pointer { return ptr_->indices; }
 auto MsrIndexList::data() const noexcept -> const_pointer { return ptr_->indices; }
 
