@@ -43,7 +43,7 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  * auto device = vm.device(KVM_DEV_TYPE_VFIO);
  * ```
  */
-auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::detail::device {
+auto vm::device(unsigned int type, unsigned int flags) -> vmm::kvm::detail::device {
     auto dev = kvm_create_device{ .type = type, .fd = 0, .flags = flags };
     utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev);
     return vmm::kvm::detail::device{dev};
@@ -67,7 +67,7 @@ auto vm::device(const unsigned int type, const unsigned int flags) -> vmm::kvm::
  * assert(vm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
-auto vm::check_extension(const unsigned int cap) -> unsigned int {
+auto vm::check_extension(unsigned int cap) -> unsigned int {
     return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
 }
 

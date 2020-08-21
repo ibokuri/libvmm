@@ -11,7 +11,7 @@ class KvmIoctl {
         unsigned int fd_;
         bool closed_;
 
-        KvmIoctl(const unsigned int fd) noexcept : fd_{fd}, closed_{false} {}
+        KvmIoctl(unsigned int fd) noexcept : fd_{fd}, closed_{false} {}
         ~KvmIoctl() noexcept;
     public:
         auto close() -> void;

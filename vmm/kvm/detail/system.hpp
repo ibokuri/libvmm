@@ -62,7 +62,7 @@ class system : public KvmIoctl {
          * auto kvm = vmm::kvm::system{fd};
          * ```
          */
-        static auto open(const bool cloexec=true) -> unsigned int {
+        static auto open(bool cloexec=true) -> unsigned int {
             const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
             if (fd < 0)
                 throw std::filesystem::filesystem_error{
@@ -80,7 +80,7 @@ class system : public KvmIoctl {
         auto vm(unsigned int machine_type = 0) -> vmm::kvm::detail::vm;
 
         // Control routines
-        auto check_extension(const unsigned int cap) -> unsigned int;
+        auto check_extension(unsigned int cap) -> unsigned int;
         auto vcpu_mmap_size() -> unsigned int;
         auto host_ipa_limit() -> unsigned int;
         auto supported_cpuids() -> CpuidList;

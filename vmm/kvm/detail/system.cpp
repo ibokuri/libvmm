@@ -82,7 +82,7 @@ auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
  * assert(kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
-auto system::check_extension(const unsigned int cap) -> unsigned int {
+auto system::check_extension(unsigned int cap) -> unsigned int {
     return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
 }
 

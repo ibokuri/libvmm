@@ -18,7 +18,7 @@ namespace vmm::kvm::detail {
  *
  *     N + sizeof(__u32)
  */
-MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) { ptr_->nmsrs = n; }
+MsrIndexList::MsrIndexList(size_t n) : FamStruct(n + 1) { ptr_->nmsrs = n; }
 
 // Element access
 auto MsrIndexList::operator[](size_t pos) noexcept -> reference {
@@ -67,7 +67,7 @@ MsrFeatureList::MsrFeatureList(const size_t n) : MsrIndexList(n) {}
  *
  *     N * (sizeof(kvm_msr_entry) / sizeof(__u64)) + sizeof(__u64)
  */
-MsrList::MsrList(const size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
+MsrList::MsrList(size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
 MsrList::MsrList(value_type entry) : MsrList(1) { data()[0] = entry; }
 MsrList::MsrList(const MsrList& other) : MsrList(other.begin(), other.end()) {}
 
@@ -124,7 +124,7 @@ auto MsrList::cend() const noexcept -> const_iterator { return end(); }
  *
  *     N * sizeof(kvm_cpuid_entry2) + 2 * sizeof(__u32)
  */
-CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(value_type) + 2) { ptr_->nent = n; }
+CpuidList::CpuidList(uint32_t n) : FamStruct(n * sizeof(value_type) + 2) { ptr_->nent = n; }
 CpuidList::CpuidList(value_type entry) : CpuidList(1) { data()[0] = entry; }
 CpuidList::CpuidList(const CpuidList& other) : CpuidList(other.begin(), other.end()) {}
 
@@ -180,7 +180,7 @@ auto CpuidList::cend() const noexcept -> const_iterator { return end(); }
  *       } u;
  * };
  */
-IrqRoutingList::IrqRoutingList(const uint32_t n) : FamStruct(n * (sizeof(value_type) / 2) + 1) {
+IrqRoutingList::IrqRoutingList(uint32_t n) : FamStruct(n * (sizeof(value_type) / 2) + 1) {
     ptr_->nr = n;
     ptr_->flags = 0;
 }

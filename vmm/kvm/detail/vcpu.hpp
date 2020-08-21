@@ -14,7 +14,7 @@ class vcpu : public KvmIoctl {
         /**
          * Restricted constructor for kvm::vm objects.
          */
-        vcpu(const unsigned int fd) noexcept : KvmIoctl(fd) {}
+        vcpu(unsigned int fd) noexcept : KvmIoctl(fd) {}
         friend vcpu vm::vcpu(unsigned long vcpu_id);
 };
 

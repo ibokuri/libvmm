@@ -20,16 +20,16 @@ class vm : public KvmIoctl {
         unsigned int mmap_size_;
 
         // Restricted constructor for kvm::system objects.
-        vm(const unsigned int fd, const unsigned int mmap_size) noexcept
+        vm(unsigned int fd, unsigned int mmap_size) noexcept
             : KvmIoctl(fd), mmap_size_{mmap_size} {}
         friend vm system::vm(unsigned int machine_type);
     public:
         // Creation routines
         auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
-        auto device(const unsigned int type, const unsigned int flags=0) -> vmm::kvm::detail::device;
+        auto device(unsigned int type, unsigned int flags=0) -> vmm::kvm::detail::device;
 
         // Control routines
-        auto check_extension(const unsigned int cap) -> unsigned int;
+        auto check_extension(unsigned int cap) -> unsigned int;
         auto set_bsp(unsigned long vcpu_id) -> void;
         auto memslot(kvm_userspace_memory_region region) -> void;
         auto irqchip(void) -> void;

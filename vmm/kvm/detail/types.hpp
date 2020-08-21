@@ -35,9 +35,8 @@ class FamStruct {
     protected:
         std::unique_ptr<Struct, void(*)(Struct*)> ptr_;
 
-        FamStruct(const size_t n)
-            : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
-                   [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
+        FamStruct(size_t n) : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
+                                   [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
 
         using value_type = Entry;
         using pointer = value_type*;
@@ -55,7 +54,7 @@ class FamStruct {
 class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
     public:
         // Constructors
-        MsrIndexList(const size_t n);
+        MsrIndexList(size_t n);
 
         // Element access
         auto operator[](size_t pos) noexcept -> reference;
@@ -78,12 +77,12 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
 
 class MsrFeatureList : public MsrIndexList {
     public:
-        MsrFeatureList(const size_t n);
+        MsrFeatureList(size_t n);
 };
 
 class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
     private:
-        MsrList(const size_t n);
+        MsrList(size_t n);
     public:
         // Constructors
         MsrList(value_type entry);
@@ -122,7 +121,7 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
 class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
     public:
         // Constructors
-        CpuidList(const uint32_t n);
+        CpuidList(uint32_t n);
         CpuidList(value_type entry);
 
         template <typename Iterator>
@@ -158,7 +157,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
 
 class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routing_entry> {
     private:
-        IrqRoutingList(const uint32_t n);
+        IrqRoutingList(uint32_t n);
     public:
         // Constructors
         IrqRoutingList(value_type entry);
