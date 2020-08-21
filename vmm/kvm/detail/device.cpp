@@ -1,4 +1,5 @@
 #include "vmm/kvm/detail/device.hpp"
+#include "vmm/utility/utility.hpp"
 
 namespace vmm::kvm::detail {
 

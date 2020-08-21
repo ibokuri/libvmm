@@ -53,21 +53,18 @@ class FamStruct {
 };
 
 class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
-    protected:
-        MsrIndexList(const size_t n);
     public:
-        MsrIndexList();
+        MsrIndexList(const size_t n);
 
         // Element access
-        auto first() -> reference;
-        auto last() -> reference;
+        auto data() noexcept -> pointer;
+        auto data() const noexcept -> const_pointer;
 
         // Capacity
         auto empty() const noexcept -> bool;
         auto size() const noexcept -> uint32_t;
-        auto max_size() const noexcept-> uint32_t;
 
-        // Iterators (TODO: rbegin, crbegin, rend, crend)
+        // Iterators
         auto begin() noexcept -> iterator;
         auto end() noexcept -> iterator;
         auto begin() const noexcept -> const_iterator;

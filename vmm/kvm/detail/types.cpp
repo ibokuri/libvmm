@@ -4,6 +4,8 @@
 
 #include "vmm/kvm/detail/types.hpp"
 
+#include <cassert>
+
 namespace vmm::kvm::detail {
 
 /**
@@ -21,17 +23,20 @@ namespace vmm::kvm::detail {
  *     N + sizeof(__u32)
  */
 MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) { ptr_->nmsrs = n; }
-MsrIndexList::MsrIndexList() : MsrIndexList(MAX_IO_MSRS) {}
+
+// Element access
+auto MsrIndexList::data() noexcept -> pointer { return ptr_->indices; }
+auto MsrIndexList::data() const noexcept -> const_pointer { return ptr_->indices; }
 
 // Capacity
+auto MsrIndexList::empty() const noexcept -> bool { return size() == 0; }
 auto MsrIndexList::size() const noexcept -> unsigned int { return ptr_->nmsrs; }
-auto MsrIndexList::max_size() const noexcept -> unsigned int { return MAX_IO_MSRS; }
 
 // Iterators
-auto MsrIndexList::begin() noexcept -> iterator { return ptr_->indices; }
-auto MsrIndexList::end() noexcept -> iterator { return ptr_->indices + ptr_->nmsrs; }
-auto MsrIndexList::begin() const noexcept -> const_iterator { return ptr_->indices; }
-auto MsrIndexList::end() const noexcept -> const_iterator { return ptr_->indices + ptr_->nmsrs; }
+auto MsrIndexList::begin() noexcept -> iterator { return data(); }
+auto MsrIndexList::end() noexcept -> iterator { return data() + size(); }
+auto MsrIndexList::begin() const noexcept -> const_iterator { return data(); }
+auto MsrIndexList::end() const noexcept -> const_iterator { return begin() + size(); }
 auto MsrIndexList::cbegin() const noexcept -> const_iterator { return begin(); }
 auto MsrIndexList::cend() const noexcept -> const_iterator { return end(); }
 

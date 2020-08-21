@@ -6,6 +6,9 @@
 
 #include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/system.hpp"
+#include "vmm/kvm/detail/types.hpp"
+
+#include <linux/kvm.h>
 
 namespace vmm::kvm::detail {
 

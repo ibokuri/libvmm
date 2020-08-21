@@ -7,6 +7,8 @@
 #include "vmm/kvm/detail/vm.hpp"
 #include "vmm/kvm/detail/base.hpp"
 
+#include <linux/kvm.h>
+
 namespace vmm::kvm::detail {
 
 class device : public KvmIoctl {
