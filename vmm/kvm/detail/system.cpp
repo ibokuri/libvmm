@@ -14,7 +14,7 @@ namespace vmm::kvm::detail {
 /**
  * Returns the kvm API version.
  *
- * Applications should refuse to run if this a value other than 12 is returned.
+ * Applications should refuse to run if a value other than 12 is returned.
  *
  * Examples
  * ========
@@ -33,7 +33,7 @@ auto system::api_version() -> unsigned int {
 /**
  * Returns a file descriptor associated with a newly created VM.
  *
- * This method should only be used indirectly by `system::vm()`.
+ * This method should only be used by `system::vm()`.
  */
 auto system::create_vm(unsigned int machine_type) -> unsigned int {
     return utility::ioctl(fd_, KVM_CREATE_VM, machine_type);
