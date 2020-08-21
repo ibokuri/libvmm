@@ -66,7 +66,7 @@ MsrFeatureList::MsrFeatureList(const size_t n) : MsrIndexList(n) {}
  *     N * (sizeof(kvm_msr_entry) / sizeof(__u64)) + sizeof(__u64)
  */
 MsrList::MsrList(const size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
-MsrList::MsrList(value_type entry) : MsrList(1) { ptr_->entries[0] = entry; }
+MsrList::MsrList(value_type entry) : MsrList(1) { data()[0] = entry; }
 
 /* Copy constructor */
 MsrList::MsrList(const MsrList& other) : MsrList(other.begin(), other.end()) {}
@@ -77,14 +77,18 @@ auto MsrList::operator=(MsrList other) -> MsrList& {
     return *this;
 }
 
+// Element access
+auto MsrList::data() noexcept -> pointer { return ptr_->entries; }
+auto MsrList::data() const noexcept -> const_pointer { return ptr_->entries; }
+
 // Capacity
 auto MsrList::size() const noexcept -> uint32_t { return ptr_->nmsrs; }
 
 // Iterators
-auto MsrList::begin() noexcept -> iterator { return ptr_->entries; }
-auto MsrList::end() noexcept -> iterator { return ptr_->entries + ptr_->nmsrs; }
-auto MsrList::begin() const noexcept -> const_iterator { return ptr_->entries; }
-auto MsrList::end() const noexcept -> const_iterator { return ptr_->entries + ptr_->nmsrs; }
+auto MsrList::begin() noexcept -> iterator { return data(); }
+auto MsrList::end() noexcept -> iterator { return data() + size(); }
+auto MsrList::begin() const noexcept -> const_iterator { return data(); }
+auto MsrList::end() const noexcept -> const_iterator { return begin() + size(); }
 auto MsrList::cbegin() const noexcept -> const_iterator { return begin(); }
 auto MsrList::cend() const noexcept -> const_iterator { return end(); }
 
@@ -117,7 +121,7 @@ auto MsrList::cend() const noexcept -> const_iterator { return end(); }
  */
 CpuidList::CpuidList(const uint32_t n) : FamStruct(n * sizeof(value_type) + 2) { ptr_->nent = n; }
 CpuidList::CpuidList() : CpuidList(MAX_CPUID_ENTRIES) {}
-CpuidList::CpuidList(value_type entry) : CpuidList(1) { ptr_->entries[0] = entry; }
+CpuidList::CpuidList(value_type entry) : CpuidList(1) { data()[0] = entry; }
 
 /* Copy constructor */
 CpuidList::CpuidList(const CpuidList& other) : CpuidList(other.begin(), other.end()) {}
@@ -126,14 +130,18 @@ auto CpuidList::operator=(CpuidList other) -> CpuidList& {
     return *this;
 }
 
+// Element access
+auto CpuidList::data() noexcept -> pointer { return ptr_->entries; }
+auto CpuidList::data() const noexcept -> const_pointer { return ptr_->entries; }
+
 // Capacity
 auto CpuidList::size() const noexcept -> uint32_t { return ptr_->nent; }
 
 // Iterators
-auto CpuidList::begin() noexcept -> iterator { return ptr_->entries; }
-auto CpuidList::end() noexcept -> iterator { return ptr_->entries + ptr_->nent; }
-auto CpuidList::begin() const noexcept -> const_iterator { return ptr_->entries; }
-auto CpuidList::end() const noexcept -> const_iterator { return ptr_->entries + ptr_->nent; }
+auto CpuidList::begin() noexcept -> iterator { return data(); }
+auto CpuidList::end() noexcept -> iterator { return data() + size(); }
+auto CpuidList::begin() const noexcept -> const_iterator { return data(); }
+auto CpuidList::end() const noexcept -> const_iterator { return begin() + size(); }
 auto CpuidList::cbegin() const noexcept -> const_iterator { return begin(); }
 auto CpuidList::cend() const noexcept -> const_iterator { return end(); }
 
@@ -167,7 +175,7 @@ IrqRoutingList::IrqRoutingList(const uint32_t n) : FamStruct(n * (sizeof(value_t
     ptr_->nr = n;
     ptr_->flags = 0;
 }
-IrqRoutingList::IrqRoutingList(value_type entry) : IrqRoutingList(1) { ptr_->entries[0] = entry; }
+IrqRoutingList::IrqRoutingList(value_type entry) : IrqRoutingList(1) { data()[0] = entry; }
 
 /* Copy constructor */
 IrqRoutingList::IrqRoutingList(const IrqRoutingList& other) : IrqRoutingList(other.begin(), other.end()) {}
@@ -178,14 +186,18 @@ auto IrqRoutingList::operator=(IrqRoutingList other) -> IrqRoutingList& {
     return *this;
 }
 
+// Element access
+auto IrqRoutingList::data() noexcept -> pointer { return ptr_->entries; }
+auto IrqRoutingList::data() const noexcept -> const_pointer { return ptr_->entries; }
+
 // Capacity
 auto IrqRoutingList::size() const noexcept -> uint32_t { return ptr_->nr; }
 
 // Iterators
-auto IrqRoutingList::begin() noexcept -> iterator { return ptr_->entries; }
-auto IrqRoutingList::end() noexcept -> iterator { return ptr_->entries + ptr_->nr; }
-auto IrqRoutingList::begin() const noexcept -> const_iterator { return ptr_->entries; }
-auto IrqRoutingList::end() const noexcept -> const_iterator { return ptr_->entries + ptr_->nr; }
+auto IrqRoutingList::begin() noexcept -> iterator { return data(); }
+auto IrqRoutingList::end() noexcept -> iterator { return data() + size(); }
+auto IrqRoutingList::begin() const noexcept -> const_iterator { return data(); }
+auto IrqRoutingList::end() const noexcept -> const_iterator { return begin() + size(); }
 auto IrqRoutingList::cbegin() const noexcept -> const_iterator { return begin(); }
 auto IrqRoutingList::cend() const noexcept -> const_iterator { return end(); }
 

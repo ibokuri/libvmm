@@ -106,7 +106,7 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
          */
         template <typename Iterator>
         MsrList(Iterator first, Iterator last) : MsrList(std::distance(first, last)) {
-            std::copy_if(first, last, ptr_->entries, [](value_type) { return true; });
+            std::copy_if(first, last, data(), [](value_type) { return true; });
         }
 
         /**
@@ -136,6 +136,10 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
         MsrList(MsrList&& other) = default;
         auto operator=(MsrList other) -> MsrList&;
 
+        // Element access
+        auto data() noexcept -> pointer;
+        auto data() const noexcept -> const_pointer;
+
         // Capacity
         auto size() const noexcept -> uint32_t;
 
@@ -157,7 +161,7 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
 
         template <typename Iterator>
         CpuidList(Iterator first, Iterator last) : CpuidList(std::distance(first, last)) {
-            std::copy_if(first, last, ptr_->entries, [](value_type) { return true; });
+            std::copy_if(first, last, data(), [](value_type) { return true; });
         }
 
         template <typename Container>
@@ -166,6 +170,10 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
         CpuidList(const CpuidList& other);
         CpuidList(CpuidList&& other) = default;
         auto operator=(CpuidList other) -> CpuidList&;
+
+        // Element access
+        auto data() noexcept -> pointer;
+        auto data() const noexcept -> const_pointer;
 
         // Capacity
         auto size() const noexcept -> uint32_t;
@@ -196,6 +204,10 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routi
         IrqRoutingList(const IrqRoutingList& other);
         IrqRoutingList(IrqRoutingList&& other) = default;
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;
+
+        // Element access
+        auto data() noexcept -> pointer;
+        auto data() const noexcept -> const_pointer;
 
         // Capacity
         auto size() const noexcept -> uint32_t;
