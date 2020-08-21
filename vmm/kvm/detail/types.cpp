@@ -21,11 +21,11 @@ namespace vmm::kvm::detail {
 MsrIndexList::MsrIndexList(const size_t n) : FamStruct(n + 1) { ptr_->nmsrs = n; }
 
 // Element access
-auto MsrIndexList::operator[](size_t pos) -> reference {
+auto MsrIndexList::operator[](size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto MsrIndexList::operator[](size_t pos) const -> const_reference {
+auto MsrIndexList::operator[](size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
@@ -77,11 +77,11 @@ auto MsrList::operator=(MsrList other) -> MsrList& {
 }
 
 // Element access
-auto MsrList::operator[](size_t pos) -> reference {
+auto MsrList::operator[](size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto MsrList::operator[](size_t pos) const -> const_reference {
+auto MsrList::operator[](size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
@@ -134,11 +134,11 @@ auto CpuidList::operator=(CpuidList other) -> CpuidList& {
 }
 
 // Element access
-auto CpuidList::operator[](size_t pos) -> reference {
+auto CpuidList::operator[](size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto CpuidList::operator[](size_t pos) const -> const_reference {
+auto CpuidList::operator[](size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
@@ -193,11 +193,11 @@ auto IrqRoutingList::operator=(IrqRoutingList other) -> IrqRoutingList& {
 }
 
 // Element access
-auto IrqRoutingList::operator[](size_t pos) -> reference {
+auto IrqRoutingList::operator[](size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto IrqRoutingList::operator[](size_t pos) const -> const_reference {
+auto IrqRoutingList::operator[](size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
