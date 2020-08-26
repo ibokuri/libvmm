@@ -18,7 +18,7 @@ class vm;
 
 class system : public KvmIoctl {
     private:
-        auto create_vm(unsigned int machine_type) -> unsigned int;
+        [[nodiscard]] auto create_vm(unsigned int machine_type) -> unsigned int;
     public:
         system() : KvmIoctl(open()) {}
 
@@ -62,7 +62,7 @@ class system : public KvmIoctl {
          * auto kvm = vmm::kvm::system{fd};
          * ```
          */
-        static auto open(bool cloexec=true) -> unsigned int {
+        [[nodiscard]] static auto open(bool cloexec=true) -> unsigned int {
             const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
             if (fd < 0)
                 throw std::filesystem::filesystem_error{
@@ -74,21 +74,21 @@ class system : public KvmIoctl {
         }
 
         // General routines
-        auto api_version() -> unsigned int;
+        [[nodiscard]] auto api_version() -> unsigned int;
 
         // Creation routines
-        auto vm(unsigned int machine_type = 0) -> vmm::kvm::detail::vm;
+        [[nodiscard]] auto vm(unsigned int machine_type = 0) -> vmm::kvm::detail::vm;
 
         // Control routines
-        auto check_extension(unsigned int cap) -> unsigned int;
-        auto vcpu_mmap_size() -> unsigned int;
-        auto host_ipa_limit() -> unsigned int;
-        auto supported_cpuids() -> CpuidList;
-        auto emulated_cpuids() -> CpuidList;
+        [[nodiscard]] auto check_extension(unsigned int cap) -> unsigned int;
+        [[nodiscard]] auto vcpu_mmap_size() -> unsigned int;
+        [[nodiscard]] auto host_ipa_limit() -> unsigned int;
+        [[nodiscard]] auto supported_cpuids() -> CpuidList;
+        [[nodiscard]] auto emulated_cpuids() -> CpuidList;
         auto supported_cpuids(CpuidList& cpuids) -> void;
         auto emulated_cpuids(CpuidList& cpuids) -> void;
-        auto msr_index_list() -> MsrIndexList;
-        auto msr_feature_list() -> MsrFeatureList;
+        [[nodiscard]] auto msr_index_list() -> MsrIndexList;
+        [[nodiscard]] auto msr_feature_list() -> MsrFeatureList;
         auto msr_index_list(MsrIndexList& msrs) -> void;
         auto msr_feature_list(MsrFeatureList& msrs) -> void;
         auto get_msrs(MsrList& msrs) -> unsigned int;

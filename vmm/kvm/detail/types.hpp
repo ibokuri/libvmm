@@ -48,7 +48,7 @@ class FamStruct {
         FamStruct(size_t n) : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
                                    [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
     public:
-        auto get() -> Struct* { return ptr_.get(); }
+        [[nodiscard]] auto get() -> Struct* { return ptr_.get(); }
 };
 
 class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
@@ -57,14 +57,14 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
         MsrIndexList(size_t n);
 
         // Element access
-        auto operator[](size_t pos) noexcept -> reference;
-        auto operator[](size_t pos) const noexcept -> const_reference;
-        auto data() noexcept -> pointer;
-        auto data() const noexcept -> const_pointer;
+        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto data() noexcept -> pointer;
+        [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
-        auto empty() const noexcept -> bool;
-        auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto empty() const noexcept -> bool;
+        [[nodiscard]] auto size() const noexcept -> uint32_t;
 
         // Iterators
         auto begin() noexcept -> iterator;
@@ -100,14 +100,14 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
         auto operator=(MsrList other) -> MsrList&;
 
         // Element access
-        auto operator[](size_t pos) noexcept -> reference;
-        auto operator[](size_t pos) const noexcept -> const_reference;
-        auto data() noexcept -> pointer;
-        auto data() const noexcept -> const_pointer;
+        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto data() noexcept -> pointer;
+        [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
-        auto empty() const noexcept -> bool;
-        auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto empty() const noexcept -> bool;
+        [[nodiscard]] auto size() const noexcept -> uint32_t;
 
         // Iterators
         auto begin() noexcept -> iterator;
@@ -137,14 +137,14 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
         auto operator=(CpuidList other) -> CpuidList&;
 
         // Element access
-        auto operator[](size_t pos) noexcept -> reference;
-        auto operator[](size_t pos) const noexcept -> const_reference;
-        auto data() noexcept -> pointer;
-        auto data() const noexcept -> const_pointer;
+        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto data() noexcept -> pointer;
+        [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
-        auto empty() const noexcept -> bool;
-        auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto empty() const noexcept -> bool;
+        [[nodiscard]] auto size() const noexcept -> uint32_t;
 
         // Iterators
         auto begin() noexcept -> iterator;
@@ -175,14 +175,14 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routi
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;
 
         // Element access
-        auto operator[](size_t pos) noexcept -> reference;
-        auto operator[](size_t pos) const noexcept -> const_reference;
-        auto data() noexcept -> pointer;
-        auto data() const noexcept -> const_pointer;
+        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto data() noexcept -> pointer;
+        [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
-        auto empty() const noexcept -> bool;
-        auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto empty() const noexcept -> bool;
+        [[nodiscard]] auto size() const noexcept -> uint32_t;
 
         // Iterators
         auto begin() noexcept -> iterator;

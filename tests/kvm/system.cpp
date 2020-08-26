@@ -89,14 +89,14 @@ TEST_CASE("VM creation (with IPA size)", "[api]") {
     auto kvm = vmm::kvm::system{};
 
     if (kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE)) {
-            auto host_ipa_limit = kvm.host_ipa_limit();
+        auto host_ipa_limit = kvm.host_ipa_limit();
 
-            // Test max value
-            kvm.vm(host_ipa_limit);
+        // Test max value
+        auto vm = kvm.vm(host_ipa_limit);
 
-            // Test invalid values
-            REQUIRE_THROWS(kvm.vm(31));
-            REQUIRE_THROWS(kvm.vm(host_ipa_limit + 1));
+        // Test invalid values
+        REQUIRE_THROWS(kvm.vm(31));
+        REQUIRE_THROWS(kvm.vm(host_ipa_limit + 1));
     }
     else {
         // Test default size

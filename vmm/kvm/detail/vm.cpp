@@ -224,7 +224,7 @@ auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
  *
  * auto kvm = vmm::kvm::system{};
  * auto vm = kvm.vm();
- * auto clock = vm.get_clock(&clock);
+ * auto clock = vm.get_clock();
  * ```
  */
 auto vm::get_clock(void) -> kvm_clock_data {

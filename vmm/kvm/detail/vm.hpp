@@ -25,25 +25,25 @@ class vm : public KvmIoctl {
         friend vm system::vm(unsigned int machine_type);
     public:
         // Creation routines
-        auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
-        auto device(unsigned int type, unsigned int flags=0) -> vmm::kvm::detail::device;
+        [[nodiscard]] auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
+        [[nodiscard]] auto device(unsigned int type, unsigned int flags=0) -> vmm::kvm::detail::device;
 
         // Control routines
-        auto check_extension(unsigned int cap) -> unsigned int;
+        [[nodiscard]] auto check_extension(unsigned int cap) -> unsigned int;
         auto set_bsp(unsigned long vcpu_id) -> void;
         auto memslot(kvm_userspace_memory_region region) -> void;
         auto irqchip(void) -> void;
         auto get_irqchip(kvm_irqchip &irqchip_p) -> void;
         auto set_irqchip(kvm_irqchip &irqchip_p) -> void;
-        auto get_clock(void) -> kvm_clock_data;
+        [[nodiscard]] auto get_clock(void) -> kvm_clock_data;
         auto set_clock(kvm_clock_data &clock) -> void;
         auto gsi_routing(IrqRoutingList &routing_list) -> void;
 
         // Convenient routines
-        auto mmap_size(void) -> unsigned int;
-        auto num_vcpus(void) -> unsigned int;
-        auto max_vcpus(void) -> unsigned int;
-        auto num_memslots(void) -> unsigned int;
+        [[nodiscard]] auto mmap_size(void) -> unsigned int;
+        [[nodiscard]] auto num_vcpus(void) -> unsigned int;
+        [[nodiscard]] auto max_vcpus(void) -> unsigned int;
+        [[nodiscard]] auto num_memslots(void) -> unsigned int;
 };
 
 }  // namespace vmm::kvm::detail

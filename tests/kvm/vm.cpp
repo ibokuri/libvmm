@@ -74,6 +74,6 @@ TEST_CASE("Bootstrap Processor (BSP)", "[api]") {
     REQUIRE(vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0);
 
     REQUIRE_NOTHROW(vm.set_bsp(0));
-    vm.vcpu(0);
+    auto vcpu = vm.vcpu(0);
     REQUIRE_THROWS(vm.set_bsp(0));
 }
