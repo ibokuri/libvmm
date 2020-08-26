@@ -33,11 +33,6 @@ namespace vmm::kvm::detail {
 template<typename Struct, typename Buffer, typename Entry>
 class FamStruct {
     protected:
-        std::unique_ptr<Struct, void(*)(Struct*)> ptr_;
-
-        FamStruct(size_t n) : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
-                                   [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
-
         using value_type = Entry;
         using pointer = value_type*;
         using const_pointer = const pointer;
@@ -47,6 +42,11 @@ class FamStruct {
         using const_iterator = const_pointer;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+        std::unique_ptr<Struct, void(*)(Struct*)> ptr_;
+
+        FamStruct(size_t n) : ptr_{reinterpret_cast<Struct*>(new Buffer[n]()),
+                                   [](Struct *p){ delete[] reinterpret_cast<Buffer*>(p); }} {}
     public:
         auto get() -> Struct* { return ptr_.get(); }
 };
