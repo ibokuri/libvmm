@@ -27,7 +27,7 @@ namespace vmm::kvm::detail {
  * ```
  */
 auto system::api_version() -> unsigned int {
-    return utility::ioctl(fd_, KVM_GET_API_VERSION);
+    return fd_.ioctl(KVM_GET_API_VERSION);
 }
 
 /**
@@ -36,7 +36,7 @@ auto system::api_version() -> unsigned int {
  * This method should only be used by `system::vm()`.
  */
 auto system::create_vm(unsigned int machine_type) -> unsigned int {
-    return utility::ioctl(fd_, KVM_CREATE_VM, machine_type);
+     return fd_.ioctl(KVM_CREATE_VM, machine_type);
 }
 
 /**
@@ -83,7 +83,7 @@ auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
  * ```
  */
 auto system::check_extension(unsigned int cap) -> unsigned int {
-    return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
+    return fd_.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
 /**
@@ -111,7 +111,7 @@ auto system::check_extension(unsigned int cap) -> unsigned int {
  * ```
  */
 auto system::vcpu_mmap_size() -> unsigned int {
-    return utility::ioctl(fd_, KVM_GET_VCPU_MMAP_SIZE);
+    return fd_.ioctl(KVM_GET_VCPU_MMAP_SIZE);
 }
 
 /* Returns the IPA size for a VM; 0 if the capability isn't available.
@@ -187,7 +187,7 @@ auto system::supported_cpuids() -> CpuidList {
  * ```
  */
 auto system::supported_cpuids(CpuidList& cpuids) -> void {
-    utility::ioctl(fd_, KVM_GET_SUPPORTED_CPUID, cpuids.get());
+    fd_.ioctl(KVM_GET_SUPPORTED_CPUID, cpuids.get());
 }
 
 /**
@@ -230,7 +230,7 @@ auto system::emulated_cpuids() -> CpuidList {
  * ```
  */
 auto system::emulated_cpuids(CpuidList& cpuids) -> void {
-    utility::ioctl(fd_, KVM_GET_EMULATED_CPUID, cpuids.get());
+    fd_.ioctl(KVM_GET_EMULATED_CPUID, cpuids.get());
 }
 
 /**
@@ -265,7 +265,7 @@ auto system::msr_index_list() -> MsrIndexList {
  * ```
  */
 auto system::msr_index_list(MsrIndexList& msrs) -> void {
-    utility::ioctl(fd_, KVM_GET_MSR_INDEX_LIST, msrs.get());
+    fd_.ioctl(KVM_GET_MSR_INDEX_LIST, msrs.get());
 }
 
 /**
@@ -301,7 +301,7 @@ auto system::msr_feature_list() -> MsrFeatureList {
  * ```
  */
 auto system::msr_feature_list(MsrFeatureList& msrs) -> void {
-    utility::ioctl(fd_, KVM_GET_MSR_FEATURE_INDEX_LIST, msrs.get());
+    fd_.ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST, msrs.get());
 }
 
 /**
@@ -337,7 +337,7 @@ auto system::msr_feature_list(MsrFeatureList& msrs) -> void {
  * ```
  */
 auto system::get_msrs(MsrList& msrs) -> unsigned int {
-    return utility::ioctl(fd_, KVM_GET_MSRS, msrs.get());
+    return fd_.ioctl(KVM_GET_MSRS, msrs.get());
 }
 
 }  // namespace vmm::kvm::detail

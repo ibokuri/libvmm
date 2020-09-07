@@ -15,15 +15,21 @@ namespace vmm::kvm::detail {
 class vcpu;
 class device;
 
-class vm : public KvmIoctl {
+class vm {
     private:
+        KvmFd fd_;
         unsigned int mmap_size_;
 
-        // Restricted constructor for kvm::system objects.
-        vm(unsigned int fd, unsigned int mmap_size) noexcept
-            : KvmIoctl(fd), mmap_size_{mmap_size} {}
+        vm(const unsigned int fd, unsigned int mmap_size) noexcept
+            : fd_{fd}, mmap_size_{mmap_size} {}
+
         friend vm system::vm(unsigned int machine_type);
     public:
+        vm(const vm& other) = delete;
+        vm(vm&& other) = default;
+        auto operator=(const vm& other) -> vm& = delete;
+        auto operator=(vm&& other) -> vm& = default;
+
         // Creation routines
         [[nodiscard]] auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
         [[nodiscard]] auto device(unsigned int type, unsigned int flags=0) -> vmm::kvm::detail::device;

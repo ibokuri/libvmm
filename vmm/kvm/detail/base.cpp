@@ -7,16 +7,16 @@
 
 namespace vmm::kvm::detail {
 
-KvmIoctl::~KvmIoctl() noexcept {
-    if (!closed_) {
-        try {
-            utility::close(fd_);
-        }
-        catch (std::system_error& e) {
-            // TODO
-        }
-    }
-}
+//KvmIoctl::~KvmIoctl() noexcept {
+    //if (!closed_) {
+        //try {
+            //utility::close(fd_);
+        //}
+        //catch (std::system_error& e) {
+            //// TODO
+        //}
+    //}
+//}
 
 /**
  * Closes the ioctl class handle.
@@ -39,9 +39,9 @@ KvmIoctl::~KvmIoctl() noexcept {
  *     throw;
  * ```
  */
-auto KvmIoctl::close() -> void {
-    utility::close(fd_);
-    closed_ = true;
-}
+//auto KvmIoctl::close() -> void {
+    //utility::close(fd_);
+    //closed_ = true;
+//}
 
 }  // namespace vmm::kvm::detail

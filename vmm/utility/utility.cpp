@@ -5,23 +5,23 @@
 
 namespace vmm::utility {
 
-/**
- * Closes a file descriptor.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/utility.hpp>
- *
- * auto fd = open("/dev/kvm", O_RDWR | O_CLOEXEC);
- *
- * ...
- *
- * vmm::utility::close(kvm_fd);
- * ```
- */
-auto close(const int fd) -> void {
-    if (::close(fd) < 0) throw std::system_error{errno, std::system_category()};
+FileDescriptor::FileDescriptor(unsigned int fd) noexcept : fd_{fd}, closed_{false} {};
+
+FileDescriptor::~FileDescriptor() noexcept {
+    if (!closed_) {
+        try {
+            close();
+        }
+        catch (std::system_error& e) {
+            // TODO
+        }
+    }
+};
+
+auto FileDescriptor::close() -> void {
+    if (::close(fd_) < 0)
+        throw std::system_error{errno, std::system_category()};
+    closed_ = true;
 }
 
 }  // namespace vmm::utility

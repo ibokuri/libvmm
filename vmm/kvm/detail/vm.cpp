@@ -25,7 +25,7 @@ namespace vmm::kvm::detail {
  * ```
  */
 auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
-    return vmm::kvm::detail::vcpu{utility::ioctl(fd_, KVM_CREATE_VCPU, vcpu_id)};
+    return vmm::kvm::detail::vcpu{fd_.ioctl(KVM_CREATE_VCPU, vcpu_id)};
 }
 
 /**
@@ -45,7 +45,6 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  */
 auto vm::device(unsigned int type, unsigned int flags) -> vmm::kvm::detail::device {
     auto dev = kvm_create_device{ .type = type, .fd = 0, .flags = flags };
-    utility::ioctl(fd_, KVM_CREATE_DEVICE, &dev);
     return vmm::kvm::detail::device{dev};
 }
 
@@ -68,7 +67,7 @@ auto vm::device(unsigned int type, unsigned int flags) -> vmm::kvm::detail::devi
  * ```
  */
 auto vm::check_extension(unsigned int cap) -> unsigned int {
-    return utility::ioctl(fd_, KVM_CHECK_EXTENSION, cap);
+    return fd_.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
 /**
@@ -98,7 +97,7 @@ auto vm::check_extension(unsigned int cap) -> unsigned int {
  * ```
  */
 auto vm::set_bsp(unsigned long vcpu_id) -> void {
-    utility::ioctl(fd_, KVM_SET_BOOT_CPU_ID, vcpu_id);
+    fd_.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
 /**
@@ -125,7 +124,7 @@ auto vm::set_bsp(unsigned long vcpu_id) -> void {
  * ```
  */
 auto vm::memslot(kvm_userspace_memory_region region) -> void {
-    utility::ioctl(fd_, KVM_SET_USER_MEMORY_REGION, &region);
+    fd_.ioctl(KVM_SET_USER_MEMORY_REGION, &region);
 }
 
 /**
@@ -148,7 +147,7 @@ auto vm::memslot(kvm_userspace_memory_region region) -> void {
  * ```
  */
 auto vm::irqchip(void) -> void {
-    utility::ioctl(fd_, KVM_CREATE_IRQCHIP);
+    fd_.ioctl(KVM_CREATE_IRQCHIP);
 }
 
 /**
@@ -175,7 +174,7 @@ auto vm::irqchip(void) -> void {
  * ```
  */
 auto vm::get_irqchip(kvm_irqchip &irqchip_p) -> void {
-    utility::ioctl(fd_, KVM_GET_IRQCHIP, &irqchip_p);
+    fd_.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
 }
 
 /**
@@ -205,7 +204,7 @@ auto vm::get_irqchip(kvm_irqchip &irqchip_p) -> void {
  * ```
  */
 auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
-    utility::ioctl(fd_, KVM_SET_IRQCHIP, &irqchip_p);
+    fd_.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
 }
 
 /**
@@ -229,7 +228,7 @@ auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
  */
 auto vm::get_clock(void) -> kvm_clock_data {
     auto clock = kvm_clock_data{0};
-    utility::ioctl(fd_, KVM_GET_CLOCK, &clock);
+    fd_.ioctl(KVM_GET_CLOCK, &clock);
     return clock;
 }
 
@@ -255,7 +254,7 @@ auto vm::get_clock(void) -> kvm_clock_data {
  * ```
  */
 auto vm::set_clock(kvm_clock_data &clock) -> void {
-    utility::ioctl(fd_, KVM_SET_CLOCK, &clock);
+    fd_.ioctl(KVM_SET_CLOCK, &clock);
 }
 
 /**
@@ -268,7 +267,7 @@ auto vm::set_clock(kvm_clock_data &clock) -> void {
  * x86, s390, arm, arm64
  */
 auto vm::gsi_routing(IrqRoutingList &routing_list) -> void {
-    utility::ioctl(fd_, KVM_SET_GSI_ROUTING, &routing_list);
+    fd_.ioctl(KVM_SET_GSI_ROUTING, &routing_list);
 }
 
 /**

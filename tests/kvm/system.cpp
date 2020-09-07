@@ -10,7 +10,7 @@ TEST_CASE("KVM object creation", "[api]") {
 
 TEST_CASE("KVM object creation (via external fd)", "[api]") {
     auto fd = vmm::kvm::system::open();
-    auto kvm = vmm::kvm::system{fd};
+    auto kvm = vmm::kvm::system{std::move(fd)};
 }
 
 TEST_CASE("KVM object creation (via bad fd)", "[api]") {

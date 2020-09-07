@@ -11,13 +11,14 @@
 
 namespace vmm::kvm::detail {
 
-class device : public KvmIoctl {
+class device {
     private:
+        KvmFd fd_;
         unsigned int type_;
         unsigned int flags_;
 
-        device(const kvm_create_device dev) noexcept
-            : KvmIoctl(dev.fd), type_{dev.type}, flags_{dev.flags} {}
+        device(const kvm_create_device& dev) noexcept
+            : fd_{dev.fd}, type_{dev.type}, flags_{dev.flags} {}
         friend device vm::device(unsigned int type, unsigned int flags);
     public:
         auto get_attr(kvm_device_attr &attr) -> void;

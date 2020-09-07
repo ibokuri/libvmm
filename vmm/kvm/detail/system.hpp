@@ -4,23 +4,24 @@
 
 #pragma once
 
-#include "vmm/kvm/detail/base.hpp"
-#include "vmm/kvm/detail/types.hpp"
-
 #include <filesystem>
-#include <memory>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include "vmm/kvm/detail/base.hpp"
+#include "vmm/kvm/detail/types.hpp"
 
 namespace vmm::kvm::detail {
 
 class vm;
 
-class system : public KvmIoctl {
+class system {
     private:
+        KvmFd fd_;
+
         [[nodiscard]] auto create_vm(unsigned int machine_type) -> unsigned int;
     public:
-        system() : KvmIoctl(open()) {}
+        system() : fd_{open()} {}
 
         /**
          * Constructs a kvm object from a file descriptor.
@@ -29,21 +30,16 @@ class system : public KvmIoctl {
          * to work. It is also encouraged to have O_CLOEXEC set, though it may
          * be omitted as needed.
          *
-         * Note that the passed file descriptor is of type unsigned int. As
-         * such, users are encouraged use `kvm::system::open()` to create a
-         * system object unless they're willing to do casts on a C-style
-         * open(). This provides a bit more assurance that the handle used
-         * byt the system object will be a valid, proper kvm handle.
-         *
-         * Safety
-         * ======
-         * Ownership of `fd` is transferred over to the created Kvm object.
-         *
          * Examples
          * ========
          * See kvm::system::open().
          */
-        explicit system(unsigned int fd) noexcept : KvmIoctl(fd) {};
+        system(unsigned int fd) : fd_{fd} {}
+
+        system(const system& other) = delete;
+        system(system&& other) = default;
+        auto operator=(const system& other) -> system& = delete;
+        auto operator=(system&& other) -> system& = default;
 
         /**
          * Opens /dev/kvm and returns a file descriptor.
@@ -64,12 +60,13 @@ class system : public KvmIoctl {
          */
         [[nodiscard]] static auto open(bool cloexec=true) -> unsigned int {
             const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
-            if (fd < 0)
+            if (fd < 0) {
                 throw std::filesystem::filesystem_error{
                     "open()",
                     "/dev/kvm",
                     std::error_code{errno, std::system_category()}
                 };
+            }
             return fd;
         }
 

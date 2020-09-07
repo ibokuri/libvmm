@@ -4,23 +4,22 @@
 
 #pragma once
 
+#include "vmm/utility/utility.hpp"
+
 namespace vmm::kvm::detail {
 
-class KvmIoctl {
-    protected:
-        unsigned int fd_;
-        bool closed_;
-
-        KvmIoctl(unsigned int fd) noexcept : fd_{fd}, closed_{false} {}
-        ~KvmIoctl() noexcept;
+class KvmFd : public vmm::utility::FileDescriptor {
     public:
-        auto close() -> void;
+        KvmFd(unsigned int fd) noexcept : vmm::utility::FileDescriptor(fd) {}
 
-        // Copy & move constructors
-        KvmIoctl(const KvmIoctl& other) = delete;
-        KvmIoctl(KvmIoctl&& other) = default;
-        auto operator=(const KvmIoctl& other) -> KvmIoctl& = delete;
-        auto operator=(KvmIoctl& other) -> KvmIoctl& = default;
+        KvmFd(const KvmFd& other) = delete;
+        KvmFd(KvmFd&& other) = default;
+        auto operator=(const KvmFd& other) -> KvmFd& = delete;
+        auto operator=(KvmFd& other) -> KvmFd& = default;
+
+        auto read() const -> void;
+        auto write() const -> void;
+        auto stat() const -> void;
 };
 
 }  // namespace vmm::kvm::detail
