@@ -34,8 +34,10 @@ template<typename Struct, typename Buffer, typename Entry>
 class FamStruct {
     protected:
         using value_type = Entry;
-        using pointer = value_type*;
-        using const_pointer = const pointer;
+        using allocator_type = std::allocator<Entry>;
+        using pointer = typename std::allocator_traits<allocator_type>::pointer;
+        using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
+
         using reference = value_type&;
         using const_reference = const value_type&;
         using iterator = pointer;
