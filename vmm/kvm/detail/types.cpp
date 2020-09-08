@@ -2,9 +2,9 @@
  * types.cpp - KVM types
  */
 
-#include "vmm/kvm/detail/types.hpp"
+#include <cassert> // assert
 
-#include <cassert>
+#include "vmm/kvm/detail/types.hpp"
 
 namespace vmm::kvm::detail {
 

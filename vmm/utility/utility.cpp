@@ -1,5 +1,5 @@
-#include <fcntl.h>
-#include <unistd.h>
+#include <fcntl.h> // close
+#include <unistd.h> // close
 
 #include "vmm/utility/utility.hpp"
 

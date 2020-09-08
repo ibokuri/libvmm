@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "vmm/utility/utility.hpp"
-
-#include <algorithm>
-#include <memory>
-#include <linux/kvm.h>
+#include <algorithm> // copy_if, swap
+#include <iterator> // distance
+#include <memory> // new/delete, unique_ptr
+#include <linux/kvm.h> // kvm_*
 
 namespace vmm::kvm::detail {
 

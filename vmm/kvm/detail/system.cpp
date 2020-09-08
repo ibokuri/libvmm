@@ -2,12 +2,12 @@
  * system.cpp - KVM ioctls
  */
 
+#include <linux/kvm.h> // KVM_*
+
 #include "vmm/kvm/detail/system.hpp"
 #include "vmm/kvm/detail/vm.hpp"
 #include "vmm/utility/utility.hpp"
 
-#include <linux/kvm.h>
-#include <sys/stat.h>
 
 namespace vmm::kvm::detail {
 

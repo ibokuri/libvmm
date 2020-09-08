@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <filesystem>
-#include <fcntl.h>
-#include <unistd.h>
+#include <filesystem> // filesystem_error
+#include <system_error> // error_code
+#include <fcntl.h> // open
+#include <unistd.h> // open
 
 #include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/types.hpp"

@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <stdexcept>
-#include <system_error>
-#include <sys/ioctl.h>
+#include <system_error> // system_category, system_error
+#include <sys/ioctl.h> // ioctl
 
 namespace vmm::utility {
 

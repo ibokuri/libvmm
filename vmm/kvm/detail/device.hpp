@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <linux/kvm.h> // kvm_*
+
 #include "vmm/kvm/detail/vm.hpp"
 #include "vmm/kvm/detail/base.hpp"
-
-#include <linux/kvm.h>
 
 namespace vmm::kvm::detail {
 
