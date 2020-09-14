@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "vmm/kvm/detail/vm.hpp"
 #include "vmm/kvm/detail/base.hpp"
+#include "vmm/kvm/detail/vm.hpp"
 
 namespace vmm::kvm::detail {
 

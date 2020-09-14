@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_MAIN
 
+#include <iterator>
 #include <catch2/catch.hpp>
 #include "vmm/kvm/kvm.hpp"
-#include <iterator>
 
 TEST_CASE("KVM object creation", "[api]") {
     auto kvm = vmm::kvm::system{};
@@ -16,12 +16,12 @@ TEST_CASE("KVM object creation (via external fd)", "[api]") {
 TEST_CASE("KVM object creation (via bad fd)", "[api]") {
     auto kvm = vmm::kvm::system{999};
 
-    REQUIRE_THROWS_WITH(kvm.vcpu_mmap_size(), "Bad file descriptor");
-    REQUIRE_THROWS_WITH(kvm.supported_cpuids(), "Bad file descriptor");
-    REQUIRE_THROWS_WITH(kvm.emulated_cpuids(), "Bad file descriptor");
-    REQUIRE_THROWS_WITH(kvm.msr_index_list(), "Bad file descriptor");
-    REQUIRE_THROWS_WITH(kvm.msr_feature_list(), "Bad file descriptor");
-    REQUIRE_THROWS_WITH(kvm.vm(), "Bad file descriptor");
+    REQUIRE_THROWS_AS(kvm.vcpu_mmap_size(), std::system_error);
+    REQUIRE_THROWS_AS(kvm.supported_cpuids(), std::system_error);
+    REQUIRE_THROWS_AS(kvm.emulated_cpuids(), std::system_error);
+    REQUIRE_THROWS_AS(kvm.msr_index_list(), std::system_error);
+    REQUIRE_THROWS_AS(kvm.msr_feature_list(), std::system_error);
+    REQUIRE_THROWS_AS(kvm.vm(), std::system_error);
 }
 
 TEST_CASE("API version", "[api]") {
@@ -95,11 +95,11 @@ TEST_CASE("VM creation (with IPA size)", "[api]") {
         auto vm = kvm.vm(host_ipa_limit);
 
         // Test invalid values
-        REQUIRE_THROWS(kvm.vm(31));
-        REQUIRE_THROWS(kvm.vm(host_ipa_limit + 1));
+        REQUIRE_THROWS_AS(kvm.vm(31), std::system_error);
+        REQUIRE_THROWS_AS(kvm.vm(host_ipa_limit + 1), std::system_error);
     }
     else {
         // Test default size
-        REQUIRE_THROWS(kvm.vm(40));
+        REQUIRE_THROWS_AS(kvm.vm(40), std::system_error);
     }
 }

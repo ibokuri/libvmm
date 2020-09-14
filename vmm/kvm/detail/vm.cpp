@@ -5,7 +5,6 @@
 #include "vmm/kvm/detail/vm.hpp"
 #include "vmm/kvm/detail/vcpu.hpp"
 #include "vmm/kvm/detail/device.hpp"
-#include "vmm/utility/utility.hpp"
 
 namespace vmm::kvm::detail {
 

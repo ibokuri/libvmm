@@ -6,8 +6,6 @@ kvm_internal_sources = files(
     'vm.cpp',
 )
 
-sources += kvm_internal_sources
-
 kvm_internal_headers = files(
   'base.hpp',
   'device.hpp',
@@ -16,5 +14,7 @@ kvm_internal_headers = files(
   'vcpu.hpp',
   'vm.hpp',
 )
+
+sources += kvm_internal_sources
 
 install_headers(kvm_internal_headers, subdir: 'vmm/kvm/detail')

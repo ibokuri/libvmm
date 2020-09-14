@@ -6,8 +6,6 @@
 
 #include "vmm/kvm/detail/system.hpp"
 #include "vmm/kvm/detail/vm.hpp"
-#include "vmm/utility/utility.hpp"
-
 
 namespace vmm::kvm::detail {
 

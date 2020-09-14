@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include "vmm/utility/utility.hpp"
+#include "vmm/types/file_descriptor.hpp"
+#include "vmm/types/detail/exceptions.hpp"
 
 namespace vmm::kvm::detail {
 
-class KvmFd : public vmm::utility::FileDescriptor {
+class KvmFd : public vmm::types::FileDescriptor {
     public:
-        KvmFd(unsigned int fd) noexcept : vmm::utility::FileDescriptor(fd) {}
+        KvmFd(unsigned int fd) noexcept : vmm::types::FileDescriptor(fd) {}
 
         KvmFd(const KvmFd& other) = delete;
         KvmFd(KvmFd&& other) = default;

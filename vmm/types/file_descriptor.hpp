@@ -1,13 +1,16 @@
 /*
- * utility.hpp - System utilities
+ * types.hpp - System utilities
  */
 
 #pragma once
 
-#include <system_error> // system_category, system_error
+#include <system_error> // error_code, system_error
 #include <sys/ioctl.h> // ioctl
+#include <cerrno> // errno
 
-namespace vmm::utility {
+#include "vmm/types/detail/exceptions.hpp"
+
+namespace vmm::types {
 
 class FileDescriptor {
     protected:
@@ -23,16 +26,19 @@ class FileDescriptor {
          * Examples
          * ========
          * ```
-         * #include <vmm/utility.hpp>
          * #include <iostream>
+         * #include <vmm/types.hpp>
          *
          * auto fd = FileDescriptor{open("/dev/kvm", O_RDWR | O_CLOEXEC)};
          *
+         * // do stuff
+         * ...
+         *
          * try {
-         *     vmm::utility::close(fd);
+         *     fd.close();
          * }
-         * catch (std::system_error& err) {
-         *     std::err << "ERROR: Failed to close /dev/kvm\n";
+         * catch (std::system_error& e) {
+         *     std::cerr << "message: " << e.what() << std::endl;
          * }
          * ```
          */
@@ -46,10 +52,10 @@ class FileDescriptor {
          * Examples
          * ========
          * ```
-         * #include <vmm/utility.hpp>
-         * #include <linux/kvm.h>
          * #include <fcntl.h>
          * #include <sys/stat.h>
+         * #include <linux/kvm.h>
+         * #include <vmm/types/file_descriptor.hpp>
          *
          * auto fd = FileDescriptor{open("/dev/kvm", O_RDWR | O_CLOEXEC)};
          * auto version = fd.ioctl(KVM_GET_API_VERSION);
@@ -59,10 +65,13 @@ class FileDescriptor {
         template<typename T=int>
         auto ioctl(const unsigned long req, T arg=T{}) const -> unsigned int {
             const auto ret = ::ioctl(fd_, req, arg);
-            if (ret < 0)
-                throw std::system_error{errno, std::system_category()};
+
+            if (ret < 0) {
+                VMM_THROW(std::system_error(std::error_code{errno, std::system_category()}, "ioctl"));
+            }
+
             return ret;
         }
 };
 
-}  // namespace vmm::utility
+}
