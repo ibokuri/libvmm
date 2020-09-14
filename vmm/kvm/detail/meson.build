@@ -1,5 +1,4 @@
 kvm_internal_sources = files(
-    'base.cpp',
     'device.cpp',
     'types.cpp',
     'system.cpp',
