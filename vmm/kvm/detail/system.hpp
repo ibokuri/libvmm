@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <system_error> // error_code, system_error
+#include <system_error> // error_code, system_category, system_error
 #include <fcntl.h> // open
 #include <sys/types.h> // open
 #include <sys/stat.h> // open
@@ -60,7 +60,7 @@ class system {
          * ```
          */
         [[nodiscard]] static auto open(bool cloexec=true) -> unsigned int {
-            const auto fd {::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR)};
+            const auto fd = ::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR);
 
             if (fd < 0) {
                 VMM_THROW(std::system_error(std::error_code{errno, std::system_category()}, "open"));
