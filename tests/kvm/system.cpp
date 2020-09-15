@@ -5,12 +5,11 @@
 #include "vmm/kvm/kvm.hpp"
 
 TEST_CASE("KVM object creation", "[api]") {
-    auto kvm = vmm::kvm::system{};
+    REQUIRE_NOTHROW(vmm::kvm::system{});
 }
 
 TEST_CASE("KVM object creation (via external fd)", "[api]") {
-    auto fd = vmm::kvm::system::open();
-    auto kvm = vmm::kvm::system{std::move(fd)};
+    REQUIRE_NOTHROW(vmm::kvm::system{vmm::kvm::system::open()});
 }
 
 TEST_CASE("KVM object creation (via bad fd)", "[api]") {

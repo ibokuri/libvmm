@@ -4,8 +4,7 @@
 #include "vmm/kvm/kvm.hpp"
 
 TEST_CASE("VM creation", "[api]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
+    REQUIRE_NOTHROW(vmm::kvm::system{}.vm());
 }
 
 TEST_CASE("vcpu and memory slots", "[api]") {
