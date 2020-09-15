@@ -1,11 +1,13 @@
 subdir('detail')
 
 type_sources = files(
-  'file_descriptor.cpp',
+  'eventfd.cpp',
+  'file_descriptor.cpp'
 )
 
 type_headers = files(
-  'file_descriptor.hpp',
+  'eventfd.hpp',
+  'file_descriptor.hpp'
 )
 
 sources += type_sources

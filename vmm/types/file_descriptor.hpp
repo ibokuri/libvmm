@@ -16,6 +16,8 @@ class FileDescriptor {
     protected:
         unsigned int fd_;
         bool closed_;
+
+        FileDescriptor() noexcept;
     public:
         FileDescriptor(unsigned int fd) noexcept;
         ~FileDescriptor() noexcept;
