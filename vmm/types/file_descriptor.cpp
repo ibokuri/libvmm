@@ -14,7 +14,7 @@ FileDescriptor::~FileDescriptor() noexcept {
 
 auto FileDescriptor::close() -> void {
     if (::close(fd_) < 0) {
-        VMM_THROW(std::system_error(std::error_code{errno, std::system_category()}, "close"));
+        VMM_THROW(std::system_error(errno, std::system_category()));
     }
     closed_ = true;
 }

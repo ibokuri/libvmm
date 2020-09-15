@@ -63,7 +63,7 @@ class system {
             const auto fd = ::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR);
 
             if (fd < 0) {
-                VMM_THROW(std::system_error(std::error_code{errno, std::system_category()}, "open"));
+                VMM_THROW(std::system_error(errno, std::system_category()));
             }
 
             return fd;

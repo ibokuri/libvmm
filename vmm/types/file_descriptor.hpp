@@ -67,7 +67,7 @@ class FileDescriptor {
             const auto ret = ::ioctl(fd_, req, arg);
 
             if (ret < 0) {
-                VMM_THROW(std::system_error(std::error_code{errno, std::system_category()}, "ioctl"));
+                VMM_THROW(std::system_error(errno, std::system_category()));
             }
 
             return ret;
