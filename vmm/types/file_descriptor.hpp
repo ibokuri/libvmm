@@ -22,6 +22,11 @@ class FileDescriptor {
         FileDescriptor(unsigned int fd) noexcept;
         ~FileDescriptor() noexcept;
 
+        FileDescriptor(const FileDescriptor& other);
+        FileDescriptor(FileDescriptor&& other) = default;
+        auto operator=(const FileDescriptor& other) -> FileDescriptor&;
+        auto operator=(FileDescriptor&& other) -> FileDescriptor& = default;
+
         /**
          * Closes a file descriptor.
          *

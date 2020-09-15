@@ -4,29 +4,35 @@
 
 namespace vmm::types {
 
-EventFd::EventFd(int flags) noexcept : FileDescriptor(create(flags)) {}
-
-EventFd::EventFd(const EventFd& other) {
-    fd_ = ::dup(other.fd_);
+/**
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/types/eventfd.hpp>
+ *
+ * auto fd = vmm::types::EventFd{EFD_NONBLOCK};
+ * ```
+ */
+EventFd::EventFd(int flags) {
+    fd_ = ::eventfd(0, flags);
 
     if (fd_ < 0) {
         VMM_THROW(std::system_error(errno, std::system_category()));
     }
 }
 
-auto EventFd::operator=(const EventFd& other) -> EventFd& {
-    if (&other == this)
-        return *this;
-
-    fd_ = ::dup(other.fd_);
-
-    if (fd_ < 0) {
-        VMM_THROW(std::system_error(errno, std::system_category()));
-    }
-
-    return *this;
-}
-
+/**
+ * Increments the value of the 8-byte counter in the eventfd object by `value`.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/types/eventfd.hpp>
+ *
+ * auto fd = vmm::types::EventFd{};
+ * fd.write(99);
+ * ```
+ */
 auto EventFd::write(uint64_t value) const -> void {
     auto ret = ::write(fd_, &value, sizeof(uint64_t));
 
@@ -35,8 +41,21 @@ auto EventFd::write(uint64_t value) const -> void {
     }
 }
 
+/**
+ * Returns the value of the 8-byte counter in the eventfd object.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/types/eventfd.hpp>
+ *
+ * auto fd = vmm::types::EventFd{};
+ * fd.write(99);
+ * auto data = fd.read();
+ * ```
+ */
 [[nodiscard]] auto EventFd::read() const -> uint64_t {
-    auto buf = uint64_t{0};
+    auto buf = uint64_t{};
     auto ret = ::read(fd_, &buf, sizeof(uint64_t));
 
     if (ret < 0) {
