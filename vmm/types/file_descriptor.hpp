@@ -14,12 +14,12 @@ namespace vmm::types {
 
 class FileDescriptor {
     protected:
-        unsigned int fd_;
-        bool closed_;
+        int fd_;
+        bool closed_ = false;
 
         FileDescriptor() noexcept;
     public:
-        FileDescriptor(unsigned int fd) noexcept;
+        FileDescriptor(int fd) noexcept;
         ~FileDescriptor() noexcept;
 
         FileDescriptor(const FileDescriptor& other);

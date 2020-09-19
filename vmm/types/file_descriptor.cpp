@@ -4,8 +4,8 @@
 
 namespace vmm::types {
 
-FileDescriptor::FileDescriptor() noexcept : closed_{false} {};
-FileDescriptor::FileDescriptor(unsigned int fd) noexcept : fd_{fd}, closed_{false} {};
+FileDescriptor::FileDescriptor() noexcept {};
+FileDescriptor::FileDescriptor(int fd) noexcept : fd_{fd} {};
 
 FileDescriptor::~FileDescriptor() noexcept {
     if (!closed_) {
