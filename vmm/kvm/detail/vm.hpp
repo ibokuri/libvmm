@@ -9,6 +9,7 @@
 #include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/system.hpp"
 #include "vmm/kvm/detail/types.hpp"
+#include "vmm/types/eventfd.hpp"
 
 namespace vmm::kvm::detail {
 
@@ -48,6 +49,99 @@ class vm {
         [[nodiscard]] auto num_vcpus() -> unsigned int;
         [[nodiscard]] auto max_vcpus() -> unsigned int;
         [[nodiscard]] auto num_memslots() -> unsigned int;
+
+        /**
+        * Attaches an ioeventfd to a legal pio/mmio address within the guest.
+        *
+        * A guest write in the registered address will signal the provided
+        * event instead of triggering an exit.
+        *
+        * Examples
+        * ========
+        * ```
+        * #include "vmm/kvm.hpp"
+        *
+        * using Pio = vmm::types::IoEventAddress::Pio;
+        * using Mmio = vmm::types::IoEventAddress::Mmio;
+        *
+        * auto kvm = vmm::kvm::system{};
+        * auto vm = kvm.vm();
+        * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+        *
+        * vm.attach_ioevent<Pio>(eventfd, 0xf4);
+        * vm.attach_ioevent<Mmio>(eventfd, 0x1000);
+        * ```
+        */
+        template<vmm::types::IoEventAddress T>
+        auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) -> void {
+            auto flags = uint32_t{};
+
+            if (datamatch > 0) {
+                flags |= KVM_IOEVENTFD_FLAG_DATAMATCH;
+            }
+
+            if (T == vmm::types::IoEventAddress::Pio) {
+                flags |= KVM_IOEVENTFD_FLAG_PIO;
+            }
+
+            auto ioeventfd = kvm_ioeventfd {
+                .datamatch = datamatch,
+                .addr = addr,
+                .len = sizeof(uint64_t),
+                .fd = eventfd.fd(),
+                .flags = flags
+            };
+
+            fd_.ioctl(KVM_IOEVENTFD, &ioeventfd);
+        }
+
+        /**
+        * Detaches an ioeventfd to a legal pio/mmio address within the guest.
+        *
+        * A guest write in the registered address will signal the provided
+        * event instead of triggering an exit.
+        *
+        * Examples
+        * ========
+        * ```
+        * #include "vmm/kvm.hpp"
+        *
+        * using Pio = vmm::types::IoEventAddress::Pio;
+        * using Mmio = vmm::types::IoEventAddress::Mmio;
+        *
+        * auto kvm = vmm::kvm::system{};
+        * auto vm = kvm.vm();
+        * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+        *
+        * vm.attach_ioevent<Pio>(eventfd, 0xf4);
+        * vm.attach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
+        *
+        * vm.detach_ioevent<Pio>(eventfd, 0xf4);
+        * vm.detach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
+        * ```
+        */
+        template<vmm::types::IoEventAddress T>
+        auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) -> void {
+            auto flags = uint32_t{KVM_IOEVENTFD_FLAG_DEASSIGN};
+
+            if (datamatch > 0) {
+                flags |= KVM_IOEVENTFD_FLAG_DATAMATCH;
+            }
+
+            if (T == vmm::types::IoEventAddress::Pio) {
+                flags |= KVM_IOEVENTFD_FLAG_PIO;
+            }
+
+            auto ioeventfd = kvm_ioeventfd {
+                .datamatch = datamatch,
+                .addr = addr,
+                .len = sizeof(uint64_t),
+                .fd = eventfd.fd(),
+                .flags = flags
+            };
+
+            fd_.ioctl(KVM_IOEVENTFD, &ioeventfd);
+        }
 };
 
 }  // namespace vmm::kvm::detail

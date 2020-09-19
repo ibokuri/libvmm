@@ -76,3 +76,41 @@ TEST_CASE("Bootstrap Processor (BSP)", "[api]") {
     auto vcpu = vm.vcpu(0);
     REQUIRE_THROWS(vm.set_bsp(0));
 }
+
+TEST_CASE("Attach ioevent", "[api]") {
+    using IoEventAddress = vmm::types::IoEventAddress;
+
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+
+    REQUIRE(vm.check_extension(KVM_CAP_IOEVENTFD) > 0);
+
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Mmio>(eventfd, 0x1000));
+
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xf4));
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc1, 0x7f));
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc2, 0x1337));
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc4, 0xdeadbeef));
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc8, 0xdeadbeefdeadbeef));
+}
+
+TEST_CASE("Detach ioevent", "[api]") {
+    using IoEventAddress = vmm::types::IoEventAddress;
+
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+    auto pio_addr = 0xf4;
+    auto mmio_addr = 0x1000;
+
+    REQUIRE(vm.check_extension(KVM_CAP_IOEVENTFD) > 0);
+
+    REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+    REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr));
+
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+    REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
+    REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+    REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
+}
