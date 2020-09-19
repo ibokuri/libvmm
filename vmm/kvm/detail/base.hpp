@@ -11,7 +11,7 @@ namespace vmm::kvm::detail {
 
 class KvmFd : public vmm::types::FileDescriptor {
     public:
-        KvmFd(unsigned int fd) noexcept : vmm::types::FileDescriptor(fd) {}
+        KvmFd(int fd) noexcept : vmm::types::FileDescriptor(fd) {}
 
         KvmFd(const KvmFd& other) = delete;
         KvmFd(KvmFd&& other) = default;

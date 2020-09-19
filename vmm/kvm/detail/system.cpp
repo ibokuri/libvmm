@@ -33,7 +33,7 @@ auto system::api_version() -> unsigned int {
  *
  * This method should only be used by `system::vm()`.
  */
-auto system::create_vm(unsigned int machine_type) -> unsigned int {
+auto system::create_vm(unsigned int machine_type) -> int {
      return fd_.ioctl(KVM_CREATE_VM, machine_type);
 }
 
@@ -108,7 +108,7 @@ auto system::check_extension(unsigned int cap) -> unsigned int {
  * auto mmap_size = kvm.vcpu_mmap_size();
  * ```
  */
-auto system::vcpu_mmap_size() -> unsigned int {
+auto system::vcpu_mmap_size() -> std::size_t {
     return fd_.ioctl(KVM_GET_VCPU_MMAP_SIZE);
 }
 

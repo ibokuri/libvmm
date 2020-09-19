@@ -46,7 +46,7 @@ TEST_CASE("Host-supported x86 cpuid features", "[api]") {
     auto size = std::distance(cpuids.begin(), cpuids.end());
 
     REQUIRE(size != 0);
-    REQUIRE(size == cpuids.size());
+    REQUIRE(static_cast<std::size_t>(size) == cpuids.size());
     REQUIRE(size <= MAX_CPUID_ENTRIES);
 }
 
@@ -56,7 +56,7 @@ TEST_CASE("KVM-emulated x86 cpuid features", "[api]") {
     auto size = std::distance(cpuids.begin(), cpuids.end());
 
     REQUIRE(size != 0);
-    REQUIRE(size == cpuids.size());
+    REQUIRE(static_cast<std::size_t>(size) == cpuids.size());
     REQUIRE(size <= MAX_CPUID_ENTRIES);
 }
 
@@ -72,7 +72,7 @@ TEST_CASE("MSR index list", "[api]") {
     auto size = std::distance(msr_list.begin(), msr_list.end());
 
     REQUIRE(size > 1);
-    REQUIRE(size == msr_list.size());
+    REQUIRE(static_cast<std::size_t>(size) == msr_list.size());
 }
 
 TEST_CASE("MSR feature list", "[api]") {
@@ -81,7 +81,7 @@ TEST_CASE("MSR feature list", "[api]") {
     auto size = std::distance(msr_list.begin(), msr_list.end());
 
     REQUIRE(size > 1);
-    REQUIRE(size == msr_list.size());
+    REQUIRE(static_cast<std::size_t>(size) == msr_list.size());
 }
 
 TEST_CASE("VM creation (with IPA size)", "[api]") {

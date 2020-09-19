@@ -54,8 +54,6 @@ class FileDescriptor {
         /**
          * Runs an ioctl.
          *
-         * By default, the ioctl ran is equivalent to one with no arguments.
-         *
          * Examples
          * ========
          * ```
@@ -70,7 +68,7 @@ class FileDescriptor {
          * ```
          */
         template<typename T=int>
-        auto ioctl(const unsigned long req, T arg=T{}) const -> unsigned int {
+        auto ioctl(int req, T arg=T{}) const -> int {
             const auto ret = ::ioctl(fd_, req, arg);
 
             if (ret < 0) {

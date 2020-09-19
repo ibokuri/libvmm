@@ -20,7 +20,7 @@ class system {
     private:
         KvmFd fd_;
 
-        [[nodiscard]] auto create_vm(unsigned int machine_type) -> unsigned int;
+        [[nodiscard]] auto create_vm(unsigned int machine_type) -> int;
     public:
         system() : fd_{open()} {}
 
@@ -35,7 +35,7 @@ class system {
          * ========
          * See kvm::system::open().
          */
-        system(unsigned int fd) : fd_{fd} {}
+        system(int fd) : fd_{fd} {}
 
         system(const system& other) = delete;
         system(system&& other) = default;
@@ -59,7 +59,7 @@ class system {
          * auto kvm = vmm::kvm::system{fd};
          * ```
          */
-        [[nodiscard]] static auto open(bool cloexec=true) -> unsigned int {
+        [[nodiscard]] static auto open(bool cloexec=true) -> int {
             const auto fd = ::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR);
 
             if (fd < 0) {
@@ -73,11 +73,11 @@ class system {
         [[nodiscard]] auto api_version() -> unsigned int;
 
         // Creation routines
-        [[nodiscard]] auto vm(unsigned int machine_type = 0) -> vmm::kvm::detail::vm;
+        [[nodiscard]] auto vm(unsigned int machine_type=0) -> vmm::kvm::detail::vm;
 
         // Control routines
         [[nodiscard]] auto check_extension(unsigned int cap) -> unsigned int;
-        [[nodiscard]] auto vcpu_mmap_size() -> unsigned int;
+        [[nodiscard]] auto vcpu_mmap_size() -> std::size_t;
         [[nodiscard]] auto host_ipa_limit() -> unsigned int;
         [[nodiscard]] auto supported_cpuids() -> CpuidList;
         [[nodiscard]] auto emulated_cpuids() -> CpuidList;

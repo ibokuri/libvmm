@@ -14,12 +14,11 @@ namespace vmm::kvm::detail {
 class device {
     private:
         KvmFd fd_;
-        unsigned int type_;
-        unsigned int flags_;
+        uint32_t type_;
+        uint32_t flags_;
 
-        device(const kvm_create_device& dev) noexcept
-            : fd_{dev.fd}, type_{dev.type}, flags_{dev.flags} {}
-        friend device vm::device(unsigned int type, unsigned int flags);
+        device(const kvm_create_device& dev) noexcept : fd_{static_cast<int>(dev.fd)}, type_{dev.type}, flags_{dev.flags} {}
+        friend device vm::device(uint32_t type, uint32_t flags);
     public:
         auto get_attr(kvm_device_attr &attr) -> void;
         auto set_attr(kvm_device_attr &attr) -> void;

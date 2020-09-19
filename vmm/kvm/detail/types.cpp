@@ -18,14 +18,14 @@ namespace vmm::kvm::detail {
  *
  *     N + sizeof(__u32)
  */
-MsrIndexList::MsrIndexList(size_t n) : FamStruct(n + 1) { ptr_->nmsrs = n; }
+MsrIndexList::MsrIndexList(std::size_t n) : FamStruct(n + 1) { ptr_->nmsrs = n; }
 
 // Element access
-auto MsrIndexList::operator[](size_t pos) noexcept -> reference {
+auto MsrIndexList::operator[](std::size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto MsrIndexList::operator[](size_t pos) const noexcept -> const_reference {
+auto MsrIndexList::operator[](std::size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
@@ -35,7 +35,7 @@ auto MsrIndexList::data() const noexcept -> const_pointer { return ptr_->indices
 
 // Capacity
 auto MsrIndexList::empty() const noexcept -> bool { return size() == 0; }
-auto MsrIndexList::size() const noexcept -> unsigned int { return ptr_->nmsrs; }
+auto MsrIndexList::size() const noexcept -> std::size_t { return ptr_->nmsrs; }
 
 // Iterators
 auto MsrIndexList::begin() noexcept -> iterator { return data(); }
@@ -47,7 +47,7 @@ auto MsrIndexList::cend() const noexcept -> const_iterator { return end(); }
 
 
 // Constructors
-MsrFeatureList::MsrFeatureList(const size_t n) : MsrIndexList(n) {}
+MsrFeatureList::MsrFeatureList(std::size_t n) : MsrIndexList(n) {}
 
 
 /**
@@ -67,7 +67,7 @@ MsrFeatureList::MsrFeatureList(const size_t n) : MsrIndexList(n) {}
  *
  *     N * (sizeof(kvm_msr_entry) / sizeof(__u64)) + sizeof(__u64)
  */
-MsrList::MsrList(size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
+MsrList::MsrList(std::size_t n) : FamStruct(n * 2 + 1) { ptr_->nmsrs = n; }
 MsrList::MsrList(value_type entry) : MsrList(1) { data()[0] = entry; }
 MsrList::MsrList(const MsrList& other) : MsrList(other.begin(), other.end()) {}
 
@@ -77,11 +77,11 @@ auto MsrList::operator=(MsrList other) -> MsrList& {
 }
 
 // Element access
-auto MsrList::operator[](size_t pos) noexcept -> reference {
+auto MsrList::operator[](std::size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto MsrList::operator[](size_t pos) const noexcept -> const_reference {
+auto MsrList::operator[](std::size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
@@ -91,7 +91,7 @@ auto MsrList::data() const noexcept -> const_pointer { return ptr_->entries; }
 
 // Capacity
 auto MsrList::empty() const noexcept -> bool { return size() == 0; }
-auto MsrList::size() const noexcept -> uint32_t { return ptr_->nmsrs; }
+auto MsrList::size() const noexcept -> std::size_t { return ptr_->nmsrs; }
 
 // Iterators
 auto MsrList::begin() noexcept -> iterator { return data(); }
@@ -134,11 +134,11 @@ auto CpuidList::operator=(CpuidList other) -> CpuidList& {
 }
 
 // Element access
-auto CpuidList::operator[](size_t pos) noexcept -> reference {
+auto CpuidList::operator[](std::size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto CpuidList::operator[](size_t pos) const noexcept -> const_reference {
+auto CpuidList::operator[](std::size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
@@ -148,7 +148,7 @@ auto CpuidList::data() const noexcept -> const_pointer { return ptr_->entries; }
 
 // Capacity
 auto CpuidList::empty() const noexcept -> bool { return size() == 0; }
-auto CpuidList::size() const noexcept -> uint32_t { return ptr_->nent; }
+auto CpuidList::size() const noexcept -> std::size_t { return ptr_->nent; }
 
 // Iterators
 auto CpuidList::begin() noexcept -> iterator { return data(); }
@@ -193,11 +193,11 @@ auto IrqRoutingList::operator=(IrqRoutingList other) -> IrqRoutingList& {
 }
 
 // Element access
-auto IrqRoutingList::operator[](size_t pos) noexcept -> reference {
+auto IrqRoutingList::operator[](std::size_t pos) noexcept -> reference {
     assert(pos < size());
     return data()[pos];
 }
-auto IrqRoutingList::operator[](size_t pos) const noexcept -> const_reference {
+auto IrqRoutingList::operator[](std::size_t pos) const noexcept -> const_reference {
     assert(pos < size());
     return data()[pos];
 }
@@ -207,7 +207,7 @@ auto IrqRoutingList::data() const noexcept -> const_pointer { return ptr_->entri
 
 // Capacity
 auto IrqRoutingList::empty() const noexcept -> bool { return size() == 0; }
-auto IrqRoutingList::size() const noexcept -> uint32_t { return ptr_->nr; }
+auto IrqRoutingList::size() const noexcept -> std::size_t { return ptr_->nr; }
 
 // Iterators
 auto IrqRoutingList::begin() noexcept -> iterator { return data(); }

@@ -30,17 +30,17 @@ namespace vmm::kvm::detail {
 class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
     public:
         // Constructors
-        MsrIndexList(size_t n);
+        MsrIndexList(std::size_t n);
 
         // Element access
-        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
-        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference;
         [[nodiscard]] auto data() noexcept -> pointer;
         [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
         [[nodiscard]] auto empty() const noexcept -> bool;
-        [[nodiscard]] auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto size() const noexcept -> std::size_t;
 
         // Iterators
         auto begin() noexcept -> iterator;
@@ -53,12 +53,12 @@ class MsrIndexList : public FamStruct<kvm_msr_list, uint32_t, uint32_t> {
 
 class MsrFeatureList : public MsrIndexList {
     public:
-        MsrFeatureList(size_t n);
+        MsrFeatureList(std::size_t n);
 };
 
 class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
     private:
-        MsrList(size_t n);
+        MsrList(std::size_t n);
     public:
         // Constructors
         MsrList(value_type entry);
@@ -76,14 +76,14 @@ class MsrList : public FamStruct<kvm_msrs, uint64_t, kvm_msr_entry> {
         auto operator=(MsrList other) -> MsrList&;
 
         // Element access
-        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
-        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference;
         [[nodiscard]] auto data() noexcept -> pointer;
         [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
         [[nodiscard]] auto empty() const noexcept -> bool;
-        [[nodiscard]] auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto size() const noexcept -> std::size_t;
 
         // Iterators
         auto begin() noexcept -> iterator;
@@ -113,14 +113,14 @@ class CpuidList : public FamStruct<kvm_cpuid2, uint32_t, kvm_cpuid_entry2> {
         auto operator=(CpuidList other) -> CpuidList&;
 
         // Element access
-        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
-        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference;
         [[nodiscard]] auto data() noexcept -> pointer;
         [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
         [[nodiscard]] auto empty() const noexcept -> bool;
-        [[nodiscard]] auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto size() const noexcept -> std::size_t;
 
         // Iterators
         auto begin() noexcept -> iterator;
@@ -151,14 +151,14 @@ class IrqRoutingList : public FamStruct<kvm_irq_routing, uint64_t, kvm_irq_routi
         auto operator=(IrqRoutingList other) -> IrqRoutingList&;
 
         // Element access
-        [[nodiscard]] auto operator[](size_t pos) noexcept -> reference;
-        [[nodiscard]] auto operator[](size_t pos) const noexcept -> const_reference;
+        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference;
+        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference;
         [[nodiscard]] auto data() noexcept -> pointer;
         [[nodiscard]] auto data() const noexcept -> const_pointer;
 
         // Capacity
         [[nodiscard]] auto empty() const noexcept -> bool;
-        [[nodiscard]] auto size() const noexcept -> uint32_t;
+        [[nodiscard]] auto size() const noexcept -> std::size_t;
 
         // Iterators
         auto begin() noexcept -> iterator;

@@ -18,11 +18,9 @@ class device;
 class vm {
     private:
         KvmFd fd_;
-        unsigned int mmap_size_;
+        size_t mmap_size_;
 
-        vm(const unsigned int fd, unsigned int mmap_size) noexcept
-            : fd_{fd}, mmap_size_{mmap_size} {}
-
+        vm(int fd, std::size_t mmap_size) noexcept : fd_{fd}, mmap_size_{mmap_size} {}
         friend vm system::vm(unsigned int machine_type);
     public:
         vm(const vm& other) = delete;
@@ -31,25 +29,25 @@ class vm {
         auto operator=(vm&& other) -> vm& = default;
 
         // Creation routines
-        [[nodiscard]] auto vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu;
-        [[nodiscard]] auto device(unsigned int type, unsigned int flags=0) -> vmm::kvm::detail::device;
+        [[nodiscard]] auto vcpu(unsigned int vcpu_id) -> vmm::kvm::detail::vcpu;
+        [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) -> vmm::kvm::detail::device;
 
         // Control routines
         [[nodiscard]] auto check_extension(unsigned int cap) -> unsigned int;
-        auto set_bsp(unsigned long vcpu_id) -> void;
+        auto set_bsp(unsigned int vcpu_id) -> void;
         auto memslot(kvm_userspace_memory_region region) -> void;
-        auto irqchip(void) -> void;
+        auto irqchip() -> void;
         auto get_irqchip(kvm_irqchip &irqchip_p) -> void;
         auto set_irqchip(kvm_irqchip &irqchip_p) -> void;
-        [[nodiscard]] auto get_clock(void) -> kvm_clock_data;
+        [[nodiscard]] auto get_clock() -> kvm_clock_data;
         auto set_clock(kvm_clock_data &clock) -> void;
         auto gsi_routing(IrqRoutingList &routing_list) -> void;
 
         // Convenient routines
-        [[nodiscard]] auto mmap_size(void) -> unsigned int;
-        [[nodiscard]] auto num_vcpus(void) -> unsigned int;
-        [[nodiscard]] auto max_vcpus(void) -> unsigned int;
-        [[nodiscard]] auto num_memslots(void) -> unsigned int;
+        [[nodiscard]] auto mmap_size() -> std::size_t;
+        [[nodiscard]] auto num_vcpus() -> unsigned int;
+        [[nodiscard]] auto max_vcpus() -> unsigned int;
+        [[nodiscard]] auto num_memslots() -> unsigned int;
 };
 
 }  // namespace vmm::kvm::detail

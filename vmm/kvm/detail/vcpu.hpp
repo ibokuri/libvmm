@@ -16,8 +16,8 @@ class vcpu {
         /**
          * Restricted constructor for kvm::vm objects.
          */
-        vcpu(unsigned int fd) noexcept : fd_{fd} {}
-        friend vcpu vm::vcpu(unsigned long vcpu_id);
+        vcpu(int fd) noexcept : fd_{fd} {}
+        friend vcpu vm::vcpu(unsigned int vcpu_id);
 };
 
 }  // namespace vmm::kvm::detail

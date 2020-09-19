@@ -23,7 +23,7 @@ namespace vmm::kvm::detail {
  * auto vcpu = vm.vcpu(0);
  * ```
  */
-auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
+auto vm::vcpu(unsigned int vcpu_id) -> vmm::kvm::detail::vcpu {
     return vmm::kvm::detail::vcpu{fd_.ioctl(KVM_CREATE_VCPU, vcpu_id)};
 }
 
@@ -42,7 +42,8 @@ auto vm::vcpu(unsigned long vcpu_id) -> vmm::kvm::detail::vcpu {
  * auto device = vm.device(KVM_DEV_TYPE_VFIO);
  * ```
  */
-auto vm::device(unsigned int type, unsigned int flags) -> vmm::kvm::detail::device {
+auto vm::device(uint32_t type, uint32_t flags) -> vmm::kvm::detail::device {
+    // FIXME: is the .fd = 0 right?
     auto dev = kvm_create_device{ .type = type, .fd = 0, .flags = flags };
     return vmm::kvm::detail::device{dev};
 }
@@ -95,7 +96,7 @@ auto vm::check_extension(unsigned int cap) -> unsigned int {
  * vm.set_bsp(0);
  * ```
  */
-auto vm::set_bsp(unsigned long vcpu_id) -> void {
+auto vm::set_bsp(unsigned int vcpu_id) -> void {
     fd_.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
@@ -145,7 +146,7 @@ auto vm::memslot(kvm_userspace_memory_region region) -> void {
  * vm.irqchip();
  * ```
  */
-auto vm::irqchip(void) -> void {
+auto vm::irqchip() -> void {
     fd_.ioctl(KVM_CREATE_IRQCHIP);
 }
 
@@ -225,7 +226,7 @@ auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
  * auto clock = vm.get_clock();
  * ```
  */
-auto vm::get_clock(void) -> kvm_clock_data {
+auto vm::get_clock() -> kvm_clock_data {
     auto clock = kvm_clock_data{0};
     fd_.ioctl(KVM_GET_CLOCK, &clock);
     return clock;
@@ -272,14 +273,14 @@ auto vm::gsi_routing(IrqRoutingList &routing_list) -> void {
 /**
  * Returns KVM_RUN's shared memory region size.
  */
-auto vm::mmap_size(void) -> unsigned int {
+auto vm::mmap_size() -> std::size_t {
     return mmap_size_;
 }
 
 /**
  * Returns the recommended number for max_vcpus.
  */
-auto vm::num_vcpus(void) -> unsigned int {
+auto vm::num_vcpus() -> unsigned int {
     auto ret = check_extension(KVM_CAP_NR_VCPUS);
     return ret > 0 ? ret : 4;
 }
@@ -287,7 +288,7 @@ auto vm::num_vcpus(void) -> unsigned int {
 /**
  * Returns the maximum possible value for max_vcpus.
  */
-auto vm::max_vcpus(void) -> unsigned int {
+auto vm::max_vcpus() -> unsigned int {
     auto ret = check_extension(KVM_CAP_MAX_VCPUS);
     return ret > 0 ? ret : num_vcpus();
 }
@@ -295,7 +296,7 @@ auto vm::max_vcpus(void) -> unsigned int {
 /**
  * Returns the maximum number of allowed memory slots for a VM.
  */
-auto vm::num_memslots(void) -> unsigned int {
+auto vm::num_memslots() -> unsigned int {
     auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
     return ret > 0 ? ret : 32;
 }
