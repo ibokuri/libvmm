@@ -2,7 +2,7 @@
 
 #include <limits>
 #include <catch2/catch.hpp>
-#include "vmm/types/eventfd.hpp"
+#include "vmm/types/event.hpp"
 
 namespace vt = vmm::types;
 

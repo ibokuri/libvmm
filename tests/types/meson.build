@@ -1,5 +1,5 @@
 types_test_suite = {
-  'eventfd' : files('eventfd.cpp')
+  'event' : files('event.cpp')
 }
 
 test_suites += {'types': types_test_suite}

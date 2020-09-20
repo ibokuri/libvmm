@@ -9,7 +9,7 @@
 #include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/system.hpp"
 #include "vmm/kvm/detail/types.hpp"
-#include "vmm/types/eventfd.hpp"
+#include "vmm/types/event.hpp"
 
 namespace vmm::kvm::detail {
 

@@ -1,6 +1,6 @@
 #include <unistd.h> // read, write, dup
 
-#include "vmm/types/eventfd.hpp"
+#include "vmm/types/event.hpp"
 
 namespace vmm::types {
 
@@ -8,7 +8,7 @@ namespace vmm::types {
  * Examples
  * ========
  * ```
- * #include <vmm/types/eventfd.hpp>
+ * #include <vmm/types/event.hpp>
  *
  * auto fd = vmm::types::EventFd{EFD_NONBLOCK};
  * ```
@@ -27,7 +27,7 @@ EventFd::EventFd(int flags) {
  * Examples
  * ========
  * ```
- * #include <vmm/types/eventfd.hpp>
+ * #include <vmm/types/event.hpp>
  *
  * auto fd = vmm::types::EventFd{};
  * fd.write(99);
@@ -47,7 +47,7 @@ auto EventFd::write(uint64_t value) const -> void {
  * Examples
  * ========
  * ```
- * #include <vmm/types/eventfd.hpp>
+ * #include <vmm/types/event.hpp>
  *
  * auto fd = vmm::types::EventFd{};
  * fd.write(99);
