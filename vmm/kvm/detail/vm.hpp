@@ -44,34 +44,28 @@ class vm {
         auto set_clock(kvm_clock_data &clock) -> void;
         auto gsi_routing(IrqRoutingList &routing_list) -> void;
 
-        // Convenient routines
-        [[nodiscard]] auto mmap_size() -> std::size_t;
-        [[nodiscard]] auto num_vcpus() -> unsigned int;
-        [[nodiscard]] auto max_vcpus() -> unsigned int;
-        [[nodiscard]] auto num_memslots() -> unsigned int;
-
         /**
-        * Attaches an ioeventfd to a legal pio/mmio address within the guest.
-        *
-        * A guest write in the registered address will signal the provided
-        * event instead of triggering an exit.
-        *
-        * Examples
-        * ========
-        * ```
-        * #include "vmm/kvm.hpp"
-        *
-        * using Pio = vmm::types::IoEventAddress::Pio;
-        * using Mmio = vmm::types::IoEventAddress::Mmio;
-        *
-        * auto kvm = vmm::kvm::system{};
-        * auto vm = kvm.vm();
-        * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
-        *
-        * vm.attach_ioevent<Pio>(eventfd, 0xf4);
-        * vm.attach_ioevent<Mmio>(eventfd, 0x1000);
-        * ```
-        */
+         * Attaches an ioeventfd to a legal pio/mmio address within the guest.
+         *
+         * A guest write in the registered address will signal the provided
+         * event instead of triggering an exit.
+         *
+         * Examples
+         * ========
+         * ```
+         * #include "vmm/kvm.hpp"
+         *
+         * using Pio = vmm::types::IoEventAddress::Pio;
+         * using Mmio = vmm::types::IoEventAddress::Mmio;
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto vm = kvm.vm();
+         * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+         *
+         * vm.attach_ioevent<Pio>(eventfd, 0xf4);
+         * vm.attach_ioevent<Mmio>(eventfd, 0x1000);
+         * ```
+         */
         template<vmm::types::IoEventAddress T>
         auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) -> void {
             auto flags = uint32_t{};
@@ -96,30 +90,27 @@ class vm {
         }
 
         /**
-        * Detaches an ioeventfd to a legal pio/mmio address within the guest.
-        *
-        * A guest write in the registered address will signal the provided
-        * event instead of triggering an exit.
-        *
-        * Examples
-        * ========
-        * ```
-        * #include "vmm/kvm.hpp"
-        *
-        * using Pio = vmm::types::IoEventAddress::Pio;
-        * using Mmio = vmm::types::IoEventAddress::Mmio;
-        *
-        * auto kvm = vmm::kvm::system{};
-        * auto vm = kvm.vm();
-        * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
-        *
-        * vm.attach_ioevent<Pio>(eventfd, 0xf4);
-        * vm.attach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
-        *
-        * vm.detach_ioevent<Pio>(eventfd, 0xf4);
-        * vm.detach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
-        * ```
-        */
+         * Detaches an ioeventfd to a legal pio/mmio address within the guest.
+         *
+         * Examples
+         * ========
+         * ```
+         * #include "vmm/kvm.hpp"
+         *
+         * using Pio = vmm::types::IoEventAddress::Pio;
+         * using Mmio = vmm::types::IoEventAddress::Mmio;
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto vm = kvm.vm();
+         * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+         *
+         * vm.attach_ioevent<Pio>(eventfd, 0xf4);
+         * vm.attach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
+         *
+         * vm.detach_ioevent<Pio>(eventfd, 0xf4);
+         * vm.detach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
+         * ```
+         */
         template<vmm::types::IoEventAddress T>
         auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) -> void {
             auto flags = uint32_t{KVM_IOEVENTFD_FLAG_DEASSIGN};
@@ -142,6 +133,12 @@ class vm {
 
             fd_.ioctl(KVM_IOEVENTFD, &ioeventfd);
         }
+
+        // Convenient routines
+        [[nodiscard]] auto mmap_size() -> std::size_t;
+        [[nodiscard]] auto num_vcpus() -> unsigned int;
+        [[nodiscard]] auto max_vcpus() -> unsigned int;
+        [[nodiscard]] auto num_memslots() -> unsigned int;
 };
 
 }  // namespace vmm::kvm::detail

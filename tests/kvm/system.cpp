@@ -25,14 +25,18 @@ TEST_CASE("KVM object creation (via bad fd)", "[api]") {
 
 TEST_CASE("API version", "[api]") {
     auto kvm = vmm::kvm::system{};
+
     REQUIRE(kvm.api_version() == KVM_API_VERSION);
 }
 
 TEST_CASE("KVM mmap and IPA size", "[api]") {
     auto kvm = vmm::kvm::system{};
-    auto ipa_limit = kvm.host_ipa_limit();
 
+    // mmap size
     REQUIRE(kvm.vcpu_mmap_size() > 0);
+
+    // IPA size
+    auto ipa_limit = kvm.host_ipa_limit();
 
     if (ipa_limit > 0)
         REQUIRE(ipa_limit >= 32);
@@ -42,6 +46,7 @@ TEST_CASE("KVM mmap and IPA size", "[api]") {
 
 TEST_CASE("Host-supported x86 cpuid features", "[api]") {
     auto kvm = vmm::kvm::system{};
+
     auto cpuids = kvm.supported_cpuids();
     auto size = std::distance(cpuids.begin(), cpuids.end());
 
@@ -84,21 +89,27 @@ TEST_CASE("MSR feature list", "[api]") {
     REQUIRE(static_cast<std::size_t>(size) == msr_list.size());
 }
 
+TEST_CASE("VM creation", "[api]") {
+    auto kvm = vmm::kvm::system{};
+
+    REQUIRE(kvm.vm().mmap_size() == kvm.vcpu_mmap_size());
+}
+
 TEST_CASE("VM creation (with IPA size)", "[api]") {
     auto kvm = vmm::kvm::system{};
 
     if (kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE)) {
         auto host_ipa_limit = kvm.host_ipa_limit();
 
-        // Test max value
-        auto vm = kvm.vm(host_ipa_limit);
+        // max value
+        REQUIRE_NOTHROW(kvm.vm(host_ipa_limit));
 
-        // Test invalid values
+        // invalid values
         REQUIRE_THROWS_AS(kvm.vm(31), std::system_error);
         REQUIRE_THROWS_AS(kvm.vm(host_ipa_limit + 1), std::system_error);
     }
     else {
-        // Test default size
+        // default size
         REQUIRE_THROWS_AS(kvm.vm(40), std::system_error);
     }
 }

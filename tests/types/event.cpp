@@ -35,6 +35,7 @@ TEST_CASE("EventFd clone", "[api]") {
 
     fd.write(123);
     REQUIRE(clone.read() == 123);
+
     fd.write(234);
     REQUIRE(clone2.read() == 234);
 }
