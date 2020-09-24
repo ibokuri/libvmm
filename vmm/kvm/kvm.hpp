@@ -12,10 +12,16 @@ using vcpu = vmm::kvm::detail::vcpu;
 using device = vmm::kvm::detail::device;
 
 /* types */
-using MsrIndexList = vmm::kvm::detail::MsrIndexList;
-using MsrFeatureList = vmm::kvm::detail::MsrFeatureList;
-using MsrList = vmm::kvm::detail::MsrList;
-using CpuidList = vmm::kvm::detail::CpuidList;
-using IrqRoutingList = vmm::kvm::detail::IrqRoutingList;
+template<std::size_t N>
+using MsrList = vmm::kvm::detail::MsrList<N>;
+
+template<std::size_t N>
+using Msrs = vmm::kvm::detail::Msrs<N>;
+
+template<std::size_t N>
+using Cpuids = vmm::kvm::detail::Cpuids<N>;
+
+template<std::size_t N>
+using IrqRouting = vmm::kvm::detail::IrqRouting<N>;
 
 }  // namespace vmm::kvm

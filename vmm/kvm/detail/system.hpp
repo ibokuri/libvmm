@@ -5,6 +5,8 @@
 #pragma once
 
 #include <system_error> // error_code, system_category, system_error
+#include <type_traits> // enable_if_t, is_same_v
+
 #include <fcntl.h> // open
 #include <sys/types.h> // open
 #include <sys/stat.h> // open
@@ -21,7 +23,17 @@ class system {
     private:
         KvmFd fd_;
 
-        [[nodiscard]] auto create_vm(unsigned int machine_type) -> int;
+        [[nodiscard]] auto create_vm(unsigned int machine_type) const -> int;
+
+        /**
+         * Creates and returns a populated KVM list (e.g., MSR features, cpuids).
+         */
+        template<template<std::size_t N> typename List, std::size_t N, unsigned int Ioctl>
+        [[nodiscard]] auto get_list() const -> List<N> {
+            auto l = List<N>{};
+            fd_.ioctl(Ioctl, l.data());
+            return l;
+        }
     public:
         system() : fd_{open()} {}
 
@@ -71,24 +83,59 @@ class system {
         }
 
         // General routines
-        [[nodiscard]] auto api_version() -> unsigned int;
+        [[nodiscard]] auto api_version() const -> unsigned int;
 
         // Creation routines
-        [[nodiscard]] auto vm(unsigned int machine_type=0) -> vmm::kvm::detail::vm;
+        [[nodiscard]] auto vm(unsigned int machine_type=0) const -> vmm::kvm::detail::vm;
 
         // Control routines
-        [[nodiscard]] auto check_extension(unsigned int cap) -> unsigned int;
-        [[nodiscard]] auto vcpu_mmap_size() -> std::size_t;
-        [[nodiscard]] auto host_ipa_limit() -> unsigned int;
-        [[nodiscard]] auto supported_cpuids() -> CpuidList;
-        [[nodiscard]] auto emulated_cpuids() -> CpuidList;
-        auto supported_cpuids(CpuidList& cpuids) -> void;
-        auto emulated_cpuids(CpuidList& cpuids) -> void;
-        [[nodiscard]] auto msr_index_list() -> MsrIndexList;
-        [[nodiscard]] auto msr_feature_list() -> MsrFeatureList;
-        auto msr_index_list(MsrIndexList& msrs) -> void;
-        auto msr_feature_list(MsrFeatureList& msrs) -> void;
-        auto get_msrs(MsrList& msrs) -> unsigned int;
+        [[nodiscard]] auto check_extension(unsigned int cap) const -> unsigned int;
+        [[nodiscard]] auto vcpu_mmap_size() const -> std::size_t;
+        [[nodiscard]] auto host_ipa_limit() const -> unsigned int;
+
+        [[nodiscard]] auto msr_index_list() const -> MsrList<MAX_IO_MSRS>;
+        [[nodiscard]] auto msr_feature_list() const -> MsrList<MAX_IO_MSRS_FEATURES>;
+
+        /**
+         * Reads the values of MSR-based features available for VMs. Returns the
+         * number of successfully read values.
+         *
+         * Examples
+         * ========
+         * ```
+         * #include <vmm/kvm.hpp>
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto entry = kvm_msr_entry{0x174};
+         * auto msrs = vmm::kvm::Msrs<1>{entry};
+         * auto nmsrs = kvm.get_msrs(msrs);
+         * ```
+         *
+         * ```
+         * #include <vector>
+         * #include <vmm/kvm.hpp>
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto msr_list = kvm.msr_feature_list();
+         * auto entries = std::vector<kvm_msr_entry>{};
+         *
+         * for (auto msr : msr_list) {
+         *     auto entry = kvm_msr_entry{msr};
+         *     entries.push_back(entry);
+         * }
+         *
+         * auto msrs = vmm::kvm::Msrs{entries};
+         * auto nmsrs = kvm.read_msrs(msrs);
+         * ```
+         */
+        //template<typename T, typename = std::enable_if_t<std::is_same_v<T, Msrs>>>
+        template<typename T, typename = std::enable_if_t<std::is_same_v<typename T::value_type, kvm_msr_entry>>>
+        auto read_msrs(T &msrs) const -> unsigned int {
+            return fd_.ioctl(KVM_GET_MSRS, msrs.data());
+        }
+
+        [[nodiscard]] auto supported_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES>;
+        [[nodiscard]] auto emulated_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES>;
 };
 
 }  // namespace vmm::kvm::detail

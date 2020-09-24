@@ -243,27 +243,8 @@ auto system::emulated_cpuids(CpuidList& cpuids) -> void {
  * auto msr_list = kvm.msr_index_list();
  * ```
  */
-auto system::msr_index_list() -> MsrIndexList {
-    auto msrs = MsrIndexList{MAX_IO_MSRS};
-    msr_index_list(msrs);
-    return msrs;
-}
-
-/**
- * Obtains a list of host-supported and kvm-specific MSRs.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto msr_list = vmm::kvm::MsrIndexList{MAX_IO_MSRS};
- * kvm.msr_index_list(msr_list);
- * ```
- */
-auto system::msr_index_list(MsrIndexList& msrs) -> void {
-    fd_.ioctl(KVM_GET_MSR_INDEX_LIST, msrs.get());
+[[nodiscard]] auto system::msr_index_list() const -> MsrList<MAX_IO_MSRS> {
+    return get_list<MsrList, MAX_IO_MSRS, KVM_GET_MSR_INDEX_LIST>();
 }
 
 /**
@@ -272,21 +253,23 @@ auto system::msr_index_list(MsrIndexList& msrs) -> void {
  * Examples
  * ========
  * ```
- * #include <iostream>
  * #include <vmm/kvm.hpp>
  *
  * auto kvm = vmm::kvm::system{};
  * auto msr_list = kvm.msr_feature_list();
  * ```
  */
-auto system::msr_feature_list() -> MsrFeatureList {
-    auto msrs = MsrFeatureList{MAX_IO_MSRS_FEATURES};
-    msr_feature_list(msrs);
-    return msrs;
+[[nodiscard]] auto system::msr_feature_list() const -> MsrList<MAX_IO_MSRS_FEATURES> {
+    return get_list<MsrList, MAX_IO_MSRS_FEATURES, KVM_GET_MSR_FEATURE_INDEX_LIST>();
 }
 
 /**
- * Obtains a list of MSRs exposing MSR-based CPU features.
+ * Returns a list of host- and kvm-supported x86 cpuid features.
+ *
+ * In x86, the CPU identification (CPUID) instruction is a supplementary
+ * instruction allowing software to discover details of the processor. A
+ * program can use the CPUID to determine processor type and whether certain
+ * features are implemented.
  *
  * Examples
  * ========
@@ -294,17 +277,18 @@ auto system::msr_feature_list() -> MsrFeatureList {
  * #include <vmm/kvm.hpp>
  *
  * auto kvm = vmm::kvm::system{};
- * auto msr_list = vmm::kvm::MsrFeatureList{MAX_IO_MSRS_FEATURES};
- * kvm.msr_feature_list(msr_list);
+ * auto cpuids = kvm.supported_cpuids();
+ *
+ * // Print CPU's manufacturer ID string
+ * TODO
  * ```
  */
-auto system::msr_feature_list(MsrFeatureList& msrs) -> void {
-    fd_.ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST, msrs.get());
+[[nodiscard]] auto system::supported_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES> {
+    return get_list<Cpuids, MAX_CPUID_ENTRIES, KVM_GET_SUPPORTED_CPUID>();
 }
 
 /**
- * Reads the values of MSR-based features available for VMs. Returns the
- * number of successfully read values.
+ * Returns a list of kvm-emulated x86 cpuid features.
  *
  * Examples
  * ========
@@ -312,30 +296,11 @@ auto system::msr_feature_list(MsrFeatureList& msrs) -> void {
  * #include <vmm/kvm.hpp>
  *
  * auto kvm = vmm::kvm::system{};
- * auto entry = kvm_msr_entry{0x174};
- * auto msrs = vmm::kvm::MsrList{entry};
- * auto nmsrs = kvm.get_msrs(msrs);
- * ```
- *
- * ```
- * #include <vector>
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto msr_list = kvm.msr_feature_list();
- * auto entries = std::vector<kvm_msr_entry>{};
- *
- * for (auto msr : msr_list) {
- *     auto entry = kvm_msr_entry{msr};
- *     entries.push_back(entry);
- * }
- *
- * auto msrs = vmm::kvm::MsrList{entries};
- * auto nmsrs = kvm.get_msrs(msrs);
+ * auto cpuids = kvm.emulated_cpuids();
  * ```
  */
-auto system::get_msrs(MsrList& msrs) -> unsigned int {
-    return fd_.ioctl(KVM_GET_MSRS, msrs.get());
+[[nodiscard]] auto system::emulated_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES> {
+    return get_list<Cpuids, MAX_CPUID_ENTRIES, KVM_GET_EMULATED_CPUID>();
 }
 
 }  // namespace vmm::kvm::detail
