@@ -6,29 +6,32 @@
 
 namespace vt = vmm::types;
 
-TEST_CASE("EventFd creation", "[api]") {
+TEST_CASE("EventFd creation", "[all]") {
     REQUIRE_NOTHROW(vt::EventFd{});
     REQUIRE_NOTHROW(vt::EventFd{EFD_NONBLOCK});
 }
 
-TEST_CASE("EventFd read/write", "[api]") {
+TEST_CASE("EventFd read/write", "[all]") {
     auto fd = vt::EventFd{EFD_NONBLOCK};
+
     fd.write(55);
     REQUIRE(fd.read() == 55);
 }
 
-TEST_CASE("EventFd write overflow", "[api]") {
+TEST_CASE("EventFd write overflow", "[all]") {
     auto fd = vt::EventFd{EFD_NONBLOCK};
+
     REQUIRE_NOTHROW(fd.write(std::numeric_limits<uint64_t>::max() - 1));
     REQUIRE_THROWS(fd.write(1));
 }
 
-TEST_CASE("EventFd empty read", "[api]") {
+TEST_CASE("EventFd empty read", "[all]") {
     auto fd = vt::EventFd{EFD_NONBLOCK};
+
     REQUIRE_THROWS(fd.read());
 }
 
-TEST_CASE("EventFd clone", "[api]") {
+TEST_CASE("EventFd clone", "[all]") {
     auto fd = vt::EventFd{EFD_NONBLOCK};
     auto clone{fd};
     auto clone2 = fd;
