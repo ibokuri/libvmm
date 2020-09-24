@@ -10,6 +10,7 @@
 #include <fcntl.h> // open
 #include <sys/types.h> // open
 #include <sys/stat.h> // open
+#include <linux/kvm.h> // KVM_*
 
 #include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/macros.hpp"
@@ -35,7 +36,7 @@ class system {
             return l;
         }
     public:
-        system() : fd_{open()} {}
+        explicit system() : fd_{open()} {}
 
         /**
          * Constructs a kvm object from a file descriptor.
@@ -48,7 +49,7 @@ class system {
          * ========
          * See kvm::system::open().
          */
-        system(int fd) : fd_{fd} {}
+        explicit system(int fd) : fd_{fd} {}
 
         system(const system& other) = delete;
         system(system&& other) = default;

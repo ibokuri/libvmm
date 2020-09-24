@@ -21,8 +21,8 @@ class vm {
         KvmFd fd_;
         size_t mmap_size_;
 
-        vm(int fd, std::size_t mmap_size) noexcept : fd_{fd}, mmap_size_{mmap_size} {}
-        friend vm system::vm(unsigned int machine_type);
+        explicit vm(int fd, std::size_t mmap_size) noexcept : fd_{fd}, mmap_size_{mmap_size} {}
+        friend vm system::vm(unsigned int machine_type) const;
     public:
         vm(const vm& other) = delete;
         vm(vm&& other) = default;
@@ -30,19 +30,18 @@ class vm {
         auto operator=(vm&& other) -> vm& = default;
 
         // Creation routines
-        [[nodiscard]] auto vcpu(unsigned int vcpu_id) -> vmm::kvm::detail::vcpu;
-        [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) -> vmm::kvm::detail::device;
+        [[nodiscard]] auto vcpu(unsigned int vcpu_id) const -> vmm::kvm::detail::vcpu;
+        [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) const -> vmm::kvm::detail::device;
 
         // Control routines
-        [[nodiscard]] auto check_extension(unsigned int cap) -> unsigned int;
-        auto set_bsp(unsigned int vcpu_id) -> void;
-        auto memslot(kvm_userspace_memory_region region) -> void;
-        auto irqchip() -> void;
-        auto get_irqchip(kvm_irqchip &irqchip_p) -> void;
-        auto set_irqchip(kvm_irqchip &irqchip_p) -> void;
-        [[nodiscard]] auto get_clock() -> kvm_clock_data;
-        auto set_clock(kvm_clock_data &clock) -> void;
-        auto gsi_routing(IrqRoutingList &routing_list) -> void;
+        [[nodiscard]] auto check_extension(unsigned int cap) const -> unsigned int;
+        auto set_bsp(unsigned int vcpu_id) const -> void;
+        auto memslot(kvm_userspace_memory_region region) const -> void;
+        auto irqchip() const -> void;
+        auto get_irqchip(kvm_irqchip &irqchip_p) const -> void;
+        auto set_irqchip(kvm_irqchip const &irqchip_p) const -> void;
+        [[nodiscard]] auto get_clock() const -> kvm_clock_data;
+        auto set_clock(kvm_clock_data &clock) const -> void;
 
         /**
          * Attaches an ioeventfd to a legal pio/mmio address within the guest.
@@ -67,14 +66,14 @@ class vm {
          * ```
          */
         template<vmm::types::IoEventAddress T>
-        auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) -> void {
+        auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) const -> void {
             auto flags = uint32_t{};
 
             if (datamatch > 0) {
                 flags |= KVM_IOEVENTFD_FLAG_DATAMATCH;
             }
 
-            if (T == vmm::types::IoEventAddress::Pio) {
+            if constexpr (T == vmm::types::IoEventAddress::Pio) {
                 flags |= KVM_IOEVENTFD_FLAG_PIO;
             }
 
@@ -112,14 +111,14 @@ class vm {
          * ```
          */
         template<vmm::types::IoEventAddress T>
-        auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) -> void {
+        auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) const -> void {
             auto flags = uint32_t{KVM_IOEVENTFD_FLAG_DEASSIGN};
 
             if (datamatch > 0) {
                 flags |= KVM_IOEVENTFD_FLAG_DATAMATCH;
             }
 
-            if (T == vmm::types::IoEventAddress::Pio) {
+            if constexpr (T == vmm::types::IoEventAddress::Pio) {
                 flags |= KVM_IOEVENTFD_FLAG_PIO;
             }
 
@@ -135,10 +134,10 @@ class vm {
         }
 
         // Convenient routines
-        [[nodiscard]] auto mmap_size() -> std::size_t;
-        [[nodiscard]] auto num_vcpus() -> unsigned int;
-        [[nodiscard]] auto max_vcpus() -> unsigned int;
-        [[nodiscard]] auto num_memslots() -> unsigned int;
+        [[nodiscard]] auto mmap_size() const -> std::size_t;
+        [[nodiscard]] auto num_vcpus() const -> unsigned int;
+        [[nodiscard]] auto max_vcpus() const -> unsigned int;
+        [[nodiscard]] auto num_memslots() const -> unsigned int;
 };
 
 }  // namespace vmm::kvm::detail

@@ -23,7 +23,7 @@ namespace vmm::kvm::detail {
  * auto vcpu = vm.vcpu(0);
  * ```
  */
-auto vm::vcpu(unsigned int vcpu_id) -> vmm::kvm::detail::vcpu {
+auto vm::vcpu(unsigned int vcpu_id) const -> vmm::kvm::detail::vcpu {
     return vmm::kvm::detail::vcpu{fd_.ioctl(KVM_CREATE_VCPU, vcpu_id)};
 }
 
@@ -42,9 +42,8 @@ auto vm::vcpu(unsigned int vcpu_id) -> vmm::kvm::detail::vcpu {
  * auto device = vm.device(KVM_DEV_TYPE_VFIO);
  * ```
  */
-auto vm::device(uint32_t type, uint32_t flags) -> vmm::kvm::detail::device {
-    // FIXME: is the .fd = 0 right?
-    auto dev = kvm_create_device{ .type = type, .fd = 0, .flags = flags };
+auto vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device {
+    auto dev = kvm_create_device{ .type = type, .flags = flags };
     return vmm::kvm::detail::device{dev};
 }
 
@@ -66,7 +65,7 @@ auto vm::device(uint32_t type, uint32_t flags) -> vmm::kvm::detail::device {
  * assert(vm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
-auto vm::check_extension(unsigned int cap) -> unsigned int {
+auto vm::check_extension(unsigned int cap) const -> unsigned int {
     return fd_.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
@@ -77,10 +76,6 @@ auto vm::check_extension(unsigned int cap) -> unsigned int {
  * for a VM, otherwise the call will fail.
  *
  * See the documentation for KVM_SET_BOOT_CPU_ID.
- *
- * Architectures
- * =============
- * x86
  *
  * Examples
  * ========
@@ -96,7 +91,7 @@ auto vm::check_extension(unsigned int cap) -> unsigned int {
  * vm.set_bsp(0);
  * ```
  */
-auto vm::set_bsp(unsigned int vcpu_id) -> void {
+auto vm::set_bsp(unsigned int vcpu_id) const -> void {
     fd_.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
@@ -123,7 +118,7 @@ auto vm::set_bsp(unsigned int vcpu_id) -> void {
  * vm.memslot(mem_region);
  * ```
  */
-auto vm::memslot(kvm_userspace_memory_region region) -> void {
+auto vm::memslot(kvm_userspace_memory_region region) const -> void {
     fd_.ioctl(KVM_SET_USER_MEMORY_REGION, &region);
 }
 
@@ -131,10 +126,6 @@ auto vm::memslot(kvm_userspace_memory_region region) -> void {
  * Creates an interrupt controller model in the kernel
  *
  * See the documentation for `KVM_CREATE_IRQCHIP`.
- *
- * Architectures
- * =============
- * x86, x86_64, arm, aarch64
  *
  * Examples
  * ========
@@ -146,7 +137,7 @@ auto vm::memslot(kvm_userspace_memory_region region) -> void {
  * vm.irqchip();
  * ```
  */
-auto vm::irqchip() -> void {
+auto vm::irqchip() const -> void {
     fd_.ioctl(KVM_CREATE_IRQCHIP);
 }
 
@@ -155,10 +146,6 @@ auto vm::irqchip() -> void {
  * the caller.
  *
  * See the documentation for `KVM_GET_IRQCHIP`.
- *
- * Architectures
- * =============
- * x86
  *
  * Examples
  * ========
@@ -170,10 +157,10 @@ auto vm::irqchip() -> void {
  * auto irqchip = kvm_irqchip{ .chip_id = KVM_IRQCHIP_PIC_MASTER };
  *
  * vm.irqchip();
- * vm.getirqchip(&irqchip);
+ * vm.get_irqchip(irqchip);
  * ```
  */
-auto vm::get_irqchip(kvm_irqchip &irqchip_p) -> void {
+auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void {
     fd_.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
 }
 
@@ -183,9 +170,6 @@ auto vm::get_irqchip(kvm_irqchip &irqchip_p) -> void {
  *
  * See the documentation for `KVM_SET_IRQCHIP`.
  *
- * Architectures
- * =============
- * x86
  *
  * Examples
  * ========
@@ -200,10 +184,10 @@ auto vm::get_irqchip(kvm_irqchip &irqchip_p) -> void {
  * };
  *
  * vm.irqchip();
- * vm.set_irqchip(&irqchip);
+ * vm.set_irqchip(irqchip);
  * ```
  */
-auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
+auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void {
     fd_.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
 }
 
@@ -211,10 +195,6 @@ auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
  * Gets the current timestamp of kvmclock as seen by the current guest.
  *
  * See the documentation for `KVM_GET_CLOCK`.
- *
- * Architectures
- * =============
- * x86
  *
  * Examples
  * ========
@@ -226,8 +206,8 @@ auto vm::set_irqchip(kvm_irqchip &irqchip_p) -> void {
  * auto clock = vm.get_clock();
  * ```
  */
-auto vm::get_clock() -> kvm_clock_data {
-    auto clock = kvm_clock_data{0};
+auto vm::get_clock() const -> kvm_clock_data {
+    auto clock = kvm_clock_data{};
     fd_.ioctl(KVM_GET_CLOCK, &clock);
     return clock;
 }
@@ -236,10 +216,6 @@ auto vm::get_clock() -> kvm_clock_data {
  * Sets the current timestamp of kvmclock.
  *
  * See the documentation for `KVM_SET_CLOCK`.
- *
- * Architectures
- * =============
- * x86
  *
  * Examples
  * ========
@@ -253,34 +229,21 @@ auto vm::get_clock() -> kvm_clock_data {
  * vm.set_clock(&clock);
  * ```
  */
-auto vm::set_clock(kvm_clock_data &clock) -> void {
+auto vm::set_clock(kvm_clock_data &clock) const -> void {
     fd_.ioctl(KVM_SET_CLOCK, &clock);
-}
-
-/**
- * Sets the GSI routing table entries, overwriting any previously set entries.
- *
- * See the documentation for `KVM_SET_GSI_ROUTING`.
- *
- * Architectures
- * =============
- * x86, s390, arm, arm64
- */
-auto vm::gsi_routing(IrqRoutingList &routing_list) -> void {
-    fd_.ioctl(KVM_SET_GSI_ROUTING, &routing_list);
 }
 
 /**
  * Returns KVM_RUN's shared memory region size.
  */
-auto vm::mmap_size() -> std::size_t {
+auto vm::mmap_size() const -> std::size_t {
     return mmap_size_;
 }
 
 /**
  * Returns the recommended number for max_vcpus.
  */
-auto vm::num_vcpus() -> unsigned int {
+auto vm::num_vcpus() const -> unsigned int {
     auto ret = check_extension(KVM_CAP_NR_VCPUS);
     return ret > 0 ? ret : 4;
 }
@@ -288,7 +251,7 @@ auto vm::num_vcpus() -> unsigned int {
 /**
  * Returns the maximum possible value for max_vcpus.
  */
-auto vm::max_vcpus() -> unsigned int {
+auto vm::max_vcpus() const -> unsigned int {
     auto ret = check_extension(KVM_CAP_MAX_VCPUS);
     return ret > 0 ? ret : num_vcpus();
 }
@@ -296,7 +259,7 @@ auto vm::max_vcpus() -> unsigned int {
 /**
  * Returns the maximum number of allowed memory slots for a VM.
  */
-auto vm::num_memslots() -> unsigned int {
+auto vm::num_memslots() const -> unsigned int {
     auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
     return ret > 0 ? ret : 32;
 }

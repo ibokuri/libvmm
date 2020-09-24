@@ -2,8 +2,6 @@
  * system.cpp - KVM ioctls
  */
 
-#include <linux/kvm.h> // KVM_*
-
 #include "vmm/kvm/detail/system.hpp"
 #include "vmm/kvm/detail/vm.hpp"
 
@@ -24,7 +22,7 @@ namespace vmm::kvm::detail {
  * assert(kvm.api_version() == KVM_API_VERSION))
  * ```
  */
-auto system::api_version() -> unsigned int {
+auto system::api_version() const -> unsigned int {
     return fd_.ioctl(KVM_GET_API_VERSION);
 }
 
@@ -33,7 +31,7 @@ auto system::api_version() -> unsigned int {
  *
  * This method should only be used by `system::vm()`.
  */
-auto system::create_vm(unsigned int machine_type) -> int {
+auto system::create_vm(unsigned int machine_type) const -> int {
      return fd_.ioctl(KVM_CREATE_VM, machine_type);
 }
 
@@ -59,7 +57,7 @@ auto system::create_vm(unsigned int machine_type) -> int {
  * auto vm = kvm.vm(KVM_VM_TYPE_ARM_IPA_SIZE(48);
  * ```
  */
-auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
+auto system::vm(unsigned int machine_type) const -> vmm::kvm::detail::vm {
     return vmm::kvm::detail::vm{create_vm(machine_type), vcpu_mmap_size()};
 }
 
@@ -80,7 +78,7 @@ auto system::vm(unsigned int machine_type) -> vmm::kvm::detail::vm {
  * assert(kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
-auto system::check_extension(unsigned int cap) -> unsigned int {
+auto system::check_extension(unsigned int cap) const -> unsigned int {
     return fd_.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
@@ -108,7 +106,7 @@ auto system::check_extension(unsigned int cap) -> unsigned int {
  * auto mmap_size = kvm.vcpu_mmap_size();
  * ```
  */
-auto system::vcpu_mmap_size() -> std::size_t {
+auto system::vcpu_mmap_size() const -> std::size_t {
     return fd_.ioctl(KVM_GET_VCPU_MMAP_SIZE);
 }
 
@@ -120,115 +118,17 @@ auto system::vcpu_mmap_size() -> std::size_t {
  * the IPA space undergo a second translation into the real physical address
  * space by the hypervisor.
  *
- * Architectures
- * =============
- * aarch64
- *
  * Examples
  * ========
  * ```
  * #include <vmm/kvm.hpp>
  *
  * auto kvm = vmm::kvm::system{}};
- * auto ipa_size {kvm.host_ipa_limit()};
+ * auto ipa_size = kvm.host_ipa_limit();
  * ```
  */
-auto system::host_ipa_limit() -> unsigned int {
+auto system::host_ipa_limit() const -> unsigned int {
     return check_extension(KVM_CAP_ARM_VM_IPA_SIZE);
-}
-
-/**
- * Returns a list of host- and kvm-supported x86 cpuid features.
- *
- * In x86, the CPU identification (CPUID) instruction is a supplementary
- * instruction allowing software to discover details of the processor. A
- * program can use the CPUID to determine processor type and whether certain
- * features are implemented.
- *
- * Architectures
- * =============
- * x86
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto cpuids = kvm.supported_cpuids();
- *
- * // Print CPU's manufacturer ID string
- * TODO
- * ```
- */
-auto system::supported_cpuids() -> CpuidList {
-    auto cpuids = CpuidList{MAX_CPUID_ENTRIES};
-    supported_cpuids(cpuids);
-    return cpuids;
-}
-
-/**
- * Obtains a list of host- and kvm-supported x86 cpuid features.
- *
- * Architectures
- * =============
- * x86
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto cpuids = vmm::kvm::CpuidList{MAX_CPUID_ENTRIES};
- * kvm.supported_cpuids(cpuids);
- * ```
- */
-auto system::supported_cpuids(CpuidList& cpuids) -> void {
-    fd_.ioctl(KVM_GET_SUPPORTED_CPUID, cpuids.get());
-}
-
-/**
- * Returns a list of kvm-emulated x86 cpuid features.
- *
- * Architectures
- * =============
- * x86
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto cpuids = kvm.emulated_cpuids();
- * ```
- */
-auto system::emulated_cpuids() -> CpuidList {
-    auto cpuids = CpuidList{MAX_CPUID_ENTRIES};
-    emulated_cpuids(cpuids);
-    return cpuids;
-}
-
-/**
- * Obtains a list of kvm-emulated x86 cpuid features.
- *
- * Architectures
- * =============
- * x86
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto cpuids = vmm::kvm::CpuidList{MAX_CPUID_ENTRIES};
- * kvm.emulated_cpuids(cpuids);
- * ```
- */
-auto system::emulated_cpuids(CpuidList& cpuids) -> void {
-    fd_.ioctl(KVM_GET_EMULATED_CPUID, cpuids.get());
 }
 
 /**
