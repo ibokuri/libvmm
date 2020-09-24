@@ -8,6 +8,7 @@
 #include <iterator> // distance
 #include <linux/kvm.h> // kvm_*
 
+#include "vmm/kvm/detail/macros.hpp"
 #include "vmm/types/detail/fam_struct.hpp"
 
 namespace vmm::kvm::detail {

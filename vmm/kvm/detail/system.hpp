@@ -10,6 +10,7 @@
 #include <sys/stat.h> // open
 
 #include "vmm/kvm/detail/base.hpp"
+#include "vmm/kvm/detail/macros.hpp"
 #include "vmm/kvm/detail/types.hpp"
 
 namespace vmm::kvm::detail {

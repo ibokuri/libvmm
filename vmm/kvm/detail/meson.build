@@ -9,6 +9,7 @@ kvm_internal_sources = files(
 kvm_internal_headers = files(
   'base.hpp',
   'device.hpp',
+  'macros.hpp',
   'types.hpp',
   'system.hpp',
   'vcpu.hpp',
