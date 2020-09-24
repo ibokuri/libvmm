@@ -22,8 +22,8 @@ class system;
  * };
  */
 template<std::size_t N>
-class MsrList : public fam_struct<kvm_msr_list, uint32_t, N> {
-    using Base = fam_struct<kvm_msr_list, uint32_t, N>;
+class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
+    using Base = FamStruct<kvm_msr_list, uint32_t, N>;
 
     public:
         using value_type = typename Base::value_type;
@@ -56,8 +56,8 @@ class MsrList : public fam_struct<kvm_msr_list, uint32_t, N> {
  * };
  */
 template<std::size_t N>
-class Msrs : public fam_struct<kvm_msrs, kvm_msr_entry, N> {
-    using Base = fam_struct<kvm_msrs, kvm_msr_entry, N>;
+class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
+    using Base = FamStruct<kvm_msrs, kvm_msr_entry, N>;
 
     public:
         using value_type = typename Base::value_type;
@@ -112,8 +112,8 @@ class Msrs : public fam_struct<kvm_msrs, kvm_msr_entry, N> {
  * };
  */
 template<std::size_t N>
-class Cpuids : public fam_struct<kvm_cpuid2, kvm_cpuid_entry2, N> {
-    using Base = fam_struct<kvm_cpuid2, kvm_cpuid_entry2, N>;
+class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
+    using Base = FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N>;
 
     public:
         using value_type = typename Base::value_type;
@@ -171,8 +171,8 @@ class Cpuids : public fam_struct<kvm_cpuid2, kvm_cpuid_entry2, N> {
  * };
  */
 template<std::size_t N>
-class IrqRouting : public fam_struct<kvm_irq_routing, kvm_irq_routing_entry, N> {
-    using Base = fam_struct<kvm_irq_routing, kvm_irq_routing_entry, N>;
+class IrqRouting : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N> {
+    using Base = FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N>;
 
     public:
         using value_type = typename Base::value_type;

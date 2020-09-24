@@ -3,18 +3,19 @@
 #include <cstddef>
 #include <array>
 
-/**
- * NOTE: DEPRECATED
+/*
+ * A wrapper for FAM structs used by KVM.
  *
- * Buffer size computation (general form)
+ * This class should not be used for arbitrary FAM structs. It is only meant to
+ * be used with KVM structs, which imply certain properties:
  *
- *     sizeof(struct_type) + N * sizeof(value_type)
+ *     * No padding is provided in FamStruct as KVM provides it explicitly
+ *       where needed.
  *
- * The left-hand side of the sum computes the size needed to hold the header.
- * The right-hand side of the sum computes the size needed to hold N entries.
+ *     * FamStruct ensures that the struct is able to be passed to KVM's API.
  */
 template<typename Struct, typename Entry, std::size_t N>
-class fam_struct {
+class FamStruct {
     protected:
         using value_type = Entry;
         using size_type = std::size_t;
