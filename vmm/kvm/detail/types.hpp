@@ -45,6 +45,28 @@ class FamStruct {
         Struct struct_ = {};
         std::array<value_type, N> entries_ = {};
     public:
+        // Element access
+        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
+            return this->entries_[pos];
+        }
+
+        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
+            return this->entries_[pos];
+        }
+
+        [[nodiscard]] auto data() noexcept -> Struct* {
+            return &this->struct_;
+        }
+
+        [[nodiscard]] auto data() const noexcept -> const Struct* {
+            return &this->struct_;
+        }
+
+        // Capacity
+        [[nodiscard]] constexpr auto max_size() const noexcept -> size_type {
+            return N;
+        }
+
         // Iterators
         auto begin() noexcept -> iterator {
             return this->entries_.begin();
@@ -68,28 +90,6 @@ class FamStruct {
 
         auto cend() const noexcept -> const_iterator {
             return end();
-        }
-
-        // Element access
-        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
-            return this->entries_[pos];
-        }
-
-        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
-            return this->entries_[pos];
-        }
-
-        [[nodiscard]] auto data() noexcept -> Struct* {
-            return &this->struct_;
-        }
-
-        [[nodiscard]] auto data() const noexcept -> const Struct* {
-            return &this->struct_;
-        }
-
-        // Capacity
-        [[nodiscard]] constexpr auto max_size() const noexcept -> size_type {
-            return N;
         }
 };
 
