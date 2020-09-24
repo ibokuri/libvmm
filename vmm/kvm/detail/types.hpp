@@ -11,13 +11,27 @@
 #include <linux/kvm.h> // kvm_*
 
 #include "vmm/kvm/detail/macros.hpp"
+#include "vmm/types/file_descriptor.hpp"
 
 namespace vmm::kvm::detail {
 
 class system;
 
-/*
- * A wrapper for FAM structs used by KVM.
+/**
+ * Base class for KVM file descriptors.
+ */
+class KvmFd : public vmm::types::FileDescriptor {
+    public:
+        KvmFd(int fd) noexcept : vmm::types::FileDescriptor(fd) {}
+
+        KvmFd(const KvmFd& other) = delete;
+        KvmFd(KvmFd&& other) = default;
+        auto operator=(const KvmFd& other) -> KvmFd& = delete;
+        auto operator=(KvmFd&& other) -> KvmFd& = default;
+};
+
+/**
+ * Wrapper for KVM FAM structs.
  *
  * This class should not be used for arbitrary FAM structs. It is only meant to
  * be used with KVM structs, which imply certain properties:
