@@ -17,16 +17,9 @@ using vcpu = vmm::kvm::detail::vcpu;
 using device = vmm::kvm::detail::device;
 
 /* types */
-template<std::size_t N>
-using MsrList = vmm::kvm::detail::MsrList<N>;
-
-template<std::size_t N>
-using Msrs = vmm::kvm::detail::Msrs<N>;
-
-template<std::size_t N>
-using Cpuids = vmm::kvm::detail::Cpuids<N>;
-
-template<std::size_t N>
-using IrqRouting = vmm::kvm::detail::IrqRouting<N>;
+template<std::size_t N> using MsrList = vmm::kvm::detail::MsrList<N>;
+template<std::size_t N> using Msrs = vmm::kvm::detail::Msrs<N>;
+template<std::size_t N> using Cpuids = vmm::kvm::detail::Cpuids<N>;
+template<std::size_t N> using IrqRouting = vmm::kvm::detail::IrqRouting<N>;
 
 }  // namespace vmm::kvm

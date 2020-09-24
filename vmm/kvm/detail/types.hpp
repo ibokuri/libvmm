@@ -194,9 +194,7 @@ class IrqRouting : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N> {
         }
 
         template <typename Container>
-        explicit IrqRouting(Container& c) : IrqRouting(c.begin(), c.end()) {
-            //static_assert(std::is_same<value_type, typename Container::value_type>::value);
-        }
+        explicit IrqRouting(Container& c) : IrqRouting(c.begin(), c.end()) {}
 
         // Capacity
         [[nodiscard]] auto size() const noexcept -> size_type {

@@ -78,9 +78,8 @@ class system {
         [[nodiscard]] static auto open(bool cloexec=true) -> int {
             const auto fd = ::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR);
 
-            if (fd < 0) {
+            if (fd < 0)
                 VMM_THROW(std::system_error(errno, std::system_category()));
-            }
 
             return fd;
         }

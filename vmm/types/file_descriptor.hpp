@@ -77,7 +77,9 @@ class FileDescriptor {
             return ret;
         }
 
-        auto fd() const noexcept -> int { return fd_; }
+        auto fd() const noexcept -> int {
+            return fd_;
+        }
 };
 
 }

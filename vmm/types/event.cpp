@@ -16,9 +16,8 @@ namespace vmm::types {
 EventFd::EventFd(int flags) {
     fd_ = ::eventfd(0, flags);
 
-    if (fd_ < 0) {
+    if (fd_ < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
-    }
 }
 
 /**
@@ -36,9 +35,8 @@ EventFd::EventFd(int flags) {
 auto EventFd::write(uint64_t value) const -> void {
     auto ret = ::write(fd_, &value, sizeof(uint64_t));
 
-    if (ret < 0) {
+    if (ret < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
-    }
 }
 
 /**
@@ -58,9 +56,8 @@ auto EventFd::write(uint64_t value) const -> void {
     auto buf = uint64_t{};
     auto ret = ::read(fd_, &buf, sizeof(uint64_t));
 
-    if (ret < 0) {
+    if (ret < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
-    }
 
     return buf;
 }
