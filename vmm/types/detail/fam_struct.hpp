@@ -58,12 +58,10 @@ class fam_struct {
 
         // Element access
         [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
-            static_assert(pos < N);
             return this->entries_[pos];
         }
 
         [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
-            static_assert(pos < N);
             return this->entries_[pos];
         }
 
