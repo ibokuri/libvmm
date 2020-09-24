@@ -29,7 +29,7 @@ class fam_struct {
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         Struct struct_ = {};
-        std::array<Entry, N> entries_ = {};
+        std::array<value_type, N> entries_ = {};
     public:
         // Iterators
         auto begin() noexcept -> iterator {

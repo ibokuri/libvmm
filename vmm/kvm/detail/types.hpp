@@ -67,6 +67,12 @@ class Msrs : public fam_struct<kvm_msrs, kvm_msr_entry, N> {
             this->struct_.nmsrs = N;
         };
 
+        explicit Msrs(value_type entry) noexcept {
+            static_assert(N == 1);
+            this->struct_ = {.nmsrs = N};
+            this->entries_ = {entry};
+        }
+
         template <typename Iterator>
         explicit Msrs(Iterator first, Iterator last) {
             std::copy_if(first, last, this->entries_.begin(), [](value_type) { return true; });
@@ -75,12 +81,6 @@ class Msrs : public fam_struct<kvm_msrs, kvm_msr_entry, N> {
         template <typename Container>
         explicit Msrs(Container& c) : Msrs(c.begin(), c.end()) {
             //static_assert(std::is_same<value_type, typename Container::value_type>::value);
-        }
-
-        explicit Msrs(value_type entry) noexcept {
-            static_assert(N == 1);
-            this->struct_ = {.nmsrs = N};
-            this->entries_ = {entry};
         }
 
         // Capacity
@@ -125,6 +125,7 @@ class Cpuids : public fam_struct<kvm_cpuid2, kvm_cpuid_entry2, N> {
 
         explicit Cpuids(value_type entry) noexcept {
             static_assert(N == 1);
+
             this->struct_ = {.nent = N};
             this->entries_ = {entry};
         }
@@ -181,6 +182,12 @@ class IrqRouting : public fam_struct<kvm_irq_routing, kvm_irq_routing_entry, N> 
             this->struct_.nr = N;
         };
 
+        explicit IrqRouting(value_type entry) noexcept {
+            static_assert(N == 1);
+            this->struct_ = {.nr = N};
+            this->entries_ = {entry};
+        }
+
         template <typename Iterator>
         explicit IrqRouting(Iterator first, Iterator last) {
             std::copy_if(first, last, this->entries_.begin(), [](value_type) {return true;});
@@ -189,12 +196,6 @@ class IrqRouting : public fam_struct<kvm_irq_routing, kvm_irq_routing_entry, N> 
         template <typename Container>
         explicit IrqRouting(Container& c) : IrqRouting(c.begin(), c.end()) {
             //static_assert(std::is_same<value_type, typename Container::value_type>::value);
-        }
-
-        explicit IrqRouting(value_type entry) noexcept {
-            static_assert(N == 1);
-            this->struct_ = {.nr = N};
-            this->entries_ = {entry};
         }
 
         // Capacity

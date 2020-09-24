@@ -63,13 +63,15 @@ class vm {
          * ========
          * ```
          * #include "vmm/kvm.hpp"
+         * #include "vmm/types.hpp"
          *
          * using Pio = vmm::types::IoEventAddress::Pio;
          * using Mmio = vmm::types::IoEventAddress::Mmio;
+         * using EventFd = vmm::types::EventFd;
          *
          * auto kvm = vmm::kvm::system{};
          * auto vm = kvm.vm();
-         * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+         * auto eventfd = EventFd{EFD_NONBLOCK};
          *
          * vm.attach_ioevent<Pio>(eventfd, 0xf4);
          * vm.attach_ioevent<Mmio>(eventfd, 0x1000);
@@ -105,13 +107,15 @@ class vm {
          * ========
          * ```
          * #include "vmm/kvm.hpp"
+         * #include "vmm/types.hpp"
          *
          * using Pio = vmm::types::IoEventAddress::Pio;
          * using Mmio = vmm::types::IoEventAddress::Mmio;
+         * using EventFd = vmm::types::EventFd;
          *
          * auto kvm = vmm::kvm::system{};
          * auto vm = kvm.vm();
-         * auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+         * auto eventfd = EventFd{EFD_NONBLOCK};
          *
          * vm.attach_ioevent<Pio>(eventfd, 0xf4);
          * vm.attach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
