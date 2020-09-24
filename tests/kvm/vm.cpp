@@ -159,11 +159,12 @@ TEST_CASE("GSI routing (x86)", "[.x86]") {
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
-        auto entry = kvm_irq_routing_entry{};
-        auto routing_list = vmm::kvm::IrqRouting<1>{entry};
-        REQUIRE_THROWS(vm.gsi_routing(routing_list));
+        auto table = vmm::kvm::IrqRouting<0>{};
+
+        // No irqchip created yet
+        REQUIRE_THROWS(vm.gsi_routing(table));
 
         vm.irqchip();
-        REQUIRE_NOTHROW(vm.gsi_routing(routing_list));
+        REQUIRE_NOTHROW(vm.gsi_routing(table));
     }
 }

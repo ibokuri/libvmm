@@ -44,6 +44,16 @@ class vm {
         auto set_clock(kvm_clock_data &clock) const -> void;
 
         /**
+         * Sets the GSI routing table entries, overwriting previous entries.
+         *
+         * See the documentation for `KVM_SET_GSI_ROUTING`.
+         */
+        template<typename T, typename = std::enable_if_t<std::is_same_v<typename T::value_type, kvm_irq_routing_entry>>>
+        auto gsi_routing(T &table) const -> void {
+            fd_.ioctl(KVM_SET_GSI_ROUTING, table.data());
+        }
+
+        /**
          * Attaches an ioeventfd to a legal pio/mmio address within the guest.
          *
          * A guest write in the registered address will signal the provided
