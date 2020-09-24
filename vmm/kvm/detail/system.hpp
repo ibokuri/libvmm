@@ -9,11 +9,10 @@
 #include <type_traits> // enable_if_t, is_same_v
 
 #include <fcntl.h> // open
-#include <sys/types.h> // open
 #include <sys/stat.h> // open
+#include <sys/types.h> // open
 #include <linux/kvm.h> // kvm_*, KVM_*
 
-#include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/macros.hpp"
 #include "vmm/kvm/detail/types.hpp"
 #include "vmm/types/detail/exceptions.hpp"

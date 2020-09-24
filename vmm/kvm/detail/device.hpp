@@ -7,7 +7,7 @@
 #include <cstdint> // uint32_t
 #include <linux/kvm.h> // kvm_*, KVM_*
 
-#include "vmm/kvm/detail/base.hpp"
+#include "vmm/kvm/detail/types.hpp"
 #include "vmm/kvm/detail/vm.hpp"
 
 namespace vmm::kvm::detail {
