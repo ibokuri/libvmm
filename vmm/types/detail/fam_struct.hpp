@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstddef>
-#include <array>
+#include <cstddef> // size_t
+#include <array> // array
 
 /*
  * A wrapper for FAM structs used by KVM.

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "vmm/types/detail/exceptions.hpp"
 #include "vmm/types/file_descriptor.hpp"
 
 namespace vmm::kvm::detail {

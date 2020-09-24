@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include <linux/kvm.h> // kvm_*
+#include <cstddef> // size_t
+#include <cstdint> // uint32_t, uint64_t
+#include <linux/kvm.h> // kvm_*, KVM_*
 
 #include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/system.hpp"

@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <cerrno> // errno
 #include <system_error> // error_code, system_error
 #include <sys/ioctl.h> // ioctl
-#include <cerrno> // errno
 
 #include "vmm/types/detail/exceptions.hpp"
 
@@ -71,9 +71,8 @@ class FileDescriptor {
         auto ioctl(int req, T arg=T{}) const -> int {
             const auto ret = ::ioctl(fd_, req, arg);
 
-            if (ret < 0) {
+            if (ret < 0)
                 VMM_THROW(std::system_error(errno, std::system_category()));
-            }
 
             return ret;
         }

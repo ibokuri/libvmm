@@ -4,17 +4,19 @@
 
 #pragma once
 
+#include <cstddef> // size_t
 #include <system_error> // error_code, system_category, system_error
 #include <type_traits> // enable_if_t, is_same_v
 
 #include <fcntl.h> // open
 #include <sys/types.h> // open
 #include <sys/stat.h> // open
-#include <linux/kvm.h> // KVM_*
+#include <linux/kvm.h> // kvm_*, KVM_*
 
 #include "vmm/kvm/detail/base.hpp"
 #include "vmm/kvm/detail/macros.hpp"
 #include "vmm/kvm/detail/types.hpp"
+#include "vmm/types/detail/exceptions.hpp"
 
 namespace vmm::kvm::detail {
 
@@ -129,7 +131,6 @@ class system {
          * auto nmsrs = kvm.read_msrs(msrs);
          * ```
          */
-        //template<typename T, typename = std::enable_if_t<std::is_same_v<T, Msrs>>>
         template<typename T, typename = std::enable_if_t<std::is_same_v<typename T::value_type, kvm_msr_entry>>>
         auto read_msrs(T &msrs) const -> unsigned int {
             return fd_.ioctl(KVM_GET_MSRS, msrs.data());

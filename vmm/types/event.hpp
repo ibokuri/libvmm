@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint> // uint64_t
 #include <system_error> // error_code, system_category, system_error
 #include <sys/eventfd.h> // eventfd
 
