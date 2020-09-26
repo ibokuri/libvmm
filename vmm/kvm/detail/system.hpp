@@ -37,7 +37,7 @@ class system {
             return l;
         }
     public:
-        explicit system() : fd_{open()} {}
+        system() : fd_{open()} {}
 
         /**
          * Constructs a kvm object from a file descriptor.
