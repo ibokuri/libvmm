@@ -59,33 +59,33 @@ class FamStruct {
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+
         allocator_type m_alloc;
         Struct *m_ptr;
+    private:
+        [[nodiscard]] virtual auto entries() noexcept -> pointer = 0;
+        [[nodiscard]] virtual auto entries() const noexcept -> const_pointer = 0;
     public:
         static const auto alignment = alignof(Struct);
-        static const auto size = sizeof(Struct) + N * sizeof(Entry);
+        static const auto storage_size = sizeof(Struct) + N * sizeof(Entry);
 
         // Allocator constructor
         explicit FamStruct(const allocator_type& alloc)
-                : m_alloc{alloc}, m_ptr{static_cast<Struct*>(m_alloc.resource()->allocate(size, alignment))} {
+                : m_alloc{alloc},
+                  m_ptr{static_cast<Struct*>(m_alloc.resource()->allocate(storage_size, alignment))} {
             try {
                 m_alloc.construct(m_ptr);
-            } catch(...) {
-                m_alloc.deallocate(reinterpret_cast<std::byte*>(m_ptr), size);
+            }
+            catch(...) {
+                m_alloc.deallocate(reinterpret_cast<std::byte*>(m_ptr), storage_size);
                 throw;
             }
 
-            std::memset(m_ptr, 0, size);
+            std::memset(m_ptr, 0, storage_size);
         }
 
         // Default constructor
         explicit FamStruct() : FamStruct(std::pmr::new_delete_resource()) {}
-
-        // Destructor
-        ~FamStruct() {
-            m_alloc.destroy(m_ptr);
-            m_alloc.deallocate(reinterpret_cast<std::byte*>(m_ptr), size);
-        }
 
         // Copy constructor and assignment operator
         FamStruct(const FamStruct& other);
@@ -96,16 +96,23 @@ class FamStruct {
         FamStruct(FamStruct&& other, const allocator_type& alloc) noexcept;
 
         // Range constructor
-        template<typename InputIt>
-        FamStruct(InputIt first, InputIt last, const allocator_type& alloc={});
+        //template<typename InputIt>
+        //FamStruct(InputIt first, InputIt last, const allocator_type& alloc={});
 
         // Initializer list constructor and assignment operator
-        FamStruct(std::initializer_list<Entry> init, const allocator_type& alloc={})
-              : FamStruct(init.begin(), init.end(), alloc) {}
+        //FamStruct(std::initializer_list<Entry> init, const allocator_type& alloc={})
+              //: FamStruct(init.begin(), init.end(), alloc) {}
 
-        FamStruct& operator=(std::initializer_list<Entry> init);
+        //FamStruct& operator=(std::initializer_list<Entry> init);
 
-        // Assignment operators (NOTE: deleted as they break the invariant that a FamStruct's size never changes)
+        // Destructor
+        virtual ~FamStruct() {
+            m_alloc.destroy(m_ptr);
+            m_alloc.deallocate(reinterpret_cast<std::byte*>(m_ptr), storage_size);
+        }
+
+        // Assignment operators
+        // NOTE: deleted as they break the invariant that a FamStruct's size never changes
         void operator=(FamStruct&&) = delete;
         void operator=(const FamStruct&) = delete;
 
@@ -118,9 +125,48 @@ class FamStruct {
 			return m_ptr;
 		}
 
+        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
+			return entries()[pos];
+		}
+
+        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
+			return entries()[pos];
+		}
+
         // Capacity
+        [[nodiscard]] virtual auto size() const noexcept -> size_type = 0;
+
+        [[nodiscard]] auto empty() const noexcept -> bool {
+			return size() == 0;
+		}
+
         [[nodiscard]] constexpr auto max_size() const noexcept -> size_type {
 			return N;
+		}
+
+        // Iterators
+        auto begin() noexcept -> iterator {
+			return entries();
+		}
+
+        auto end() noexcept -> iterator {
+			return entries() + size();
+		}
+
+        auto begin() const noexcept -> const_iterator {
+			return entries();
+		}
+
+        auto end() const noexcept -> const_iterator {
+			return entries() + size();
+		}
+
+        auto cbegin() const noexcept -> const_iterator {
+			return begin();
+		}
+
+        auto cend() const noexcept -> const_iterator {
+			return end();
 		}
 };
 
@@ -134,62 +180,40 @@ template<std::size_t N>
 class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
     using Base = FamStruct<kvm_msr_list, uint32_t, N>;
 
-    private:
-        MsrList() noexcept {
-            Base::m_ptr->nmsrs = N;
-        };
-
-        friend system;
     public:
+        using allocator_type = typename Base::allocator_type;
         using value_type = typename Base::value_type;
         using size_type = typename Base::size_type;
-        using reference = typename Base::reference;
-        using const_reference = typename Base::const_reference;
-        using iterator = typename Base::iterator;
-        using const_iterator = typename Base::const_iterator;
+        using pointer = typename Base::pointer;
+        using const_pointer = typename Base::const_pointer;
+
+        static const auto alignment = Base::alignment;
+        static const auto storage_size = Base::storage_size;
+
+        virtual ~MsrList() = default;
 
         // Capacity
         [[nodiscard]] auto size() const noexcept -> size_type {
 			return Base::m_ptr->nmsrs;
 		}
+    private:
+        MsrList() noexcept {
+            Base::m_ptr->nmsrs = N;
+        };
 
-        [[nodiscard]] auto empty() const noexcept -> bool {
-			return size() == 0;
-		}
+        MsrList(const allocator_type& alloc) : Base(alloc) {
+            Base::m_ptr->nr = N;
+        };
 
-        // Element access
-        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
-			return Base::m_ptr->indices[pos];
-		}
+        friend system;
 
-        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
-			return Base::m_ptr->indices[pos];
-		}
+        [[nodiscard]] auto entries() noexcept -> pointer {
+            return Base::m_ptr->indices;
+        }
 
-        // Iterators
-        auto begin() noexcept -> iterator {
-			return Base::m_ptr->indices;
-		}
-
-        auto end() noexcept -> iterator {
-			return Base::m_ptr->indices + Base::m_ptr->nmsrs;
-		}
-
-        auto begin() const noexcept -> const_iterator {
-			return Base::m_ptr->indices;
-		}
-
-        auto end() const noexcept -> const_iterator {
-			return Base::m_ptr->indices + Base::m_ptr->nmsrs;
-		}
-
-        auto cbegin() const noexcept -> const_iterator {
-			return begin();
-		}
-
-        auto cend() const noexcept -> const_iterator {
-			return end();
-		}
+        [[nodiscard]] auto entries() const noexcept -> const_pointer {
+            return Base::m_ptr->indices;
+        }
 };
 
 /**
@@ -210,14 +234,21 @@ class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
     using Base = FamStruct<kvm_msrs, kvm_msr_entry, N>;
 
     public:
+        using allocator_type = typename Base::allocator_type;
         using value_type = typename Base::value_type;
         using size_type = typename Base::size_type;
-        using reference = typename Base::reference;
-        using const_reference = typename Base::const_reference;
-        using iterator = typename Base::iterator;
-        using const_iterator = typename Base::const_iterator;
+        using pointer = typename Base::pointer;
+        using const_pointer = typename Base::const_pointer;
+
+        static const auto alignment = Base::alignment;
+        static const auto storage_size = Base::storage_size;
 
         Msrs() noexcept {
+            Base::m_ptr->nmsrs = N;
+        };
+
+        // FIXME: Why is Msrs the only one with an allocator constructor?
+        Msrs(const allocator_type& alloc) : Base(alloc) {
             Base::m_ptr->nmsrs = N;
         };
 
@@ -230,54 +261,26 @@ class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
 
         template <typename Iterator>
         explicit Msrs(Iterator first, Iterator last) {
-            std::copy_if(first, last, begin(), [](value_type) { return true; });
+            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
             Base::m_ptr->nmsrs = N;
         }
 
         template <typename Container>
         explicit Msrs(Container& c) : Msrs(c.begin(), c.end()) {}
 
+        virtual ~Msrs() = default;
+
         // Capacity
         [[nodiscard]] auto size() const noexcept -> size_type {
             return Base::m_ptr->nmsrs;
         }
-
-        [[nodiscard]] auto empty() const noexcept -> bool {
-            return size() == 0;
-        }
-
-        // Element access
-        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
-            return Base::m_ptr->entries[pos];
-        }
-
-        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
-            return Base::m_ptr->entries[pos];
-        }
-
-        // Iterators
-        auto begin() noexcept -> iterator {
+    private:
+        [[nodiscard]] auto entries() noexcept -> pointer {
             return Base::m_ptr->entries;
         }
 
-        auto end() noexcept -> iterator {
-            return Base::m_ptr->entries + Base::m_ptr->nmsrs;
-        }
-
-        auto begin() const noexcept -> const_iterator {
+        [[nodiscard]] auto entries() const noexcept -> const_pointer {
             return Base::m_ptr->entries;
-        }
-
-        auto end() const noexcept -> const_iterator {
-            return Base::m_ptr->entries + Base::m_ptr->nmsrs;
-        }
-
-        auto cbegin() const noexcept -> const_iterator {
-            return begin();
-        }
-
-        auto cend() const noexcept -> const_iterator {
-            return end();
         }
 };
 
@@ -304,16 +307,22 @@ class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
     using Base = FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N>;
 
     public:
+        using allocator_type = typename Base::allocator_type;
         using value_type = typename Base::value_type;
         using size_type = typename Base::size_type;
-        using reference = typename Base::reference;
-        using const_reference = typename Base::const_reference;
-        using iterator = typename Base::iterator;
-        using const_iterator = typename Base::const_iterator;
+        using pointer = typename Base::pointer;
+        using const_pointer = typename Base::const_pointer;
+
+        static const auto alignment = Base::alignment;
+        static const auto storage_size = Base::storage_size;
 
         Cpuids() noexcept {
             Base::m_ptr->nent = N;
         }
+
+        Cpuids(const allocator_type& alloc) : Base(alloc) {
+            Base::m_ptr->nent = N;
+        };
 
         explicit Cpuids(value_type entry) noexcept {
             static_assert(N == 1);
@@ -324,55 +333,27 @@ class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
 
         template <typename Iterator>
         explicit Cpuids(Iterator first, Iterator last) {
-            std::copy_if(first, last, begin(), [](value_type) { return true; });
+            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
             Base::m_ptr->nent = std::distance(first, last);
         }
 
         template <typename Container>
         explicit Cpuids(Container& c) : Cpuids(c.begin(), c.end()) {}
 
+        virtual ~Cpuids() = default;
+
         // Capacity
         [[nodiscard]] auto size() const noexcept -> size_type {
 			return Base::m_ptr->nent;
 		}
+    private:
+        [[nodiscard]] auto entries() noexcept -> pointer {
+            return Base::m_ptr->entries;
+        }
 
-        [[nodiscard]] auto empty() const noexcept -> bool {
-			return size() == 0;
-		}
-
-        // Element access
-        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
-			return Base::m_ptr->entries[pos];
-		}
-
-        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
-			return Base::m_ptr->entries[pos];
-		}
-
-        // Iterators
-        auto begin() noexcept -> iterator {
-			return Base::m_ptr->entries;
-		}
-
-        auto end() noexcept -> iterator {
-			return Base::m_ptr->entries + Base::m_ptr->nent;
-		}
-
-        auto begin() const noexcept -> const_iterator {
-			return Base::m_ptr->entries;
-		}
-
-        auto end() const noexcept -> const_iterator {
-			return Base::m_ptr->entries + Base::m_ptr->nent;
-		}
-
-        auto cbegin() const noexcept -> const_iterator {
-			return begin();
-		}
-
-        auto cend() const noexcept -> const_iterator {
-			return end();
-		}
+        [[nodiscard]] auto entries() const noexcept -> const_pointer {
+            return Base::m_ptr->entries;
+        }
 };
 
 /**
@@ -401,14 +382,20 @@ class IrqRouting : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N> {
     using Base = FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N>;
 
     public:
+        using allocator_type = typename Base::allocator_type;
         using value_type = typename Base::value_type;
         using size_type = typename Base::size_type;
-        using reference = typename Base::reference;
-        using const_reference = typename Base::const_reference;
-        using iterator = typename Base::iterator;
-        using const_iterator = typename Base::const_iterator;
+        using pointer = typename Base::pointer;
+        using const_pointer = typename Base::const_pointer;
+
+        static const auto alignment = Base::alignment;
+        static const auto storage_size = Base::storage_size;
 
         IrqRouting() noexcept {
+            Base::m_ptr->nr = N;
+        };
+
+        IrqRouting(const allocator_type& alloc) : Base(alloc) {
             Base::m_ptr->nr = N;
         };
 
@@ -421,46 +408,27 @@ class IrqRouting : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N> {
 
         template <typename Iterator>
         explicit IrqRouting(Iterator first, Iterator last) {
-            std::copy_if(first, last, begin(), [](value_type) {return true;});
+            std::copy_if(first, last, Base::begin(), [](value_type) {return true;});
             Base::m_ptr->nr = N;
         }
 
         template <typename Container>
         explicit IrqRouting(Container& c) : IrqRouting(c.begin(), c.end()) {}
 
+        virtual ~IrqRouting() = default;
+
         // Capacity
         [[nodiscard]] auto size() const noexcept -> size_type {
 			return Base::m_ptr->nr;
 		}
+    private:
+        [[nodiscard]] auto entries() noexcept -> pointer {
+            return Base::m_ptr->entries;
+        }
 
-        [[nodiscard]] auto empty() const noexcept -> bool {
-			return size() == 0;
-		}
-
-        // Iterators
-        auto begin() noexcept -> iterator {
-			return Base::m_ptr->entries;
-		}
-
-        auto end() noexcept -> iterator {
-			return Base::m_ptr->entries + Base::m_ptr->nr;
-		}
-
-        auto begin() const noexcept -> const_iterator {
-			return Base::m_ptr->entries;
-		}
-
-        auto end() const noexcept -> const_iterator {
-			return Base::m_ptr->entries + Base::m_ptr->nr;
-		}
-
-        auto cbegin() const noexcept -> const_iterator {
-			return begin();
-		}
-
-        auto cend() const noexcept -> const_iterator {
-			return end();
-		}
+        [[nodiscard]] auto entries() const noexcept -> const_pointer {
+            return Base::m_ptr->entries;
+        }
 };
 
 }  // namespace vmm::kvm::detail
