@@ -69,14 +69,7 @@ class FamStruct {
         explicit FamStruct(const allocator_type& alloc)
                 : m_alloc{alloc},
                   m_ptr{static_cast<Struct*>(m_alloc.resource()->allocate(storage_size, alignment))} {
-            try {
-                m_alloc.construct(m_ptr);
-            }
-            catch(...) {
-                m_alloc.deallocate(reinterpret_cast<std::byte*>(m_ptr), storage_size);
-                throw;
-            }
-
+            // construction for our POD struct(s)
             std::memset(m_ptr, 0, storage_size);
         }
 
@@ -86,10 +79,12 @@ class FamStruct {
         // Copy constructor and assignment operator
         FamStruct(const FamStruct& other) = delete;
         FamStruct(const FamStruct& other, const allocator_type& alloc) = delete;
+        void operator=(const FamStruct&) = delete;
 
         // Move constructor and assignment operator
-        FamStruct(FamStruct&& other) noexcept = delete;
-        FamStruct(FamStruct&& other, const allocator_type& alloc) noexcept = delete;
+        FamStruct(FamStruct&& other) = delete;
+        FamStruct(FamStruct&& other, const allocator_type& alloc) = delete;
+        void operator=(FamStruct&&) = delete;
 
         // Range constructor
         //template<typename InputIt>
@@ -103,14 +98,8 @@ class FamStruct {
 
         // Destructor
         ~FamStruct() {
-            m_alloc.destroy(m_ptr);
             m_alloc.deallocate(reinterpret_cast<std::byte*>(m_ptr), storage_size);
         }
-
-        // Assignment operators
-        // NOTE: deleted as they break the invariant that a FamStruct's size never changes
-        void operator=(FamStruct&&) = delete;
-        void operator=(const FamStruct&) = delete;
 
         // Element access
         [[nodiscard]] auto data() noexcept -> Struct* {
@@ -150,6 +139,10 @@ class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
 
         static const auto alignment = Base::alignment;
         static const auto storage_size = Base::storage_size;
+
+        // TODO: Move constructor
+
+        // TODO: Allocator methods
 
         // Element access
         [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
@@ -194,6 +187,8 @@ class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
             return end();
         }
     private:
+        friend system;
+
         MsrList() noexcept {
             Base::m_ptr->nmsrs = N;
         };
@@ -205,8 +200,6 @@ class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
         MsrList(const allocator_type& alloc) : Base(alloc) {
             Base::m_ptr->nr = N;
         };
-
-        friend system;
 
         [[nodiscard]] auto entries() noexcept -> pointer {
             return Base::m_ptr->indices;
@@ -257,21 +250,30 @@ class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
             Base::m_ptr->nmsrs = N;
         };
 
-        Msrs(const Msrs& other) {
+        Msrs(const Msrs& other) : Msrs(other.m_alloc) {
             std::copy(other.begin(), other.end(), begin());
         };
 
-        explicit Msrs(value_type entry) noexcept {
+        explicit Msrs(value_type entry) noexcept : Msrs() {
             static_assert(N == 1);
 
             std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
-            Base::m_ptr->nmsrs = N;
+        }
+
+        explicit Msrs(value_type entry, const allocator_type& alloc) noexcept : Msrs(alloc) {
+            static_assert(N == 1);
+
+            std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
         }
 
         template <typename Iterator>
-        explicit Msrs(Iterator first, Iterator last) {
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
-            Base::m_ptr->nmsrs = N;
+        explicit Msrs(Iterator first, Iterator last) : Msrs() {
+            std::copy_if(first, last, begin(), [](value_type) { return true; });
+        }
+
+        template <typename Iterator>
+        explicit Msrs(Iterator first, Iterator last, const allocator_type& alloc) : Msrs(alloc) {
+            std::copy_if(first, last, begin(), [](value_type) { return true; });
         }
 
         //template <typename Container>
@@ -386,7 +388,7 @@ class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
 
         template <typename Iterator>
         explicit Cpuids(Iterator first, Iterator last) {
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
+            std::copy_if(first, last, begin(), [](value_type) { return true; });
             Base::m_ptr->nent = std::distance(first, last);
         }
 
@@ -501,7 +503,7 @@ class IrqRouting : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N> {
 
         template <typename Iterator>
         explicit IrqRouting(Iterator first, Iterator last) {
-            std::copy_if(first, last, Base::begin(), [](value_type) {return true;});
+            std::copy_if(first, last, begin(), [](value_type) {return true;});
             Base::m_ptr->nr = N;
         }
 
