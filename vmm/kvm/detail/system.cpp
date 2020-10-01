@@ -144,7 +144,10 @@ auto system::host_ipa_limit() const -> unsigned int {
  * ```
  */
 [[nodiscard]] auto system::msr_index_list() const -> MsrList<MAX_IO_MSRS> {
-    return get_list<MsrList, MAX_IO_MSRS, KVM_GET_MSR_INDEX_LIST>();
+    auto msrs = MsrList<MAX_IO_MSRS>{};
+    msrs.data()->nmsrs = MAX_IO_MSRS;
+    fd_.ioctl(KVM_GET_MSR_INDEX_LIST, msrs.data());
+    return msrs;
 }
 
 /**
@@ -160,7 +163,10 @@ auto system::host_ipa_limit() const -> unsigned int {
  * ```
  */
 [[nodiscard]] auto system::msr_feature_list() const -> MsrList<MAX_IO_MSRS_FEATURES> {
-    return get_list<MsrList, MAX_IO_MSRS_FEATURES, KVM_GET_MSR_FEATURE_INDEX_LIST>();
+    auto msrs = MsrList<MAX_IO_MSRS_FEATURES>{};
+    msrs.data()->nmsrs = MAX_IO_MSRS_FEATURES;
+    fd_.ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST, msrs.data());
+    return msrs;
 }
 
 /**
@@ -184,7 +190,10 @@ auto system::host_ipa_limit() const -> unsigned int {
  * ```
  */
 [[nodiscard]] auto system::supported_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES> {
-    return get_list<Cpuids, MAX_CPUID_ENTRIES, KVM_GET_SUPPORTED_CPUID>();
+    auto cpuids = Cpuids<MAX_CPUID_ENTRIES>{};
+    cpuids.data()->nent = MAX_CPUID_ENTRIES;
+    fd_.ioctl(KVM_GET_SUPPORTED_CPUID, cpuids.data());
+    return cpuids;
 }
 
 /**
@@ -200,7 +209,10 @@ auto system::host_ipa_limit() const -> unsigned int {
  * ```
  */
 [[nodiscard]] auto system::emulated_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES> {
-    return get_list<Cpuids, MAX_CPUID_ENTRIES, KVM_GET_EMULATED_CPUID>();
+    auto cpuids = Cpuids<MAX_CPUID_ENTRIES>{};
+    cpuids.data()->nent = MAX_CPUID_ENTRIES;
+    fd_.ioctl(KVM_GET_EMULATED_CPUID, cpuids.data());
+    return cpuids;
 }
 
 }  // namespace vmm::kvm::detail

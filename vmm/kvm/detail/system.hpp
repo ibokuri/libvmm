@@ -26,16 +26,6 @@ class system {
         KvmFd fd_;
 
         [[nodiscard]] auto create_vm(unsigned int machine_type) const -> int;
-
-        /**
-         * Creates and returns a populated KVM list (e.g., MSR features, cpuids).
-         */
-        template<template<std::size_t N> typename List, std::size_t N, unsigned int Ioctl>
-        [[nodiscard]] auto get_list() const -> List<N> {
-            auto l = List<N>{};
-            fd_.ioctl(Ioctl, l.data());
-            return l;
-        }
     public:
         system() : fd_{open()} {}
 
