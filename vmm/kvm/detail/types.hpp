@@ -6,11 +6,14 @@
 
 #include <algorithm> // copy
 #include <cstddef> // byte, size_t
+#include <cmath> // abs
 #include <cstring> // memcpy, memset
 #include <iterator> // distance
 #include <initializer_list> // initializer_list
+#include <limits> // numeric_limits
 #include <linux/kvm.h> // kvm_*
 #include <memory_resource> // polymorphic_allocator
+#include <stdexcept> // overflow_error
 
 #include "vmm/kvm/detail/macros.hpp"
 #include "vmm/types/file_descriptor.hpp"
