@@ -58,7 +58,7 @@ template<typename Struct,
 class FamStruct {
     public:
         using value_type = Entry;
-        using size_type = decltype(DataMemberPtrType(SizeMember));;
+        using size_type = decltype(DataMemberPtrType(SizeMember));
         using allocator_type = std::pmr::polymorphic_allocator<std::byte>;
         using pointer = value_type*;
         using const_pointer = const value_type*;
@@ -75,16 +75,12 @@ class FamStruct {
             : m_alloc{alloc},
               m_ptr{static_cast<Struct*>(alloc.resource()->allocate(storage_size, alignment))}
         {
+            static_assert(N <= std::numeric_limits<size_type>::max());
             std::memset(m_ptr, 0, storage_size);
             m_ptr->*SizeMember = N;
         }
 
         // Default constructor
-        //
-        // NOTE: We cannot pass m_alloc to the allocator constructor as it
-        //       would be passed in as const, meaning that it can't be changed.
-        //       However, it *is* changed in the member initializer list, which
-        //       results in a segfault.
         FamStruct()
             : FamStruct(std::pmr::new_delete_resource()) {}
 
@@ -92,27 +88,29 @@ class FamStruct {
         explicit FamStruct(const_reference entry) noexcept
             : FamStruct()
         {
+            static_assert(N > 0);
             std::memcpy(begin(), entry, sizeof(value_type));
         }
 
         FamStruct(const_reference entry, const allocator_type& alloc) noexcept
             : FamStruct(alloc)
         {
+            static_assert(N > 0);
             std::memcpy(begin(), entry, sizeof(value_type));
         }
 
         // Copy constructors
-        constexpr FamStruct(const FamStruct& other)
+        FamStruct(const FamStruct& other)
             : FamStruct(other.begin(), other.end(), other.get_allocator()) {}
 
-        constexpr FamStruct(const FamStruct& other, const allocator_type& alloc)
+        FamStruct(const FamStruct& other, const allocator_type& alloc)
             : FamStruct(other.begin(), other.end(), alloc) {}
 
         // Move constructors
-        //constexpr FamStruct(FamStruct&& other)
+        //FamStruct(FamStruct&& other)
             //: m_entries{std::move(other.m_entries)} {}
 
-        //constexpr FamStruct(FamStruct&& other, const allocator_type& alloc)
+        //FamStruct(FamStruct&& other, const allocator_type& alloc)
             //: m_entries{std::move(other.m_entries), alloc} {}
 
         // Iterator constructors
@@ -122,18 +120,30 @@ class FamStruct {
         FamStruct(InputIt first, InputIt last)
             : FamStruct()
         {
-            size_type n = std::distance(first, last);
-            m_ptr->*SizeMember = n;
-            std::copy(first, last, begin());
+            if (auto n = std::distance(first, last); n != 0) {
+                auto abs = std::abs(n);
+
+                if (abs > std::numeric_limits<size_type>::max())
+                    VMM_THROW(std::overflow_error("Range too large"));
+
+                m_ptr->*SizeMember = static_cast<size_type>(abs);
+                std::copy(first, last, begin());
+            }
         }
 
         template <typename InputIt>
         FamStruct(InputIt first, InputIt last, const allocator_type& alloc)
             : FamStruct(alloc)
         {
-            size_type n = std::distance(first, last);
-            m_ptr->*SizeMember = n;
-            std::copy(first, last, begin());
+            if (auto n = std::distance(first, last); n != 0) {
+                auto abs = std::abs(n);
+
+                if (abs > std::numeric_limits<size_type>::max())
+                    VMM_THROW(std::overflow_error("Range too large"));
+
+                m_ptr->*SizeMember = static_cast<size_type>(abs);
+                std::copy(first, last, begin());
+            }
         }
 
         // Initializer list constructors
@@ -155,11 +165,11 @@ class FamStruct {
         }
 
         // Element access
-        [[nodiscard]] auto operator[](size_type pos) noexcept -> reference {
+        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
             return (m_ptr->*EntriesMember)[pos];
         }
 
-        [[nodiscard]] auto operator[](size_type pos) const noexcept -> const_reference {
+        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
             return (m_ptr->*EntriesMember)[pos];
         }
 
