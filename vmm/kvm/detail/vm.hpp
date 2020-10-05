@@ -22,7 +22,9 @@ class vm {
         KvmFd fd_;
         size_t mmap_size_;
 
-        explicit vm(int fd, std::size_t mmap_size) noexcept : fd_{fd}, mmap_size_{mmap_size} {}
+        vm(int fd, std::size_t mmap_size) noexcept
+            : fd_{fd}, mmap_size_{mmap_size} {}
+
         friend vm system::vm(unsigned int machine_type) const;
     public:
         vm(const vm& other) = delete;

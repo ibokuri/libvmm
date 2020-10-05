@@ -85,16 +85,17 @@ class FamStruct {
         //       would be passed in as const, meaning that it can't be changed.
         //       However, it *is* changed in the member initializer list, which
         //       results in a segfault.
-        FamStruct() : FamStruct(std::pmr::new_delete_resource()) {}
+        FamStruct()
+            : FamStruct(std::pmr::new_delete_resource()) {}
 
         // Single entry constructors
-        explicit FamStruct(const_reference entry) noexcept : FamStruct()
+        explicit FamStruct(const_reference entry) noexcept
+            : FamStruct()
         {
             std::memcpy(begin(), entry, sizeof(value_type));
         }
 
-        explicit FamStruct(const_reference entry,
-                           const allocator_type& alloc) noexcept
+        FamStruct(const_reference entry, const allocator_type& alloc) noexcept
             : FamStruct(alloc)
         {
             std::memcpy(begin(), entry, sizeof(value_type));
@@ -118,7 +119,7 @@ class FamStruct {
         // TODO: SFINAE
         // TODO: Cleaner distance()
         template <typename InputIt>
-        explicit FamStruct(InputIt first, InputIt last) : FamStruct()
+        FamStruct(InputIt first, InputIt last) : FamStruct()
         {
             size_type n = std::distance(first, last);
             m_ptr->*SizeMember = n;
@@ -126,8 +127,7 @@ class FamStruct {
         }
 
         template <typename InputIt>
-        explicit FamStruct(InputIt first, InputIt last,
-                           const allocator_type& alloc)
+        FamStruct(InputIt first, InputIt last, const allocator_type& alloc)
             : FamStruct(alloc)
         {
             size_type n = std::distance(first, last);
@@ -139,8 +139,8 @@ class FamStruct {
         explicit FamStruct(std::initializer_list<value_type> ilist)
             : FamStruct(ilist.begin(), ilist.end()) {}
 
-        explicit FamStruct(std::initializer_list<value_type> ilist,
-                           const allocator_type& alloc)
+        FamStruct(std::initializer_list<value_type> ilist,
+                  const allocator_type& alloc)
             : FamStruct(ilist.begin(), ilist.end(), alloc) {}
 
         // Destructor
