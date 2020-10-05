@@ -84,8 +84,51 @@ class system {
         [[nodiscard]] auto vcpu_mmap_size() const -> std::size_t;
         [[nodiscard]] auto host_ipa_limit() const -> unsigned int;
 
-        [[nodiscard]] auto msr_index_list() const -> MsrList<MAX_IO_MSRS>;
-        [[nodiscard]] auto msr_feature_list() const -> MsrList<MAX_IO_MSRS_FEATURES>;
+        /**
+         * Returns a list of host-supported and kvm-specific MSRs.
+         *
+         * Examples
+         * ========
+         * ```
+         * #include <iostream>
+         * #include <vmm/kvm.hpp>
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto msr_list = kvm.msr_index_list();
+         *
+         * for (auto idx : msr_list)
+         *     std::cout << "index: " << idx << std::endl;
+         * ```
+         */
+        template<std::size_t N=MAX_IO_MSRS>
+        [[nodiscard]] auto msr_index_list() const -> MsrList<N> {
+            auto msrs = MsrList<N>{};
+            fd_.ioctl(KVM_GET_MSR_INDEX_LIST, msrs.data());
+            return msrs;
+        }
+
+        /**
+         * Returns a list of MSRs exposing MSR-based CPU features.
+         *
+         * Examples
+         * ========
+         * ```
+         * #include <iostream>
+         * #include <vmm/kvm.hpp>
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto msr_list = kvm.msr_feature_list();
+         *
+         * for (auto idx : msr_list)
+         *     std::cout << "index: " << idx << std::endl;
+         * ```
+         */
+        template<std::size_t N=MAX_IO_MSRS_FEATURES>
+        [[nodiscard]] auto msr_feature_list() const -> MsrList<N> {
+            auto msrs = MsrList<N>{};
+            fd_.ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST, msrs.data());
+            return msrs;
+        }
 
         /**
          * Reads the values of MSR-based features available for VMs. Returns the
@@ -111,21 +154,69 @@ class system {
          * auto entries = std::vector<kvm_msr_entry>{};
          *
          * for (auto msr : msr_list) {
-         *     auto entry = kvm_msr_entry{msr};
-         *     entries.push_back(entry);
+         *     entries.push_back(kvm_msr_entry{entry});
          * }
          *
-         * auto msrs = vmm::kvm::Msrs{entries};
+         * auto msrs = vmm::kvm::Msrs<MAX_IO_MSRS_FEATURES>{entries};
          * auto nmsrs = kvm.read_msrs(msrs);
          * ```
          */
-        template<typename T, typename = std::enable_if_t<std::is_same_v<typename T::value_type, kvm_msr_entry>>>
+        template<typename T,
+                 typename = std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                            kvm_msr_entry>>>
         auto read_msrs(T &msrs) const -> unsigned int {
             return fd_.ioctl(KVM_GET_MSRS, msrs.data());
         }
 
-        [[nodiscard]] auto supported_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES>;
-        [[nodiscard]] auto emulated_cpuids() const -> Cpuids<MAX_CPUID_ENTRIES>;
+        auto fd() -> KvmFd& {
+            return fd_;
+        }
+
+        /**
+         * Returns a list of host- and kvm-supported x86 cpuid features.
+         *
+         * In x86, the CPU identification (CPUID) instruction is a supplementary
+         * instruction allowing software to discover details of the processor. A
+         * program can use the CPUID to determine processor type and whether certain
+         * features are implemented.
+         *
+         * Examples
+         * ========
+         * ```
+         * #include <vmm/kvm.hpp>
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto cpuids = kvm.supported_cpuids();
+         *
+         * // Print CPU's manufacturer ID string
+         * TODO
+         * ```
+         */
+        template<std::size_t N=MAX_CPUID_ENTRIES>
+        [[nodiscard]] auto supported_cpuids() const -> Cpuids<N> {
+            auto cpuids = Cpuids<N>{};
+            fd_.ioctl(KVM_GET_SUPPORTED_CPUID, cpuids.data());
+            return cpuids;
+        }
+
+        /**
+         * Returns a list of kvm-emulated x86 cpuid features.
+         *
+         * Examples
+         * ========
+         * ```
+         * #include <vmm/kvm.hpp>
+         *
+         * auto kvm = vmm::kvm::system{};
+         * auto cpuids = kvm.emulated_cpuids();
+         * ```
+         */
+        template<std::size_t N=MAX_CPUID_ENTRIES>
+        [[nodiscard]] auto emulated_cpuids() const -> Cpuids<N> {
+            auto cpuids = Cpuids<N>{};
+            fd_.ioctl(KVM_GET_EMULATED_CPUID, cpuids.data());
+            return cpuids;
+        }
 };
 
 }  // namespace vmm::kvm::detail

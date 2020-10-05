@@ -4,15 +4,13 @@
 
 #pragma once
 
-#include <algorithm> // copy_if
-#include <cstddef> // size_t
+#include <algorithm> // copy
+#include <cstddef> // byte, size_t
 #include <cstring> // memcpy, memset
 #include <iterator> // distance
 #include <initializer_list> // initializer_list
 #include <linux/kvm.h> // kvm_*
-#include <memory> // allocator_traits
 #include <memory_resource> // polymorphic_allocator
-#include <stdexcept> // length_error
 
 #include "vmm/kvm/detail/macros.hpp"
 #include "vmm/types/file_descriptor.hpp"
@@ -26,7 +24,7 @@ class system;
  */
 class KvmFd : public vmm::types::FileDescriptor {
     public:
-        KvmFd(int fd) noexcept : vmm::types::FileDescriptor(fd) {}
+        explicit KvmFd(int fd) noexcept : vmm::types::FileDescriptor(fd) {}
 
         KvmFd(const KvmFd& other) = delete;
         KvmFd(KvmFd&& other) = default;
@@ -38,114 +36,146 @@ class KvmFd : public vmm::types::FileDescriptor {
  * Wrapper for KVM FAM structs.
  *
  * This class should not be used for arbitrary FAM structs. It is only meant to
- * be used with KVM FAM structs, which imply certain properties:
+ * be used with KVM FAM structs, which have certain properties:
  *
- *     * No padding is provided in FamStruct as KVM provides it explicitly
- *       where needed.
+ *     * Any required padding is explicitly provided.
  *
- *     * FamStruct ensures that the struct is able to be passed to KVM's API.
+ *     * The size field is of type __u32 and is the first field in the struct.
+ *
+ *     * The struct only contains POD types.
+ *
+ * Size: type of size member (kvm_reg_list has __u64 size member);
  */
-template<typename Struct, typename Entry, std::size_t N>
+template<typename Struct, typename Entry, std::size_t N, typename Size=uint32_t>
 class FamStruct {
-    protected:
-        using allocator_type = std::pmr::polymorphic_allocator<std::byte>;
-        using size_type = decltype(N);
+    public:
         using value_type = Entry;
+        using size_type = std::size_t;
+        using allocator_type = std::pmr::polymorphic_allocator<std::byte>;
         using pointer = value_type*;
         using const_pointer = const value_type*;
         using reference = value_type&;
         using const_reference = const value_type&;
         using iterator = pointer;
         using const_iterator = const_pointer;
-        using reverse_iterator = std::reverse_iterator<iterator>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-        allocator_type m_alloc;
-        Struct *m_ptr;
-    private:
-        [[nodiscard]] virtual auto entries() noexcept -> pointer = 0;
-        [[nodiscard]] virtual auto entries() const noexcept -> const_pointer = 0;
-    public:
         static const auto alignment = alignof(Struct);
         static const auto storage_size = sizeof(Struct) + N * sizeof(Entry);
 
         // Allocator constructor
         explicit FamStruct(const allocator_type& alloc)
-            : m_alloc{alloc},
-              m_ptr{static_cast<Struct*>(m_alloc.resource()->allocate(storage_size, alignment))} {
+                : m_alloc{alloc},
+                  m_ptr{static_cast<Struct*>( alloc.resource()->allocate(storage_size, alignment))} {
+            static_assert(N >= 0);
             std::memset(m_ptr, 0, storage_size);
+            *m_ptr = {N};
         }
 
         // Default constructor
+        //
+        // NOTE: We cannot pass m_alloc to the allocator constructor as it
+        //       would be passed in as const, meaning that it can't be changed.
+        //       However, it *is* changed in the member initializer list, which
+        //       results in a segfault.
         FamStruct() : FamStruct(std::pmr::new_delete_resource()) {}
 
-        // Copy constructor and assignment operator
-        FamStruct(const FamStruct& other) = delete;
-        FamStruct(const FamStruct& other, const allocator_type& alloc) = delete;
-        void operator=(const FamStruct&) = delete;
+        // Single entry constructors
+        explicit FamStruct(const_reference entry) noexcept : FamStruct() {
+            std::memcpy(begin(), entry, sizeof(value_type));
+        }
 
-        // Move constructor and assignment operator
-        FamStruct(FamStruct&& other) = delete;
-        FamStruct(FamStruct&& other, const allocator_type& alloc) = delete;
-        void operator=(FamStruct&&) = delete;
+        explicit FamStruct(const_reference entry, const allocator_type& alloc) noexcept : FamStruct(alloc) {
+            std::memcpy(begin(), entry, sizeof(value_type));
+        }
+
+        // Copy constructors
+        constexpr FamStruct(const FamStruct& other)
+                : FamStruct(other.begin(), other.end(), other.get_allocator()) {}
+
+        constexpr FamStruct(const FamStruct& other, const allocator_type& alloc)
+                : FamStruct(other.begin(), other.end(), alloc) {}
+
+        // Move constructors
+        //constexpr FamStruct(FamStruct&& other)
+            //: m_entries{std::move(other.m_entries)} {}
+
+        //constexpr FamStruct(FamStruct&& other, const allocator_type& alloc)
+                //: m_entries{std::move(other.m_entries), alloc} {}
+
+        // Iterator constructors
+        // TODO: SFINAE
+        // TODO: Cleaner distance()
+        template <typename InputIt>
+        explicit FamStruct(InputIt first, InputIt last) : FamStruct() {
+            Size n = std::distance(first, last);
+            *m_ptr = {n};
+            std::copy(first, last, begin());
+        }
+
+        template <typename InputIt>
+        explicit FamStruct(InputIt first, InputIt last, const allocator_type& alloc) : FamStruct(alloc) {
+            Size n = std::distance(first, last);
+            *m_ptr = {n};
+            std::copy(first, last, begin());
+        }
+
+        // Initializer list constructors
+        explicit FamStruct(std::initializer_list<value_type> ilist) : FamStruct(ilist.begin(), ilist.end()) {}
+        explicit FamStruct(std::initializer_list<value_type> ilist, const allocator_type& alloc)
+                : FamStruct(ilist.begin(), ilist.end(), alloc) {}
 
         // Destructor
-        virtual ~FamStruct() {
-            m_alloc.deallocate(reinterpret_cast<std::byte*>(m_ptr), storage_size);
+        ~FamStruct() {
+            m_alloc.resource()->deallocate(m_ptr, storage_size, alignment);
         }
+
+        // Allocator
+        auto get_allocator() const noexcept -> allocator_type { return m_alloc; }
 
         // Element access
-        [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
-            return entries()[pos];
-        }
+        [[nodiscard]] auto operator[](Size pos) noexcept -> reference { return *(begin() + pos); }
+        [[nodiscard]] auto operator[](Size pos) const noexcept -> const_reference { return *(begin() + pos); }
 
-        [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
-            return entries()[pos];
-        }
+        [[nodiscard]] auto front() noexcept -> reference { return *begin(); }
+        [[nodiscard]] auto front() const noexcept -> const_reference { return *begin(); }
 
-        [[nodiscard]] auto data() noexcept -> Struct* {
-            return m_ptr;
-        }
+        [[nodiscard]] auto back() noexcept -> reference { return *end(); }
+        [[nodiscard]] auto back() const noexcept -> const_reference { return *end(); }
 
-        [[nodiscard]] auto data() const noexcept -> const Struct* {
-            return m_ptr;
-        }
-
-        // Capacity
-        [[nodiscard]] virtual auto size() const noexcept -> const size_type = 0;
-
-        [[nodiscard]] auto empty() const noexcept -> bool {
-            return size() == 0;
-        }
-
-        [[nodiscard]] constexpr auto max_size() const noexcept -> size_type {
-            return N;
-        }
+        [[nodiscard]] constexpr auto data() noexcept -> Struct* { return m_ptr; }
+        [[nodiscard]] constexpr auto data() const noexcept -> const Struct* { return m_ptr; }
 
         // Iterators
         auto begin() noexcept -> iterator {
-            return entries();
-        }
-
-        auto end() noexcept -> iterator {
-            return entries() + size();
+           iterator it = nullptr;
+           std::memcpy(&it, &m_ptr, sizeof(iterator));
+           return it + sizeof(Struct);
         }
 
         auto begin() const noexcept -> const_iterator {
-            return entries();
+            iterator it = nullptr;
+            std::memcpy(&it, &m_ptr, sizeof(iterator));
+            return it + sizeof(Struct);
         }
 
-        auto end() const noexcept -> const_iterator {
-            return entries() + size();
+        auto end() noexcept -> iterator { return begin() + size(); }
+        auto end() const noexcept -> const_iterator { return begin() + size(); }
+        auto cbegin() const noexcept -> const_iterator { return begin(); }
+        auto cend() const noexcept -> const_iterator { return end(); }
+
+        // Capacity
+        [[nodiscard]] auto size() const noexcept -> const Size {
+            Size size = 0;
+            std::memcpy(&size, m_ptr, sizeof(Size));
+            return size;
         }
 
-        auto cbegin() const noexcept -> const_iterator {
-            return begin();
-        }
+        [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0; }
 
-        auto cend() const noexcept -> const_iterator {
-            return end();
-        }
+        [[nodiscard]] constexpr auto capacity() const noexcept -> size_type { return N; }
+    private:
+        allocator_type m_alloc;
+        Struct *m_ptr = nullptr;
 };
 
 /**
@@ -153,41 +183,25 @@ class FamStruct {
  *    __u32 nmsrs;
  *    __u32 indices[0];
  * };
+ *
+ * NOTE: Because MsrList's value_type is an integer, it is very easy to confuse
+ *       the size_type initializer_list and constructor. That is, one may think
+ *       that `auto msr_list = MsrList{10}` constructs a FAM struct with enough
+ *       space for 10 entries, but really it constructs a FAM struct with an
+ *       initializer list, resulting in a FAM struct with only 1 entry with a
+ *       value of 10. To use the size_type constructor, use `MsrList(10)`.
  */
 template<std::size_t N>
 class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
-    using Base = FamStruct<kvm_msr_list, uint32_t, N>;
+    using Base = typename FamStruct<kvm_msr_list, uint32_t, N>::FamStruct;
     using Base::Base;
+    using allocator_type = typename Base::allocator_type;
 
-    public:
-        using allocator_type = typename Base::allocator_type;
-        using value_type = typename Base::value_type;
-        using size_type = typename Base::size_type;
-        using pointer = typename Base::pointer;
-        using const_pointer = typename Base::const_pointer;
-
-        static const auto alignment = Base::alignment;
-        static const auto storage_size = Base::storage_size;
-
-        // Capacity
-        [[nodiscard]] auto size() const noexcept -> const size_type override {
-            return Base::m_ptr->nmsrs;
-        }
     private:
         friend system;
 
-        [[nodiscard]] auto entries() noexcept -> pointer override {
-            return Base::m_ptr->indices;
-        }
-
-        [[nodiscard]] auto entries() const noexcept -> const_pointer override {
-            return Base::m_ptr->indices;
-        }
-
-        MsrList(const MsrList& other) : Base() {
-            Base::m_ptr->nmsrs = other.m_ptr->nmsrs;
-            std::copy(other.begin(), other.end(), Base::begin());
-        }
+        MsrList() : Base::FamStruct() {}
+        explicit MsrList(const allocator_type& alloc) : Base::FamStruct(alloc) {}
 };
 
 /**
@@ -205,78 +219,7 @@ class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
  */
 template<std::size_t N>
 class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
-    using Base = FamStruct<kvm_msrs, kvm_msr_entry, N>;
-    using Base::Base;
-
-    public:
-        using allocator_type = typename Base::allocator_type;
-        using value_type = typename Base::value_type;
-        using size_type = typename Base::size_type;
-        using pointer = typename Base::pointer;
-        using const_pointer = typename Base::const_pointer;
-
-        static const auto alignment = Base::alignment;
-        static const auto storage_size = Base::storage_size;
-
-        Msrs(const Msrs& other) : Base(other.m_alloc) {
-            Base::m_ptr->nmsrs = other.m_ptr->nmsrs;
-            std::copy(other.begin(), other.end(), Base::begin());
-        }
-
-        explicit Msrs(value_type entry) : Base() {
-            static_assert(N == 1);
-            Base::m_ptr->nmsrs = N;
-            std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
-        }
-
-        explicit Msrs(value_type entry, const allocator_type& alloc) : Base(alloc) {
-            static_assert(N == 1);
-            Base::m_ptr->nmsrs = N;
-            std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
-        }
-
-        explicit Msrs(std::initializer_list<value_type> l) : Base() {
-            if (Base::m_ptr->nmsrs = l.size(); Base::m_ptr->nmsrs > N)
-                VMM_THROW(std::length_error("Initializer list size too big"));
-
-            std::copy(l.begin(), l.end(), Base::begin());
-        }
-
-        explicit Msrs(std::initializer_list<value_type> l, const allocator_type& alloc) : Base(alloc) {
-            if (Base::m_ptr->nmsrs = l.size(); Base::m_ptr->nmsrs > N)
-                VMM_THROW(std::length_error("Initializer list size too big"));
-
-            std::copy(l.begin(), l.end(), Base::begin());
-        }
-
-        template <typename Iterator>
-        explicit Msrs(Iterator first, Iterator last) : Msrs() {
-            if (Base::m_ptr->nmsrs = std::distance(first, last); Base::m_ptr->nmsrs > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
-        }
-
-        template <typename Iterator>
-        explicit Msrs(Iterator first, Iterator last, const allocator_type& alloc) : Msrs(alloc) {
-            if (Base::m_ptr->nmsrs = std::distance(first, last); Base::m_ptr->nmsrs > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
-        }
-
-        // Capacity
-        [[nodiscard]] auto size() const noexcept -> const size_type override {
-            return Base::m_ptr->nmsrs;
-        }
-    private:
-        [[nodiscard]] auto entries() noexcept -> pointer override {
-            return Base::m_ptr->entries;
-        }
-
-        [[nodiscard]] auto entries() const noexcept -> const_pointer override {
-            return Base::m_ptr->entries;
-        }
+    using FamStruct<kvm_msrs, kvm_msr_entry, N>::FamStruct;
 };
 
 /*
@@ -299,78 +242,7 @@ class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
  */
 template<std::size_t N>
 class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
-    using Base = FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N>;
-    using Base::Base;
-
-    public:
-        using allocator_type = typename Base::allocator_type;
-        using value_type = typename Base::value_type;
-        using size_type = typename Base::size_type;
-        using pointer = typename Base::pointer;
-        using const_pointer = typename Base::const_pointer;
-
-        static const auto alignment = Base::alignment;
-        static const auto storage_size = Base::storage_size;
-
-        Cpuids(const Cpuids& other) : Base(other.m_alloc) {
-            Base::m_ptr->nent = other.m_ptr->nent;
-            std::copy(other.begin(), other.end(), Base::begin());
-        }
-
-        explicit Cpuids(value_type entry) : Base() {
-            static_assert(N == 1);
-            Base::m_ptr->nent = 1;
-            std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
-        }
-
-        explicit Cpuids(value_type entry, const allocator_type& alloc) : Base(alloc) {
-            static_assert(N == 1);
-            Base::m_ptr->nent = 1;
-            std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
-        }
-
-        explicit Cpuids(std::initializer_list<value_type> l) : Base() {
-            if (Base::m_ptr->nent = l.size(); Base::m_ptr->nent > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy(l.begin(), l.end(), Base::begin());
-        }
-
-        explicit Cpuids(std::initializer_list<value_type> l, const allocator_type& alloc) : Base(alloc) {
-            if (Base::m_ptr->nent = l.size(); Base::m_ptr->nent > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy(l.begin(), l.end(), Base::begin());
-        }
-
-        template <typename Iterator>
-        explicit Cpuids(Iterator first, Iterator last) : Base() {
-            if (Base::m_ptr->nent = std::distance(first, last); Base::m_ptr->nent > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
-        }
-
-        template <typename Iterator>
-        explicit Cpuids(Iterator first, Iterator last, const allocator_type& alloc) : Base(alloc) {
-            if (Base::m_ptr->nent = std::distance(first, last); Base::m_ptr->nent > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
-        }
-
-        // Capacity
-        [[nodiscard]] auto size() const noexcept -> const size_type override {
-            return Base::m_ptr->nent;
-        }
-    private:
-        [[nodiscard]] auto entries() noexcept -> pointer override {
-            return Base::m_ptr->entries;
-        }
-
-        [[nodiscard]] auto entries() const noexcept -> const_pointer override {
-            return Base::m_ptr->entries;
-        }
+    using FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N>::FamStruct;
 };
 
 /**
@@ -396,78 +268,7 @@ class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
  */
 template<std::size_t N>
 class IrqRouting : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N> {
-    using Base = FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N>;
-    using Base::Base;
-
-    public:
-        using allocator_type = typename Base::allocator_type;
-        using value_type = typename Base::value_type;
-        using size_type = typename Base::size_type;
-        using pointer = typename Base::pointer;
-        using const_pointer = typename Base::const_pointer;
-
-        static const auto alignment = Base::alignment;
-        static const auto storage_size = Base::storage_size;
-
-        IrqRouting(const IrqRouting& other) : Base(other.m_alloc) {
-            Base::m_ptr->nr = other.m_ptr->nr;
-            std::copy(other.begin(), other.end(), Base::begin());
-        }
-
-        explicit IrqRouting(value_type entry) : Base() {
-            static_assert(N == 1);
-            Base::m_ptr->nr = 1;
-            std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
-        }
-
-        explicit IrqRouting(value_type entry, const allocator_type& alloc) : Base(alloc) {
-            static_assert(N == 1);
-            Base::m_ptr->nr = 1;
-            std::memcpy(Base::m_ptr->entries, &entry, sizeof(value_type));
-        }
-
-        explicit IrqRouting(std::initializer_list<value_type> l) : Base() {
-            if (Base::m_ptr->nr = l.size(); Base::m_ptr->nr > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy(l.begin(), l.end(), Base::begin());
-        }
-
-        explicit IrqRouting(std::initializer_list<value_type> l, const allocator_type& alloc) : Base(alloc) {
-            if (Base::m_ptr->nr = l.size(); Base::m_ptr->nr > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy(l.begin(), l.end(), Base::begin());
-        }
-
-        template <typename Iterator>
-        explicit IrqRouting(Iterator first, Iterator last) : Base() {
-            if (Base::m_ptr->nr = std::distance(first, last); Base::m_ptr->nr > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
-        }
-
-        template <typename Iterator>
-        explicit IrqRouting(Iterator first, Iterator last, const allocator_type& alloc) : Base(alloc) {
-            if (Base::m_ptr->nr = std::distance(first, last); Base::m_ptr->nr > N)
-                VMM_THROW(std::length_error("Iterator range too big"));
-
-            std::copy_if(first, last, Base::begin(), [](value_type) { return true; });
-        }
-
-        // Capacity
-        [[nodiscard]] auto size() const noexcept -> const size_type override {
-            return Base::m_ptr->nr;
-        }
-    private:
-        [[nodiscard]] auto entries() noexcept -> pointer override {
-            return Base::m_ptr->entries;
-        }
-
-        [[nodiscard]] auto entries() const noexcept -> const_pointer override {
-            return Base::m_ptr->entries;
-        }
+    using FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N>::FamStruct;
 };
 
 }  // namespace vmm::kvm::detail

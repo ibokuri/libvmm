@@ -49,7 +49,9 @@ class vm {
          *
          * See the documentation for `KVM_SET_GSI_ROUTING`.
          */
-        template<typename T, typename = std::enable_if_t<std::is_same_v<typename T::value_type, kvm_irq_routing_entry>>>
+        template<typename T,
+                 typename = std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                            kvm_irq_routing_entry>>>
         auto gsi_routing(T &table) const -> void {
             fd_.ioctl(KVM_SET_GSI_ROUTING, table.data());
         }
