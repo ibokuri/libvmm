@@ -37,22 +37,32 @@ Data members in C++ classes should be prefixed by `m_`.
 
 Setter and getter names should match the variables being set/gotten.
 
-Setters should be prefixed with `set\_`. Getters should only be preceded with `get_` if they return values through out parameters.
+Setters should be prefixed with `set_`. Getters should only be preceded with
+`get_` if they return values through out parameters.
 
-<!--[](#names-if-exists) When there are two getters for a variable, and one of them automatically makes sure the requested object is instantiated, prefix that getter function which with `ensure_`. As it ensures that an object is created, it should consequently also return a reference, not a pointer.-->
+<!--[](#names-if-exists) When there are two getters for a variable, and one of
+them automatically makes sure the requested object is instantiated, prefix that
+getter function which with `ensure_`. As it ensures that an object is created,
+it should consequently also return a reference, not a pointer.-->
 
 [](#names-variable-name-in-function-decl)
 ### Parameter Names
 Omit redundant variable names from function declarations. Usually, there should
 be a parameter name for bools, strings, and numerical types.
 
-<!--[](#names-enum-to-bool) Prefer enums to bools on function parameters if callers are likely to be passing constants, since named constants are easier to read at the call site. An exception to this rule is a setter function, where the name of the function already makes clear what the boolean is.-->
+<!--[](#names-enum-to-bool) Prefer enums to bools on function parameters if
+callers are likely to be passing constants, since named constants are easier to
+read at the call site. An exception to this rule is a setter function, where
+the name of the function already makes clear what the boolean is.-->
 
-<!--[](#names-const-to-define) Prefer `const` to `#define`. Prefer inline functions to macros.-->
+<!--[](#names-const-to-define) Prefer `const` to `#define`. Prefer inline
+functions to macros.-->
 
-<!--[](#names-define-constants) `#defined` constants should use all uppercase names with words separated by underscores.-->
+<!--[](#names-define-constants) `#defined` constants should use all uppercase
+names with words separated by underscores.-->
 
-<!--[](#header-guards) Use `#pragma once` instead of `#define` and `#ifdef` for header guards.-->
+<!--[](#header-guards) Use `#pragma once` instead of `#define` and `#ifdef` for
+header guards.-->
 
 [](#classes)
 ## Classes
@@ -120,7 +130,8 @@ variable name and the `*` or `&`.
 [](#pointers-out-argument)
 ### Out Arguments
 
-An out argument of a function should be passed by reference except rare cases where it is optional in which case it should be passed by pointer.
+An out argument of a function should be passed by reference except rare cases
+where it is optional in which case it should be passed by pointer.
 
 [](#using)
 ## `using` Statements
