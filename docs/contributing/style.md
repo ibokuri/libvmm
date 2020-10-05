@@ -8,42 +8,64 @@ This document describes the coding style used for C++ code in the Libvmm project
 
 <!--We'll definitely be tweaking and amending this over time, so let's consider it a living document. :)-->
 
+[](#general)
+## General
 
-### Names
+[](#general-line-length)
+### Line Length
 
-[](#names-basic) Use CamelCase for classes, structs, enumeration members, and template parameters. Use snake\_case for variable and function names.
+Libvmm uses an 80-character line limit. The only exceptions are function names
+with either one or no parameters as they can't be broken across lines in a
+readable fashion.
 
-[](#names-data-members) Data members in C++ classes should be prefixed by "m\_".
+[](#names)
+## Names
 
-[](#names-setter-getter) Setter and getter function names should match the variables being set/gotten. Setters should be prefixed with "set\_".
+[](#names-basic)
+### Basic
 
-[](#names-out-parameter) Precede getters value return values through out parameters with "get\_".
+Use `CamelCase` for classes, structs, enumeration members, and template
+parameters. Use `snake_case` for variable and function names.
+
+[](#names-data-members)
+### Data Members
+
+Data members in C++ classes should be prefixed by `m_`.
+
+[](#names-setter-getter)
+### Setters/Getters
+
+Setter and getter names should match the variables being set/gotten.
+
+Setters should be prefixed with `set\_`. Getters should only be preceded with `get_` if they return values through out parameters.
 
 <!--[](#names-if-exists) When there are two getters for a variable, and one of them automatically makes sure the requested object is instantiated, prefix that getter function which with `ensure_`. As it ensures that an object is created, it should consequently also return a reference, not a pointer.-->
 
-[](#names-variable-name-in-function-decl) Omit redundant variable names from function declarations. A good rule of thumb is if the parameter type contains the parameter name, then a parameter name isn't needed. Usually, there should be a parameter name for bools, strings, and numerical types.
+[](#names-variable-name-in-function-decl)
+### Parameter Names
+Omit redundant variable names from function declarations. Usually, there should
+be a parameter name for bools, strings, and numerical types.
 
-[](#names-enum-to-bool) Prefer enums to bools on function parameters if callers are likely to be passing constants, since named constants are easier to read at the call site. An exception to this rule is a setter function, where the name of the function already makes clear what the boolean is.
+<!--[](#names-enum-to-bool) Prefer enums to bools on function parameters if callers are likely to be passing constants, since named constants are easier to read at the call site. An exception to this rule is a setter function, where the name of the function already makes clear what the boolean is.-->
 
-<!--###### Right:-->
+<!--[](#names-const-to-define) Prefer `const` to `#define`. Prefer inline functions to macros.-->
 
-<!--```cpp-->
-<!--do_something(something, AllowFooBar::Yes);-->
-<!--paint_text_with_shadows(context, ..., text_stroke_width > 0, is_horizontal());-->
-<!--set_resizable(false);-->
-<!--```-->
+<!--[](#names-define-constants) `#defined` constants should use all uppercase names with words separated by underscores.-->
 
-[](#names-const-to-define) Prefer `const` to `#define`. Prefer inline functions to macros.
+<!--[](#header-guards) Use `#pragma once` instead of `#define` and `#ifdef` for header guards.-->
 
-[](#names-define-constants) `#defined` constants should use all uppercase names with words separated by underscores.
+[](#classes)
+## Classes
 
-[](#header-guards) Use `#pragma once` instead of `#define` and `#ifdef` for header guards.
+[](#classes-braces)
+### Braces
 
-### Classes
+If a constructor's body is empty, body braces should appear on the same line as
+the function name or member initializer list. If the body is not empty, the
+braces should appear on a line after the function name or member initializer
+list.
 
-[](#classes-braces) If a constructor's body is empty, body braces should appear on the same line as the function name or member initializer list. If the body is not empty, the braces should appear on a line after the function name or member initializer list.
-
-###### Right:
+#### Right:
 
 ```cpp
 class Foo {
@@ -63,9 +85,15 @@ class Foo {
 };
 ```
 
-[](#classes-member-init) Where possible, prefer initializing class members at member definition. Otherwise, initialize members with member initializer lists. Each member (or superclass) in an initializer list should be indented on a separate line, with commas at the end of each non-last line.
+[](#classes-member-init)
+### Member Initialization
 
-###### Right:
+Where possible, initialize class members at member definition. Otherwise,
+initialize members with initializer lists. Each member (or superclass) in an
+initializer list should be indented on a separate line, with commas at the end
+of each non-last line.
+
+#### Right:
 
 ```cpp
 class Foo {
@@ -80,40 +108,27 @@ class Foo {
 };
 ```
 
-### Pointers and References
+[](#pointers)
+## Pointers and References
 
-[](#pointers-name) Pointer and reference types should be written with no space between the variable name and the `*` or `&`.
+[](#pointers-name)
+### Naming
 
-[](#pointers-out-argument) An out argument of a function should be passed by reference except rare cases where it is optional in which case it should be passed by pointer.
+Pointer and reference types should be written with no space between the
+variable name and the `*` or `&`.
 
-<!--###### Right:-->
+[](#pointers-out-argument)
+### Out Arguments
 
-<!--```cpp-->
-<!--void MyClass::get_some_value(OutArgumentType& out_argument) const-->
-<!--{-->
-    <!--out_argument = m_value;-->
-<!--}-->
+An out argument of a function should be passed by reference except rare cases where it is optional in which case it should be passed by pointer.
 
-<!--void MyClass::do_something(OutArgumentType* out_argument) const-->
-<!--{-->
-    <!--do_the_thing();-->
-    <!--if (out_argument)-->
-        <!--*out_argument = m_value;-->
-<!--}-->
-<!--```-->
+[](#using)
+## `using` Statements
 
-<!--###### Wrong:-->
+[](#using-imports)
+### Imports
 
-<!--```cpp-->
-<!--void MyClass::get_some_value(OutArgumentType* outArgument) const-->
-<!--{-->
-    <!--*out_argument = m_value;-->
-<!--}-->
-<!--```-->
-
-### `using` Statements
-
-[](#using-imports) Do not use `using` statements to import names. Directly qualify the names at the point they're used instead.
+Do not use `using` statements to import names. Directly qualify the names at the point they're used instead.
 
 ###### Right:
 
@@ -126,27 +141,45 @@ std::swap(a, b);
 ```cpp
 using std::swap;
 swap(a, b);
-```
 
-###### Wrong:
+// OR
 
-```cpp
 using namespace std;
 swap(a, b);
 ```
 
-### Types
+[](#types)
+## Types
 
-[](#types-unsigned) Omit "int" when using "unsigned" modifier. Do not use "signed" modifier. Use "int" by itself instead.
+[](#types-unsigned)
+### Unsigned
 
-### Classes
+Omit "int" when using "unsigned" modifier. Do not use "signed" modifier. Use
+"int" by itself instead.
 
-[](#classes-explicit) Mark constructors with single parameters as `explicit` unless implicit conversion is desired and the type conversion is intuitive and fast.
+[](#classes)
+## Classes
 
-### Comments
+[](#classes-explicit)
+### `explicit` Keyword
 
-[](#comments-sentences) Comments should be written as proper sentences. One exception is end-of-line comments like this: `if (x == y) // false for NaN`.
+Mark constructors with single parameters as `explicit` unless implicit
+conversion is desired and the type conversion is intuitive and fast.
 
-### Overriding Virtual Methods
+[](#comments)
+## Comments
 
-[](#override-methods) The declaration of a virtual method inside a class must be declared with the `virtual` keyword. All subclasses of that class must either specify the `override` keyword when overriding the virtual method or the `final` keyword when overriding the virtual method and requiring that no further subclasses can override it.
+Comments should be written as proper sentences. One exception is end-of-line
+comments like this: `if (x == y) // false for NaN`.
+
+[](#virtual)
+## Virtual Methods
+
+[](#virtual-override)
+### Overriding
+
+The declaration of a virtual method inside a class must be declared with the
+`virtual` keyword. All subclasses of that class must either specify the
+`override` keyword when overriding the virtual method or the `final` keyword
+when overriding the virtual method and requiring that no further subclasses can
+override it.
