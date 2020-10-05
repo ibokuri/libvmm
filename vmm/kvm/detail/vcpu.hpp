@@ -13,9 +13,6 @@ class vcpu {
     private:
         KvmFd fd_;
 
-        /**
-         * Restricted constructor for kvm::vm objects.
-         */
         explicit vcpu(int fd) noexcept : fd_{fd} {}
         friend vcpu vm::vcpu(unsigned int vcpu_id) const;
 };

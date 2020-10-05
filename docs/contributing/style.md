@@ -41,7 +41,7 @@ This document describes the coding style used for C++ code in the Libvmm project
 
 ### Classes
 
-[](#classes-braces) If a constructor's body is empty, the body braces should appear on the same line as the function name or member initializer list. If the body is not empty, the braces should appear on a line after the function name or member initializer list.
+[](#classes-braces) If a constructor's body is empty, body braces should appear on the same line as the function name or member initializer list. If the body is not empty, the braces should appear on a line after the function name or member initializer list.
 
 ###### Right:
 
@@ -76,8 +76,7 @@ class Foo {
         : BaseClass(),
           m_foo(foo) {}
 
-    MyClass()
-        : BaseClass() {}
+    MyClass() : BaseClass() {}
 };
 ```
 

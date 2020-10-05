@@ -65,7 +65,8 @@ class system {
          * ```
          */
         [[nodiscard]] static auto open(bool cloexec=true) -> int {
-            const auto fd = ::open("/dev/kvm", cloexec ? O_RDWR | O_CLOEXEC : O_RDWR);
+            const auto fd = ::open("/dev/kvm",
+                                   cloexec ? O_RDWR | O_CLOEXEC : O_RDWR);
 
             if (fd < 0)
                 VMM_THROW(std::system_error(errno, std::system_category()));
@@ -168,10 +169,6 @@ class system {
                                                             kvm_msr_entry>>>
         auto read_msrs(T &msrs) const -> unsigned int {
             return fd_.ioctl(KVM_GET_MSRS, msrs.data());
-        }
-
-        auto fd() -> KvmFd& {
-            return fd_;
         }
 
         /**

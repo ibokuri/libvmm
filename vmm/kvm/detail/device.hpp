@@ -18,7 +18,11 @@ class device {
         uint32_t type_;
         uint32_t flags_;
 
-        device(const kvm_create_device& dev) noexcept : fd_{static_cast<int>(dev.fd)}, type_{dev.type}, flags_{dev.flags} {}
+        device(const kvm_create_device& dev) noexcept
+            : fd_{static_cast<int>(dev.fd)},
+              type_{dev.type},
+              flags_{dev.flags} {}
+
         friend device vm::device(uint32_t type, uint32_t flags) const;
     public:
         auto get_attr(kvm_device_attr &attr) -> void;

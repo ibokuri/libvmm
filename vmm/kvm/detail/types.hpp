@@ -119,7 +119,8 @@ class FamStruct {
         // TODO: SFINAE
         // TODO: Cleaner distance()
         template <typename InputIt>
-        FamStruct(InputIt first, InputIt last) : FamStruct()
+        FamStruct(InputIt first, InputIt last)
+            : FamStruct()
         {
             size_type n = std::distance(first, last);
             m_ptr->*SizeMember = n;
