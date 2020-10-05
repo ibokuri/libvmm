@@ -84,6 +84,8 @@ class system {
         [[nodiscard]] auto vcpu_mmap_size() const -> std::size_t;
         [[nodiscard]] auto host_ipa_limit() const -> unsigned int;
 
+        // TODO: Allocator variants for FAM struct methods
+
         /**
          * Returns a list of host-supported and kvm-specific MSRs.
          *

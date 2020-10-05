@@ -33,6 +33,12 @@ class KvmFd : public vmm::types::FileDescriptor {
 };
 
 /**
+ * NOTE: Does not work with data member pointers that point to arrays.
+ */
+template <class C, typename T>
+T DataMemberPtrType(T C::*v);
+
+/**
  * Wrapper for KVM FAM structs.
  *
  * This class should not be used for arbitrary FAM structs. It is only meant to
@@ -43,14 +49,16 @@ class KvmFd : public vmm::types::FileDescriptor {
  *     * The size field is of type __u32 and is the first field in the struct.
  *
  *     * The struct only contains POD types.
- *
- * Size: type of size member (kvm_reg_list has __u64 size member);
  */
-template<typename Struct, typename Entry, std::size_t N, typename Size=uint32_t>
+template<typename Struct,
+         typename Entry,
+         auto SizeMember,
+         auto EntriesMember,
+         std::size_t N>
 class FamStruct {
     public:
         using value_type = Entry;
-        using size_type = std::size_t;
+        using size_type = decltype(DataMemberPtrType(SizeMember));;
         using allocator_type = std::pmr::polymorphic_allocator<std::byte>;
         using pointer = value_type*;
         using const_pointer = const value_type*;
@@ -64,11 +72,11 @@ class FamStruct {
 
         // Allocator constructor
         explicit FamStruct(const allocator_type& alloc)
-                : m_alloc{alloc},
-                  m_ptr{static_cast<Struct*>( alloc.resource()->allocate(storage_size, alignment))} {
-            static_assert(N >= 0);
+            : m_alloc{alloc},
+              m_ptr{static_cast<Struct*>(alloc.resource()->allocate(storage_size, alignment))}
+        {
             std::memset(m_ptr, 0, storage_size);
-            *m_ptr = {N};
+            m_ptr->*SizeMember = N;
         }
 
         // Default constructor
@@ -80,49 +88,60 @@ class FamStruct {
         FamStruct() : FamStruct(std::pmr::new_delete_resource()) {}
 
         // Single entry constructors
-        explicit FamStruct(const_reference entry) noexcept : FamStruct() {
+        explicit FamStruct(const_reference entry) noexcept : FamStruct()
+        {
             std::memcpy(begin(), entry, sizeof(value_type));
         }
 
-        explicit FamStruct(const_reference entry, const allocator_type& alloc) noexcept : FamStruct(alloc) {
+        explicit FamStruct(const_reference entry,
+                           const allocator_type& alloc) noexcept
+            : FamStruct(alloc)
+        {
             std::memcpy(begin(), entry, sizeof(value_type));
         }
 
         // Copy constructors
         constexpr FamStruct(const FamStruct& other)
-                : FamStruct(other.begin(), other.end(), other.get_allocator()) {}
+            : FamStruct(other.begin(), other.end(), other.get_allocator()) {}
 
         constexpr FamStruct(const FamStruct& other, const allocator_type& alloc)
-                : FamStruct(other.begin(), other.end(), alloc) {}
+            : FamStruct(other.begin(), other.end(), alloc) {}
 
         // Move constructors
         //constexpr FamStruct(FamStruct&& other)
             //: m_entries{std::move(other.m_entries)} {}
 
         //constexpr FamStruct(FamStruct&& other, const allocator_type& alloc)
-                //: m_entries{std::move(other.m_entries), alloc} {}
+            //: m_entries{std::move(other.m_entries), alloc} {}
 
         // Iterator constructors
         // TODO: SFINAE
         // TODO: Cleaner distance()
         template <typename InputIt>
-        explicit FamStruct(InputIt first, InputIt last) : FamStruct() {
-            Size n = std::distance(first, last);
-            *m_ptr = {n};
+        explicit FamStruct(InputIt first, InputIt last) : FamStruct()
+        {
+            size_type n = std::distance(first, last);
+            m_ptr->*SizeMember = n;
             std::copy(first, last, begin());
         }
 
         template <typename InputIt>
-        explicit FamStruct(InputIt first, InputIt last, const allocator_type& alloc) : FamStruct(alloc) {
-            Size n = std::distance(first, last);
-            *m_ptr = {n};
+        explicit FamStruct(InputIt first, InputIt last,
+                           const allocator_type& alloc)
+            : FamStruct(alloc)
+        {
+            size_type n = std::distance(first, last);
+            m_ptr->*SizeMember = n;
             std::copy(first, last, begin());
         }
 
         // Initializer list constructors
-        explicit FamStruct(std::initializer_list<value_type> ilist) : FamStruct(ilist.begin(), ilist.end()) {}
-        explicit FamStruct(std::initializer_list<value_type> ilist, const allocator_type& alloc)
-                : FamStruct(ilist.begin(), ilist.end(), alloc) {}
+        explicit FamStruct(std::initializer_list<value_type> ilist)
+            : FamStruct(ilist.begin(), ilist.end()) {}
+
+        explicit FamStruct(std::initializer_list<value_type> ilist,
+                           const allocator_type& alloc)
+            : FamStruct(ilist.begin(), ilist.end(), alloc) {}
 
         // Destructor
         ~FamStruct() {
@@ -130,48 +149,37 @@ class FamStruct {
         }
 
         // Allocator
-        auto get_allocator() const noexcept -> allocator_type { return m_alloc; }
+        [[nodiscard]] allocator_type get_allocator() const noexcept {
+            return m_alloc;
+        }
 
         // Element access
-        [[nodiscard]] auto operator[](Size pos) noexcept -> reference { return *(begin() + pos); }
-        [[nodiscard]] auto operator[](Size pos) const noexcept -> const_reference { return *(begin() + pos); }
+        [[nodiscard]] auto operator[](size_type pos) noexcept -> reference {
+            return (m_ptr->*EntriesMember)[pos];
+        }
+
+        [[nodiscard]] auto operator[](size_type pos) const noexcept -> const_reference {
+            return (m_ptr->*EntriesMember)[pos];
+        }
 
         [[nodiscard]] auto front() noexcept -> reference { return *begin(); }
         [[nodiscard]] auto front() const noexcept -> const_reference { return *begin(); }
-
         [[nodiscard]] auto back() noexcept -> reference { return *end(); }
         [[nodiscard]] auto back() const noexcept -> const_reference { return *end(); }
-
         [[nodiscard]] constexpr auto data() noexcept -> Struct* { return m_ptr; }
         [[nodiscard]] constexpr auto data() const noexcept -> const Struct* { return m_ptr; }
 
         // Iterators
-        auto begin() noexcept -> iterator {
-           iterator it = nullptr;
-           std::memcpy(&it, &m_ptr, sizeof(iterator));
-           return it + sizeof(Struct);
-        }
-
-        auto begin() const noexcept -> const_iterator {
-            iterator it = nullptr;
-            std::memcpy(&it, &m_ptr, sizeof(iterator));
-            return it + sizeof(Struct);
-        }
-
+        auto begin() noexcept -> iterator { return m_ptr->*EntriesMember; }
+        auto begin() const noexcept -> const_iterator { return m_ptr->*EntriesMember; }
         auto end() noexcept -> iterator { return begin() + size(); }
         auto end() const noexcept -> const_iterator { return begin() + size(); }
         auto cbegin() const noexcept -> const_iterator { return begin(); }
         auto cend() const noexcept -> const_iterator { return end(); }
 
         // Capacity
-        [[nodiscard]] auto size() const noexcept -> const Size {
-            Size size = 0;
-            std::memcpy(&size, m_ptr, sizeof(Size));
-            return size;
-        }
-
+        [[nodiscard]] auto size() const noexcept -> size_type { return m_ptr->*SizeMember; }
         [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0; }
-
         [[nodiscard]] constexpr auto capacity() const noexcept -> size_type { return N; }
     private:
         allocator_type m_alloc;
@@ -192,8 +200,17 @@ class FamStruct {
  *       value of 10. To use the size_type constructor, use `MsrList(10)`.
  */
 template<std::size_t N>
-class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
-    using Base = typename FamStruct<kvm_msr_list, uint32_t, N>::FamStruct;
+class MsrList : public FamStruct<kvm_msr_list,
+                                 uint32_t,
+                                 &kvm_msr_list::nmsrs,
+                                 &kvm_msr_list::indices,
+                                 N>
+{
+    using Base = FamStruct<kvm_msr_list,
+                           uint32_t,
+                           &kvm_msr_list::nmsrs,
+                           &kvm_msr_list::indices,
+                           N>;
     using Base::Base;
     using allocator_type = typename Base::allocator_type;
 
@@ -218,8 +235,17 @@ class MsrList : public FamStruct<kvm_msr_list, uint32_t, N> {
  * };
  */
 template<std::size_t N>
-class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
-    using FamStruct<kvm_msrs, kvm_msr_entry, N>::FamStruct;
+class Msrs : public FamStruct<kvm_msrs,
+                              kvm_msr_entry,
+                              &kvm_msrs::nmsrs,
+                              &kvm_msrs::entries,
+                              N> {
+    using Base = FamStruct<kvm_msrs,
+                           kvm_msr_entry,
+                           &kvm_msrs::nmsrs,
+                           &kvm_msrs::entries,
+                           N>;
+    using Base::Base;
 };
 
 /*
@@ -241,8 +267,16 @@ class Msrs : public FamStruct<kvm_msrs, kvm_msr_entry, N> {
  * };
  */
 template<std::size_t N>
-class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
-    using FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N>::FamStruct;
+class Cpuids : public FamStruct<kvm_cpuid2,
+                                kvm_cpuid_entry2,
+                                &kvm_cpuid2::nent,
+                                &kvm_cpuid2::entries,
+                                N> {
+    using FamStruct<kvm_cpuid2,
+                    kvm_cpuid_entry2,
+                    &kvm_cpuid2::nent,
+                    &kvm_cpuid2::entries,
+                    N>::FamStruct;
 };
 
 /**
@@ -267,8 +301,16 @@ class Cpuids : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, N> {
  * };
  */
 template<std::size_t N>
-class IrqRouting : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N> {
-    using FamStruct<kvm_irq_routing, kvm_irq_routing_entry, N>::FamStruct;
+class IrqRouting : public FamStruct<kvm_irq_routing,
+                                    kvm_irq_routing_entry,
+                                    &kvm_irq_routing::nr,
+                                    &kvm_irq_routing::entries,
+                                    N> {
+    using FamStruct<kvm_irq_routing,
+                    kvm_irq_routing_entry,
+                    &kvm_irq_routing::nr,
+                    &kvm_irq_routing::entries,
+                    N>::FamStruct;
 };
 
 }  // namespace vmm::kvm::detail
