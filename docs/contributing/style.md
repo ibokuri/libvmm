@@ -65,7 +65,7 @@ the function name or member initializer list. If the body is not empty, the
 braces should appear on a line after the function name or member initializer
 list.
 
-#### Right:
+###### Right:
 
 ```cpp
 class Foo {
@@ -93,7 +93,7 @@ initialize members with initializer lists. Each member (or superclass) in an
 initializer list should be indented on a separate line, with commas at the end
 of each non-last line.
 
-#### Right:
+###### Right:
 
 ```cpp
 class Foo {
