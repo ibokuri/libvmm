@@ -1,6 +1,5 @@
 #define CATCH_CONFIG_MAIN
 
-#include <iterator>
 #include <catch2/catch.hpp>
 #include "vmm/kvm/kvm.hpp"
 
@@ -72,12 +71,12 @@ TEST_CASE("x86 cpuids", "[.x86]") {
 TEST_CASE("MSR index list", "[.x86]") {
     auto kvm = vmm::kvm::system{};
 
-    auto msr_list = kvm.msr_index_list();
-    REQUIRE(msr_list.size() > 1);
+    auto msrs = kvm.msr_index_list();
+    REQUIRE(msrs.size() <= MAX_IO_MSRS);
 
     if (kvm.check_extension(KVM_CAP_GET_MSR_FEATURES) > 0) {
-        auto msr_list = kvm.msr_feature_list();
-        REQUIRE(msr_list.size() > 1);
+        auto features = kvm.msr_feature_list();
+        REQUIRE(features.size() <= MAX_IO_MSRS_FEATURES);
     }
 }
 

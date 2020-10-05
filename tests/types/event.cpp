@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 
-#include <limits>
 #include <catch2/catch.hpp>
+#include <limits> // numeric_limits
 #include "vmm/types/event.hpp"
 
 namespace vt = vmm::types;
