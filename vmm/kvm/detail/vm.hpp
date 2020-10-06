@@ -18,14 +18,8 @@ class vcpu;
 class device;
 
 class vm {
-    private:
-        KvmFd fd_;
-        size_t mmap_size_;
+    friend vm system::vm(unsigned int machine_type) const;
 
-        vm(int fd, std::size_t mmap_size) noexcept
-            : fd_{fd}, mmap_size_{mmap_size} {}
-
-        friend vm system::vm(unsigned int machine_type) const;
     public:
         vm(const vm& other) = delete;
         vm(vm&& other) = default;
@@ -39,12 +33,12 @@ class vm {
         // Control routines
         [[nodiscard]] auto check_extension(unsigned int cap) const -> unsigned int;
         auto set_bsp(unsigned int vcpu_id) const -> void;
-        auto memslot(kvm_userspace_memory_region region) const -> void;
+        auto memslot(kvm_userspace_memory_region) const -> void;
         auto irqchip() const -> void;
-        auto get_irqchip(kvm_irqchip &irqchip_p) const -> void;
-        auto set_irqchip(kvm_irqchip const &irqchip_p) const -> void;
+        auto get_irqchip(kvm_irqchip&) const -> void;
+        auto set_irqchip(kvm_irqchip const&) const -> void;
         [[nodiscard]] auto get_clock() const -> kvm_clock_data;
-        auto set_clock(kvm_clock_data &clock) const -> void;
+        auto set_clock(kvm_clock_data&) const -> void;
 
         /**
          * Sets the GSI routing table entries, overwriting previous entries.
@@ -157,6 +151,12 @@ class vm {
         [[nodiscard]] auto num_vcpus() const -> unsigned int;
         [[nodiscard]] auto max_vcpus() const -> unsigned int;
         [[nodiscard]] auto num_memslots() const -> unsigned int;
+    private:
+        KvmFd fd_;
+        size_t mmap_size_;
+
+        vm(int fd, std::size_t mmap_size) noexcept
+            : fd_{fd}, mmap_size_{mmap_size} {}
 };
 
 }  // namespace vmm::kvm::detail

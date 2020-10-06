@@ -22,12 +22,9 @@ namespace vmm::kvm::detail {
 class vm;
 
 class system {
-    private:
-        KvmFd fd_;
-
-        [[nodiscard]] auto create_vm(unsigned int machine_type) const -> int;
     public:
-        system() : fd_{open()} {}
+        system()
+            : fd_{open()} {}
 
         /**
          * Constructs a kvm object from a file descriptor.
@@ -40,7 +37,8 @@ class system {
          * ========
          * See kvm::system::open().
          */
-        explicit system(int fd) : fd_{fd} {}
+        explicit system(int fd)
+            : fd_{fd} {}
 
         system(const system& other) = delete;
         system(system&& other) = default;
@@ -216,6 +214,10 @@ class system {
             fd_.ioctl(KVM_GET_EMULATED_CPUID, cpuids.data());
             return cpuids;
         }
+    private:
+        KvmFd fd_;
+
+        [[nodiscard]] auto create_vm(unsigned int machine_type) const -> int;
 };
 
 }  // namespace vmm::kvm::detail

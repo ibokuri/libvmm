@@ -14,6 +14,7 @@
 #include <linux/kvm.h> // kvm_*
 #include <memory_resource> // polymorphic_allocator
 #include <stdexcept> // overflow_error
+#include <iostream>
 
 #include "vmm/kvm/detail/macros.hpp"
 #include "vmm/types/file_descriptor.hpp"
@@ -22,12 +23,10 @@ namespace vmm::kvm::detail {
 
 class system;
 
-/**
- * Base class for KVM file descriptors.
- */
 class KvmFd : public vmm::types::FileDescriptor {
     public:
-        explicit KvmFd(int fd) noexcept : vmm::types::FileDescriptor(fd) {}
+        explicit KvmFd(int fd) noexcept
+            : vmm::types::FileDescriptor(fd) {}
 
         KvmFd(const KvmFd& other) = delete;
         KvmFd(KvmFd&& other) = default;
@@ -35,24 +34,9 @@ class KvmFd : public vmm::types::FileDescriptor {
         auto operator=(KvmFd&& other) -> KvmFd& = default;
 };
 
-/**
- * NOTE: Does not work with data member pointers that point to arrays.
- */
-template <class C, typename T>
-T DataMemberPtrType(T C::*v);
+template <class Struct, typename T>
+T DataMemberPtrType(T Struct::*v);
 
-/**
- * Wrapper for KVM FAM structs.
- *
- * This class should not be used for arbitrary FAM structs. It is only meant to
- * be used with KVM FAM structs, which have certain properties:
- *
- *     * Any required padding is explicitly provided.
- *
- *     * The size field is of type __u32 and is the first field in the struct.
- *
- *     * The struct only contains POD types.
- */
 template<typename Struct,
          typename Entry,
          auto SizeMember,
@@ -73,67 +57,20 @@ class FamStruct {
         static const auto alignment = alignof(Struct);
         static const auto storage_size = sizeof(Struct) + N * sizeof(Entry);
 
-        // Allocator constructor
         explicit FamStruct(const allocator_type& alloc)
             : m_alloc{alloc},
-              m_ptr{static_cast<Struct*>(alloc.resource()->allocate(storage_size, alignment))}
+              m_ptr{static_cast<Struct*>(alloc.resource()->allocate(storage_size,
+                                                                    alignment))}
         {
             static_assert(N <= std::numeric_limits<size_type>::max());
             std::memset(m_ptr, 0, storage_size);
             m_ptr->*SizeMember = N;
         }
 
-        // Default constructor
         FamStruct()
             : FamStruct(std::pmr::new_delete_resource()) {}
 
-        // Single entry constructors
-        explicit FamStruct(const_reference entry) noexcept
-            : FamStruct()
-        {
-            static_assert(N > 0);
-            std::memcpy(begin(), entry, sizeof(value_type));
-        }
-
-        FamStruct(const_reference entry, const allocator_type& alloc) noexcept
-            : FamStruct(alloc)
-        {
-            static_assert(N > 0);
-            std::memcpy(begin(), entry, sizeof(value_type));
-        }
-
-        // Copy constructors
-        FamStruct(const FamStruct& other)
-            : FamStruct(other.begin(), other.end(), other.get_allocator()) {}
-
-        FamStruct(const FamStruct& other, const allocator_type& alloc)
-            : FamStruct(other.begin(), other.end(), alloc) {}
-
-        // Move constructors
-        //FamStruct(FamStruct&& other)
-            //: m_entries{std::move(other.m_entries)} {}
-
-        //FamStruct(FamStruct&& other, const allocator_type& alloc)
-            //: m_entries{std::move(other.m_entries), alloc} {}
-
-        // Iterator constructors
         // TODO: SFINAE
-        // TODO: Cleaner distance()
-        template <typename InputIt>
-        FamStruct(InputIt first, InputIt last)
-            : FamStruct()
-        {
-            if (auto n = std::distance(first, last); n != 0) {
-                auto abs = std::abs(n);
-
-                if (abs > std::numeric_limits<size_type>::max())
-                    VMM_THROW(std::overflow_error("Range too large"));
-
-                m_ptr->*SizeMember = static_cast<size_type>(abs);
-                std::copy(first, last, begin());
-            }
-        }
-
         template <typename InputIt>
         FamStruct(InputIt first, InputIt last, const allocator_type& alloc)
             : FamStruct(alloc)
@@ -144,12 +81,18 @@ class FamStruct {
                 if (abs > std::numeric_limits<size_type>::max())
                     VMM_THROW(std::overflow_error("Range too large"));
 
+                if (N < static_cast<size_type>(abs))
+                    VMM_THROW(std::length_error("Range exceeds storage"));
+
                 m_ptr->*SizeMember = static_cast<size_type>(abs);
                 std::copy(first, last, begin());
             }
         }
 
-        // Initializer list constructors
+        template <typename InputIt>
+        FamStruct(InputIt first, InputIt last)
+            : FamStruct(first, last, std::pmr::new_delete_resource()) {}
+
         explicit FamStruct(std::initializer_list<value_type> ilist)
             : FamStruct(ilist.begin(), ilist.end()) {}
 
@@ -157,17 +100,27 @@ class FamStruct {
                   const allocator_type& alloc)
             : FamStruct(ilist.begin(), ilist.end(), alloc) {}
 
-        // Destructor
+        FamStruct(const FamStruct& other)
+            : FamStruct(other.begin(), other.end(), other.get_allocator()) {}
+
+        FamStruct(const FamStruct& other, const allocator_type& alloc)
+            : FamStruct(other.begin(), other.end(), alloc) {}
+
+        //FamStruct(FamStruct&& other)
+            //: m_entries{std::move(other.m_entries)} {}
+
+        //FamStruct(FamStruct&& other, const allocator_type& alloc)
+            //: m_entries{std::move(other.m_entries), alloc} {}
+
         ~FamStruct() {
             m_alloc.resource()->deallocate(m_ptr, storage_size, alignment);
         }
 
-        // Allocator
         [[nodiscard]] allocator_type get_allocator() const noexcept {
             return m_alloc;
         }
 
-        // Element access
+        /* Element access */
         [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
             return (m_ptr->*EntriesMember)[pos];
         }
@@ -178,12 +131,14 @@ class FamStruct {
 
         [[nodiscard]] auto front() noexcept -> reference { return *begin(); }
         [[nodiscard]] auto front() const noexcept -> const_reference { return *begin(); }
+
         [[nodiscard]] auto back() noexcept -> reference { return *end(); }
         [[nodiscard]] auto back() const noexcept -> const_reference { return *end(); }
+
         [[nodiscard]] constexpr auto data() noexcept -> Struct* { return m_ptr; }
         [[nodiscard]] constexpr auto data() const noexcept -> const Struct* { return m_ptr; }
 
-        // Iterators
+        /* Iterators */
         auto begin() noexcept -> iterator { return m_ptr->*EntriesMember; }
         auto begin() const noexcept -> const_iterator { return m_ptr->*EntriesMember; }
         auto end() noexcept -> iterator { return begin() + size(); }
@@ -191,7 +146,7 @@ class FamStruct {
         auto cbegin() const noexcept -> const_iterator { return begin(); }
         auto cend() const noexcept -> const_iterator { return end(); }
 
-        // Capacity
+        /* Capacity */
         [[nodiscard]] auto size() const noexcept -> size_type { return m_ptr->*SizeMember; }
         [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0; }
         [[nodiscard]] constexpr auto capacity() const noexcept -> size_type { return N; }
@@ -201,11 +156,6 @@ class FamStruct {
 };
 
 /**
- * struct kvm_msr_list {
- *    __u32 nmsrs;
- *    __u32 indices[0];
- * };
- *
  * NOTE: Because MsrList's value_type is an integer, it is very easy to confuse
  *       the size_type initializer_list and constructor. That is, one may think
  *       that `auto msr_list = MsrList{10}` constructs a FAM struct with enough
@@ -235,25 +185,13 @@ class MsrList : public FamStruct<kvm_msr_list,
         explicit MsrList(const allocator_type& alloc) : Base::FamStruct(alloc) {}
 };
 
-/**
- * struct kvm_msrs {
- *     __u32 nmsrs;
- *     __u32 pad;
- *     struct kvm_msr_entry entries[0];
- * };
- *
- * struct kvm_msr_entry {
- *     __u32 index;
- *     __u32 reserved;
- *     __u64 data;
- * };
- */
 template<std::size_t N>
 class Msrs : public FamStruct<kvm_msrs,
                               kvm_msr_entry,
                               &kvm_msrs::nmsrs,
                               &kvm_msrs::entries,
-                              N> {
+                              N>
+{
     using Base = FamStruct<kvm_msrs,
                            kvm_msr_entry,
                            &kvm_msrs::nmsrs,
@@ -262,69 +200,34 @@ class Msrs : public FamStruct<kvm_msrs,
     using Base::Base;
 };
 
-/*
- * struct kvm_cpuid2 {
- *     __u32 nent;
- *     __u32 padding;
- *     struct kvm_cpuid_entry2 entries[0];
- * };
- *
- * struct kvm_cpuid_entry2 {
- *     __u32 function;
- *     __u32 index;
- *     __u32 flags;
- *     __u32 eax;
- *     __u32 ebx;
- *     __u32 ecx;
- *     __u32 edx;
- *     __u32 padding[3];
- * };
- */
 template<std::size_t N>
 class Cpuids : public FamStruct<kvm_cpuid2,
                                 kvm_cpuid_entry2,
                                 &kvm_cpuid2::nent,
                                 &kvm_cpuid2::entries,
-                                N> {
-    using FamStruct<kvm_cpuid2,
-                    kvm_cpuid_entry2,
-                    &kvm_cpuid2::nent,
-                    &kvm_cpuid2::entries,
-                    N>::FamStruct;
+                                N>
+{
+    using Base = FamStruct<kvm_cpuid2,
+                           kvm_cpuid_entry2,
+                           &kvm_cpuid2::nent,
+                           &kvm_cpuid2::entries,
+                           N>;
+    using Base::Base;
 };
 
-/**
- * struct kvm_irq_routing {
- *       __u32 nr;
- *       __u32 flags;
- *       struct kvm_irq_routing_entry entries[0];
- * };
- *
- * struct kvm_irq_routing_entry {
- *       __u32 gsi;
- *       __u32 type;
- *       __u32 flags;
- *       __u32 pad;
- *       union {
- *               struct kvm_irq_routing_irqchip irqchip;
- *               struct kvm_irq_routing_msi msi;
- *               struct kvm_irq_routing_s390_adapter adapter;
- *               struct kvm_irq_routing_hv_sint hv_sint;
- *               __u32 pad[8];
- *       } u;
- * };
- */
 template<std::size_t N>
 class IrqRouting : public FamStruct<kvm_irq_routing,
                                     kvm_irq_routing_entry,
                                     &kvm_irq_routing::nr,
                                     &kvm_irq_routing::entries,
-                                    N> {
-    using FamStruct<kvm_irq_routing,
-                    kvm_irq_routing_entry,
-                    &kvm_irq_routing::nr,
-                    &kvm_irq_routing::entries,
-                    N>::FamStruct;
+                                    N>
+{
+    using Base = FamStruct<kvm_irq_routing,
+                           kvm_irq_routing_entry,
+                           &kvm_irq_routing::nr,
+                           &kvm_irq_routing::entries,
+                           N>;
+    using Base::Base;
 };
 
 }  // namespace vmm::kvm::detail

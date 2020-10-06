@@ -13,13 +13,10 @@
 namespace vmm::types {
 
 class FileDescriptor {
-    protected:
-        int fd_;
-        bool closed_ = false;
-
-        FileDescriptor() noexcept;
     public:
-        FileDescriptor(int fd) noexcept;
+        explicit FileDescriptor(int fd) noexcept
+            : fd_{fd} {};
+
         ~FileDescriptor() noexcept;
 
         FileDescriptor(const FileDescriptor& other);
@@ -33,7 +30,6 @@ class FileDescriptor {
          * Examples
          * ========
          * ```
-         * #include <iostream>
          * #include <vmm/types.hpp>
          *
          * auto fd = FileDescriptor{open("/dev/kvm", O_RDWR | O_CLOEXEC)};
@@ -45,7 +41,7 @@ class FileDescriptor {
          *     fd.close();
          * }
          * catch (std::system_error& e) {
-         *     std::cerr << "message: " << e.what() << std::endl;
+         *     throw
          * }
          * ```
          */
@@ -80,6 +76,11 @@ class FileDescriptor {
         auto fd() const noexcept -> int {
             return fd_;
         }
+    protected:
+        int fd_;
+        bool closed_ = false;
+
+        FileDescriptor() noexcept {};
 };
 
 }

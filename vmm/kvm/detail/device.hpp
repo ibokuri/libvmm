@@ -13,6 +13,12 @@
 namespace vmm::kvm::detail {
 
 class device {
+    friend device vm::device(uint32_t type, uint32_t flags) const;
+
+    public:
+        auto get_attr(kvm_device_attr&) -> void;
+        auto set_attr(kvm_device_attr&) -> void;
+        auto has_attr(kvm_device_attr&) -> bool;
     private:
         KvmFd fd_;
         uint32_t type_;
@@ -22,12 +28,6 @@ class device {
             : fd_{static_cast<int>(dev.fd)},
               type_{dev.type},
               flags_{dev.flags} {}
-
-        friend device vm::device(uint32_t type, uint32_t flags) const;
-    public:
-        auto get_attr(kvm_device_attr &attr) -> void;
-        auto set_attr(kvm_device_attr &attr) -> void;
-        auto has_attr(kvm_device_attr &attr) -> bool;
 };
 
 }  // namespace vmm::kvm::detail
