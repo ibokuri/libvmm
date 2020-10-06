@@ -47,7 +47,7 @@ class Widget {
 ## 🎟 Names
 
 [](#names-basic)
-### 💥 `snake_case` for variable and function names, `CamelCase` for everything else
+### 💥 Use `snake_case` for variable and function names, `CamelCase` for everything else
 
 ```cpp
 // snake_case
@@ -109,34 +109,53 @@ getter function which with `ensure_`. As it ensures that an object is created,
 it should consequently also return a reference, not a pointer.-->
 
 [](#names-variable-name-in-function-decl)
-### 💥 Parameter Names
-Omit redundant variable names from function declarations. Usually, there should
-be a parameter name for bools, strings, and numerical types.
+### 💥 Omit redundant variable names from function declarations
 
-<!--[](#names-enum-to-bool) Prefer enums to bools on function parameters if
-callers are likely to be passing constants, since named constants are easier to
-read at the call site. An exception to this rule is a setter function, where
-the name of the function already makes clear what the boolean is.-->
+This rule usually means a name is only given to bool, string, and numerical
+parameters in function declarations.
 
-<!--[](#names-const-to-define) Prefer `const` to `#define`. Prefer inline
-functions to macros.-->
+```cpp
+auto a(int flag, bool status) -> void;
+auto b(Context*) -> void;
+```
+
+[](#names-enum-to-bool)
+### 💥 Prefer enums over bools for function parameters
+
+```cpp
+enum class Status {
+    Off,
+    On
+};
+
+auto func(Status) -> void;
+auto set_widget(bool) -> void;
+```
+
+##### Exception
+
+* For setter functions, a bool parameter is fine since the name of the function
+  makes clear what the parameter is.
+
+<!--[](#names-const-to-define) Prefer `const` to `#define`. Prefer inline-->
+<!--functions to macros.-->-->
 
 <!--[](#names-define-constants) `#defined` constants should use all uppercase
 names with words separated by underscores.-->
 
-<!--[](#header-guards) Use `#pragma once` instead of `#define` and `#ifdef` for
-header guards.-->
+[](#header-guards)
+### 💥 Use `#pragma once` instead of include guards for header files
+
 
 [](#classes)
 ## 🎟 Classes
 
 [](#classes-braces)
-### 💥 Braces
+### 💥 A class constructor's braces depends on the body's contents
 
-If a constructor's body is empty, body braces should appear on the same line as
-the function name or member initializer list. If the body is not empty, the
-braces should appear on a line after the function name or member initializer
-list.
+If a constructor's body is empty, braces should appear on the same line as the
+function name or member initializer list. If the body is not empty, braces
+should appear on their own line.
 
 ```cpp
 class Foo {
@@ -161,7 +180,7 @@ class Foo {
 ### 💥 Member Initialization
 
 Where possible, initialize class members at member definition. Otherwise,
-initialize members with initializer lists. Each member (or superclass) in an
+initialize members with initializer lists. Each member (or base class) in an
 initializer list should be indented on a separate line, with commas at the end
 of each non-last line.
 
