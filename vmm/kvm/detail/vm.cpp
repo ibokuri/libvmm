@@ -24,7 +24,7 @@ namespace vmm::kvm::detail {
  * ```
  */
 auto vm::vcpu(unsigned int vcpu_id) const -> vmm::kvm::detail::vcpu {
-    return vmm::kvm::detail::vcpu{fd_.ioctl(KVM_CREATE_VCPU, vcpu_id)};
+    return vmm::kvm::detail::vcpu{m_fd.ioctl(KVM_CREATE_VCPU, vcpu_id)};
 }
 
 /**
@@ -66,7 +66,7 @@ auto vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device
  * ```
  */
 auto vm::check_extension(unsigned int cap) const -> unsigned int {
-    return fd_.ioctl(KVM_CHECK_EXTENSION, cap);
+    return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
 /**
@@ -92,7 +92,7 @@ auto vm::check_extension(unsigned int cap) const -> unsigned int {
  * ```
  */
 auto vm::set_bsp(unsigned int vcpu_id) const -> void {
-    fd_.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
+    m_fd.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
 /**
@@ -119,7 +119,7 @@ auto vm::set_bsp(unsigned int vcpu_id) const -> void {
  * ```
  */
 auto vm::memslot(kvm_userspace_memory_region region) const -> void {
-    fd_.ioctl(KVM_SET_USER_MEMORY_REGION, &region);
+    m_fd.ioctl(KVM_SET_USER_MEMORY_REGION, &region);
 }
 
 /**
@@ -138,7 +138,7 @@ auto vm::memslot(kvm_userspace_memory_region region) const -> void {
  * ```
  */
 auto vm::irqchip() const -> void {
-    fd_.ioctl(KVM_CREATE_IRQCHIP);
+    m_fd.ioctl(KVM_CREATE_IRQCHIP);
 }
 
 /**
@@ -161,7 +161,7 @@ auto vm::irqchip() const -> void {
  * ```
  */
 auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void {
-    fd_.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
+    m_fd.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
 }
 
 /**
@@ -188,7 +188,7 @@ auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void {
  * ```
  */
 auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void {
-    fd_.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
+    m_fd.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
 }
 
 /**
@@ -208,7 +208,7 @@ auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void {
  */
 auto vm::get_clock() const -> kvm_clock_data {
     auto clock = kvm_clock_data{};
-    fd_.ioctl(KVM_GET_CLOCK, &clock);
+    m_fd.ioctl(KVM_GET_CLOCK, &clock);
     return clock;
 }
 
@@ -230,14 +230,14 @@ auto vm::get_clock() const -> kvm_clock_data {
  * ```
  */
 auto vm::set_clock(kvm_clock_data &clock) const -> void {
-    fd_.ioctl(KVM_SET_CLOCK, &clock);
+    m_fd.ioctl(KVM_SET_CLOCK, &clock);
 }
 
 /**
  * Returns KVM_RUN's shared memory region size.
  */
 auto vm::mmap_size() const -> std::size_t {
-    return mmap_size_;
+    return m_mmap_size;
 }
 
 /**

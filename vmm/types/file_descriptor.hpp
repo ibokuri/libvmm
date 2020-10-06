@@ -15,7 +15,7 @@ namespace vmm::types {
 class FileDescriptor {
     public:
         explicit FileDescriptor(int fd) noexcept
-            : fd_{fd} {};
+            : m_fd{fd} {};
 
         ~FileDescriptor() noexcept;
 
@@ -65,7 +65,7 @@ class FileDescriptor {
          */
         template<typename T=int>
         auto ioctl(int req, T arg=T{}) const -> int {
-            const auto ret = ::ioctl(fd_, req, arg);
+            const auto ret = ::ioctl(m_fd, req, arg);
 
             if (ret < 0)
                 VMM_THROW(std::system_error(errno, std::system_category()));
@@ -74,11 +74,11 @@ class FileDescriptor {
         }
 
         auto fd() const noexcept -> int {
-            return fd_;
+            return m_fd;
         }
     protected:
-        int fd_;
-        bool closed_ = false;
+        int m_fd;
+        bool m_closed = false;
 
         FileDescriptor() noexcept {};
 };

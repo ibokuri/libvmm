@@ -7,11 +7,11 @@
 namespace vmm::kvm::detail {
 
 auto device::get_attr(kvm_device_attr &attr) -> void {
-    fd_.ioctl(KVM_GET_DEVICE_ATTR, &attr);
+    m_fd.ioctl(KVM_GET_DEVICE_ATTR, &attr);
 }
 
 auto device::set_attr(kvm_device_attr &attr) -> void {
-    fd_.ioctl(KVM_SET_DEVICE_ATTR, &attr);
+    m_fd.ioctl(KVM_SET_DEVICE_ATTR, &attr);
 }
 
 /*
@@ -41,7 +41,7 @@ auto device::set_attr(kvm_device_attr &attr) -> void {
  * ```
  */
 auto device::has_attr(kvm_device_attr &attr) -> bool {
-    return fd_.ioctl(KVM_HAS_DEVICE_ATTR, &attr) == 0;
+    return m_fd.ioctl(KVM_HAS_DEVICE_ATTR, &attr) == 0;
 }
 
 }  // namespace vmm::kvm::detail

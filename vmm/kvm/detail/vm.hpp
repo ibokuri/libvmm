@@ -49,7 +49,7 @@ class vm {
                  typename = std::enable_if_t<std::is_same_v<typename T::value_type,
                                                             kvm_irq_routing_entry>>>
         auto gsi_routing(T &table) const -> void {
-            fd_.ioctl(KVM_SET_GSI_ROUTING, table.data());
+            m_fd.ioctl(KVM_SET_GSI_ROUTING, table.data());
         }
 
         /**
@@ -70,7 +70,7 @@ class vm {
          *
          * auto kvm = vmm::kvm::system{};
          * auto vm = kvm.vm();
-         * auto eventfd = EventFd{EFD_NONBLOCK};
+         * auto eventfd = EventFd{Em_fdNONBLOCK};
          *
          * vm.attach_ioevent<Pio>(eventfd, 0xf4);
          * vm.attach_ioevent<Mmio>(eventfd, 0x1000);
@@ -96,7 +96,7 @@ class vm {
                 .flags = flags
             };
 
-            fd_.ioctl(KVM_IOEVENTFD, &ioeventfd);
+            m_fd.ioctl(KVM_IOEVENTFD, &ioeventfd);
         }
 
         /**
@@ -114,7 +114,7 @@ class vm {
          *
          * auto kvm = vmm::kvm::system{};
          * auto vm = kvm.vm();
-         * auto eventfd = EventFd{EFD_NONBLOCK};
+         * auto eventfd = EventFd{Em_fdNONBLOCK};
          *
          * vm.attach_ioevent<Pio>(eventfd, 0xf4);
          * vm.attach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
@@ -143,7 +143,7 @@ class vm {
                 .flags = flags
             };
 
-            fd_.ioctl(KVM_IOEVENTFD, &ioeventfd);
+            m_fd.ioctl(KVM_IOEVENTFD, &ioeventfd);
         }
 
         // Convenient routines
@@ -152,11 +152,11 @@ class vm {
         [[nodiscard]] auto max_vcpus() const -> unsigned int;
         [[nodiscard]] auto num_memslots() const -> unsigned int;
     private:
-        KvmFd fd_;
-        size_t mmap_size_;
+        KvmFd m_fd;
+        size_t m_mmap_size;
 
         vm(int fd, std::size_t mmap_size) noexcept
-            : fd_{fd}, mmap_size_{mmap_size} {}
+            : m_fd{fd}, m_mmap_size{mmap_size} {}
 };
 
 }  // namespace vmm::kvm::detail

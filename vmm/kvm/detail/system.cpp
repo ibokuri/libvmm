@@ -23,7 +23,7 @@ namespace vmm::kvm::detail {
  * ```
  */
 auto system::api_version() const -> unsigned int {
-    return fd_.ioctl(KVM_GET_API_VERSION);
+    return m_fd.ioctl(KVM_GET_API_VERSION);
 }
 
 /**
@@ -32,7 +32,7 @@ auto system::api_version() const -> unsigned int {
  * This method should only be used by `system::vm()`.
  */
 auto system::create_vm(unsigned int machine_type) const -> int {
-     return fd_.ioctl(KVM_CREATE_VM, machine_type);
+     return m_fd.ioctl(KVM_CREATE_VM, machine_type);
 }
 
 /**
@@ -79,7 +79,7 @@ auto system::vm(unsigned int machine_type) const -> vmm::kvm::detail::vm {
  * ```
  */
 auto system::check_extension(unsigned int cap) const -> unsigned int {
-    return fd_.ioctl(KVM_CHECK_EXTENSION, cap);
+    return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
 /**
@@ -107,7 +107,7 @@ auto system::check_extension(unsigned int cap) const -> unsigned int {
  * ```
  */
 auto system::vcpu_mmap_size() const -> std::size_t {
-    return fd_.ioctl(KVM_GET_VCPU_MMAP_SIZE);
+    return m_fd.ioctl(KVM_GET_VCPU_MMAP_SIZE);
 }
 
 /* Returns the IPA size for a VM; 0 if the capability isn't available.

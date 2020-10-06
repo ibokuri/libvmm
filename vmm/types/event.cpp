@@ -10,13 +10,13 @@ namespace vmm::types {
  * ```
  * #include <vmm/types/event.hpp>
  *
- * auto fd = vmm::types::EventFd{EFD_NONBLOCK};
+ * auto fd = vmm::types::EventFd{Em_fdNONBLOCK};
  * ```
  */
 EventFd::EventFd(int flags) {
-    fd_ = ::eventfd(0, flags);
+    m_fd = ::eventfd(0, flags);
 
-    if (fd_ < 0)
+    if (m_fd < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
 }
 
@@ -33,7 +33,7 @@ EventFd::EventFd(int flags) {
  * ```
  */
 auto EventFd::write(uint64_t value) const -> void {
-    auto ret = ::write(fd_, &value, sizeof(uint64_t));
+    auto ret = ::write(m_fd, &value, sizeof(uint64_t));
 
     if (ret < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
@@ -54,7 +54,7 @@ auto EventFd::write(uint64_t value) const -> void {
  */
 [[nodiscard]] auto EventFd::read() const -> uint64_t {
     auto buf = uint64_t{};
-    auto ret = ::read(fd_, &buf, sizeof(uint64_t));
+    auto ret = ::read(m_fd, &buf, sizeof(uint64_t));
 
     if (ret < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));

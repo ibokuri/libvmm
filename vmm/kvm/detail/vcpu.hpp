@@ -13,9 +13,9 @@ class vcpu {
     friend vcpu vm::vcpu(unsigned int vcpu_id) const;
 
     private:
-        KvmFd fd_;
+        KvmFd m_fd;
 
-        explicit vcpu(int fd) noexcept : fd_{fd} {}
+        explicit vcpu(int fd) noexcept : m_fd{fd} {}
 };
 
 }  // namespace vmm::kvm::detail

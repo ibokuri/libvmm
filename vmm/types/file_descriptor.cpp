@@ -5,14 +5,14 @@
 namespace vmm::types {
 
 FileDescriptor::~FileDescriptor() noexcept {
-    if (!closed_)
-        closed_ = ::close(fd_) == 0;
+    if (!m_closed)
+        m_closed = ::close(m_fd) == 0;
 };
 
 FileDescriptor::FileDescriptor(const FileDescriptor& other) {
-    fd_ = ::dup(other.fd_);
+    m_fd = ::dup(other.m_fd);
 
-    if (fd_ < 0)
+    if (m_fd < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
 }
 
@@ -20,9 +20,9 @@ auto FileDescriptor::operator=(const FileDescriptor& other) -> FileDescriptor& {
     if (&other == this)
         return *this;
 
-    fd_ = ::dup(other.fd_);
+    m_fd = ::dup(other.m_fd);
 
-    if (fd_ < 0)
+    if (m_fd < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
 
     return *this;
@@ -30,10 +30,10 @@ auto FileDescriptor::operator=(const FileDescriptor& other) -> FileDescriptor& {
 
 
 auto FileDescriptor::close() -> void {
-    if (::close(fd_) < 0)
+    if (::close(m_fd) < 0)
         VMM_THROW(std::system_error(errno, std::system_category()));
 
-    closed_ = true;
+    m_closed = true;
 }
 
 }  // namespace vmm::types
