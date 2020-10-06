@@ -4,9 +4,40 @@
 
 ## General
 
-### Limit lines to 80 characters
+Lines should not be longer than 80 characters. If you have a line that simply
+can't be broken into multiple lines cleanly (e.g., function name with one or
+zero parameters), then it's alright if you go over by 1 or 3 characters. But
+do try to stay within the limit.
 
-### Use trailing return types for functions
+
+
+## Naming Conventions
+
+Generally, `snake_case` is used for variable, function, and file names,
+`CAPS_SNAKE_CASE` for macros, and `CamelCase` is used for everything else.
+There are some exceptions though. In particular, if a type can be described by
+a single word, is publicly available to users, and is something that can be
+reasonably considered as a primitive in the context of the module that it is
+in, then I like to use all lowercase letters. For example, the KVM API wrapper
+has classes `vmm::kvm::vm` and `vmm::kvm::vcpu`, both of which are absolutely
+fundamental to how the API functions and therefore may be considered KVM
+"primitives".
+
+For classes, there are a few rules to follow as well. To start, all non-static
+data members should be prefixed with `m_`. As for methods, all setter methods
+should be prefixed with `set_`, while getter methods should use bare names.
+The name of a setter/getter method should match (ignoring any prefixes) the
+variable that they are setting/getting. Now, there are cases where a `get_`
+prefix may be used for getter methods. Specifically, the prefix may be used
+when a getter method's bare name conflicts with a keyword or well-known name
+(e.g., `allocator`), if what the method does isn't obvious/accurate from the
+bare name, or if the method returns values through out parameters. In addition,
+if the word "get" does not accurately describe a getter method's functionality,
+another prefix may be used (e.g., `read_`).
+
+
+
+## Types
 
 ### Use `auto` for variable types
 
@@ -14,30 +45,7 @@ Specify variable types as `auto` wherever possible. When type ambiguity is not
 permitted, explicitly construct the type on the right-hand side to make the
 variable's type clear.
 
-
-
-## Naming Convention
-
-### Use `snake_case` for variable and function names, `CamelCase` for everything else
-
-Note that there are exceptions, like the ioctl classes in the KVM API wrapper.
-Generally if a type is something I consider to be a primitive in the context
-of the module that it is in, then I like to use `snake_case`, though I'll limit
-myself to a single word in such cases.
-
-### Prefix Class Members with `m_`
-
-### Prefix setter methods with `set_`. Use bare names for getter methods
-
-The name of setter/getter methods should match (ignoring any prefixes) the
-variable that they are setting/getting.
-
-There are cases where a `get_` prefix may be used for getter methods.
-Specifically, the prefix may be used when a getter method's bare name
-conflicts with a keyword/well-known name (e.g., `allocator`), if what the
-method does isn't obvious/accurate from the bare name, or if the method
-returns values through out parameters. If `get` does not accurately describe a
-getter method's functionality, another prefix may be used (e.g., `read_`).
+### Use trailing return types for functions
 
 ### Omit redundant variable names from function declarations
 
