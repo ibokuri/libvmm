@@ -5,7 +5,7 @@
 ## General
 
 Lines should not be longer than 80 characters. If you have a line that simply
-can't be broken into multiple lines cleanly (e.g., function name with one or
+can't be broken into multiple lines cleanly (e.g., a function name with one or
 zero parameters), then it's alright if you go over by 1 or 3 characters. But
 do try to stay within the limit.
 
@@ -35,29 +35,21 @@ bare name, or if the method returns values through out parameters. In addition,
 if the word "get" does not accurately describe a getter method's functionality,
 another prefix may be used (e.g., `read_`).
 
+For function declarations, omit any redundant parameter names. That is, if what
+a parameter is is clear from its type, then it does not need a name. Generally,
+this leaves names for just bools, strings, and numerical parameters.
+
 
 
 ## Types
 
-### Use `auto` for variable types
+Variable types should be specified as `auto` wherever possible. When type
+ambiguity is not permitted, explicitly construct the type on the right-hand
+side to ensure that the variable's type is clear to readers. Similarly,
+trailing return types should be used for functions.
 
-Specify variable types as `auto` wherever possible. When type ambiguity is not
-permitted, explicitly construct the type on the right-hand side to make the
-variable's type clear.
-
-### Use trailing return types for functions
-
-### Omit redundant variable names from function declarations
-
-Generally, this means only bools, strings, and numerical parameters should
-have names in function declarations.
-
-### Prefer enums over bools for function parameters
-
-For setter methods, a `bool` parameter is fine since the name of the method
-makes clear what the parameter is.
-
-### Use `#pragma once` instead of include guards for header files
+Prefer enums over bools for function parameters. For setter methods, bools are
+fine since the name of the method makes clear what the parameter is.
 
 
 
