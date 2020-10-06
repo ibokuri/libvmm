@@ -138,7 +138,7 @@ auto set_widget(bool) -> void;
   makes clear what the parameter is.
 
 <!--[](#names-const-to-define) Prefer `const` to `#define`. Prefer inline-->
-<!--functions to macros.-->-->
+<!--functions to macros.-->
 
 <!--[](#names-define-constants) `#defined` constants should use all uppercase
 names with words separated by underscores.-->
