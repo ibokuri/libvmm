@@ -1,44 +1,107 @@
-# Libvmm Coding Style Guide
+# Libvmm Style Guide
 
 <!--For low-level styling (spaces, parentheses, brace placement, etc), all code should follow the format specified in `.clang-format` in the project root.-->
 
 <!--**Important: Make sure you use `clang-format` version 10 or later!**-->
 
-This document describes the coding style used for C++ code in the Libvmm project. All new code should conform to this style.
-
-<!--We'll definitely be tweaking and amending this over time, so let's consider it a living document. :)-->
+This document describes the coding style used for C++ code in the Libvmm project.
 
 [](#general)
-## General
+## 🎟 General
 
 [](#general-line-length)
-### Line Length
+### 💥 Limit lines to 80 characters
 
-Libvmm uses an 80-character line limit. The only exceptions are function names
-with either one or no parameters as they can't be broken across lines in a
-readable fashion.
+##### Exceptions
+
+* Function names with one or zero parameters may exceed this limit.
+
+[](#general-return-type)
+### 💥 Use trailing return types for functions
+
+```cpp
+auto a() -> int;
+auto b() -> void;
+```
+
+[](#general-variable-types)
+### 💥 Use `auto` for variable types
+
+Specify variable types as `auto` wherever possible. When type ambiguity is not
+permitted, explicitly construct the type on the right-hand side to make the
+variable's type clear.
+
+```cpp
+auto a = false;
+auto b = uint64_t{1};
+auto c = Widget{};
+
+class Widget {
+    private:
+        auto m_foo = false;
+        char m_bar;  // OK: we can't use auto since we don't initialize m_foo here
+}
+```
 
 [](#names)
-## Names
+## 🎟 Names
 
 [](#names-basic)
-### Basic
+### 💥 `snake_case` for variable and function names, `CamelCase` for everything else
 
-Use `CamelCase` for classes, structs, enumeration members, and template
-parameters. Use `snake_case` for variable and function names.
+```cpp
+// snake_case
+auto my_var = 0;
+auto my_func() -> void;
+
+// CamelCase
+class MyWidget;
+struct MyGadget;
+enum class MyEnum { MyMember };
+template<typename T, auto MyNonType> class Widget;
+```
+
+##### Exceptions
+
+* TODO: The KVM ioctl classes are an exception.
 
 [](#names-data-members)
-### Data Members
+### 💥 Prefix Class Members with `m_`
 
-Data members in C++ classes should be prefixed by `m_`.
+```cpp
+class Widget {
+    int *m_foo;
+    char m_bar;
+}
+```
 
 [](#names-setter-getter)
-### Setters/Getters
+### 💥 Prefix setter methods with `set_`. Use bare names for getter methods
 
-Setter and getter names should match the variables being set/gotten.
+```cpp
+class Register { ... }
 
-Setters should be prefixed with `set_`. Getters should only be preceded with
-`get_` if they return values through out parameters.
+class Widget {
+    private:
+        auto m_value = int{0};
+        auto m_status = false;
+    public:
+        auto status() -> bool;
+
+        auto get_value(int& value) -> void;
+        auto set_value(int value) -> void;
+
+        auto read_register(Register&) -> void;
+}
+```
+
+##### Exceptions
+
+* If a getter method returns values through out parameters, then it should be
+  prefixed with `get_`.
+
+* If a getter method's function is ambiguous even with the `get_` prefix,
+  another prefix may be used such as `read_`.
 
 <!--[](#names-if-exists) When there are two getters for a variable, and one of
 them automatically makes sure the requested object is instantiated, prefix that
@@ -46,7 +109,7 @@ getter function which with `ensure_`. As it ensures that an object is created,
 it should consequently also return a reference, not a pointer.-->
 
 [](#names-variable-name-in-function-decl)
-### Parameter Names
+### 💥 Parameter Names
 Omit redundant variable names from function declarations. Usually, there should
 be a parameter name for bools, strings, and numerical types.
 
@@ -65,129 +128,113 @@ names with words separated by underscores.-->
 header guards.-->
 
 [](#classes)
-## Classes
+## 🎟 Classes
 
 [](#classes-braces)
-### Braces
+### 💥 Braces
 
 If a constructor's body is empty, body braces should appear on the same line as
 the function name or member initializer list. If the body is not empty, the
 braces should appear on a line after the function name or member initializer
 list.
 
-###### Right:
-
 ```cpp
 class Foo {
-    int m_foo = 0;
-    bool m_bar = false;
+    private:
+        int m_foo = 0;
+        bool m_bar = false;
+    public:
+        MyClass() {}
 
-    MyClass() {}
+        MyClass(int foo)
+            : m_foo(foo) {}
 
-    MyClass(int foo)
-        : m_foo(foo) {}
-
-    MyClass(bool bar)
-        : m_bar(bar)
-    {
-        std::cout << "I'm on a new line!" << std::endl;
-    }
+        MyClass(bool bar)
+            : m_bar(bar)
+        {
+            std::cout << "I'm on a new line!" << std::endl;
+        }
 };
 ```
 
 [](#classes-member-init)
-### Member Initialization
+### 💥 Member Initialization
 
 Where possible, initialize class members at member definition. Otherwise,
 initialize members with initializer lists. Each member (or superclass) in an
 initializer list should be indented on a separate line, with commas at the end
 of each non-last line.
 
-###### Right:
-
 ```cpp
 class Foo {
-    int m_foo = 0;
-    bool m_bar = false;
+    private:
+        int m_foo = 0;
+        bool m_bar = false;
+    public:
+        MyClass(int foo)
+            : BaseClass(),
+              m_foo{foo} {}
 
-    MyClass(int foo)
-        : BaseClass(),
-          m_foo(foo) {}
-
-    MyClass() : BaseClass() {}
+        MyClass() : BaseClass() {}
 };
 ```
 
 [](#pointers)
-## Pointers and References
+## 🎟 Pointers and References
 
 [](#pointers-name)
-### Naming
+### 💥 Naming
 
 Pointer and reference types should be written with no space between the
 variable name and the `*` or `&`.
 
 [](#pointers-out-argument)
-### Out Arguments
+### 💥 Out Arguments
 
 An out argument of a function should be passed by reference except rare cases
 where it is optional in which case it should be passed by pointer.
 
 [](#using)
-## `using` Statements
+## 🎟 `using` Statements
 
 [](#using-imports)
-### Imports
+### 💥 Imports
 
 Do not use `using` statements to import names. Directly qualify the names at the point they're used instead.
-
-###### Right:
 
 ```cpp
 std::swap(a, b);
 ```
 
-###### Wrong:
-
-```cpp
-using std::swap;
-swap(a, b);
-
-// OR
-
-using namespace std;
-swap(a, b);
-```
-
 [](#types)
-## Types
+## 🎟 Types
 
 [](#types-unsigned)
-### Unsigned
+### 💥 Unsigned
 
-Omit "int" when using "unsigned" modifier. Do not use "signed" modifier. Use
-"int" by itself instead.
+Omit `int` when using `unsigned` modifier. Do not use `signed` modifier. Use
+`int` by itself instead.
 
 [](#classes)
-## Classes
+## 🎟 Classes
 
 [](#classes-explicit)
-### `explicit` Keyword
+### 💥 `explicit` Keyword
 
 Mark constructors with single parameters as `explicit` unless implicit
 conversion is desired and the type conversion is intuitive and fast.
 
 [](#comments)
-## Comments
+## 🎟 Comments
 
 Comments should be written as proper sentences. One exception is end-of-line
 comments like this: `if (x == y) // false for NaN`.
 
 [](#virtual)
-## Virtual Methods
+## 🎟 Virtual Methods
 
 [](#virtual-override)
-### Overriding
+### 💥 Overriding
 
 The declaration of a virtual method inside a class must be declared with the
 `virtual` keyword. All subclasses of that class must either specify the

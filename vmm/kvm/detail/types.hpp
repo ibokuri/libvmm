@@ -182,7 +182,8 @@ class MsrList : public FamStruct<kvm_msr_list,
         friend system;
 
         MsrList() : Base::FamStruct() {}
-        explicit MsrList(const allocator_type& alloc) : Base::FamStruct(alloc) {}
+        explicit MsrList(const allocator_type& alloc)
+            : Base::FamStruct(alloc) {}
 };
 
 template<std::size_t N>
