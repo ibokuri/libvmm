@@ -4,10 +4,58 @@
 
 ## General
 
-Lines should not be longer than 80 characters. If you have a line that simply
-can't be broken into multiple lines cleanly (e.g., a function name with one or
-zero parameters), then it's alright if you go over by 1 or 3 characters. But
-do try to stay within the limit.
+### Line Length
+
+Try to keep lines under 80 columns. If a line can't be broken across multiple
+lines in a readable manner, you may go up to 100 characters.
+
+### Indentation
+
+Use 4-space tabs for indentation. Tabs should be converted to spaces.
+
+If a function is being broken up across multiple lines at its parameters,
+prefer indenting all non-first parameters to align with the first one.
+
+If an if/else/while condition, class inheritance line, or constructor member
+initializer list is broken across multiple lines, then indent the broken off
+lines by two tabs to avoid confusion about what is what.
+
+```cpp
+auto long_function_name1(arg1, arg2, arg3,
+                         arg4, arg5);
+
+auto long_function_name2(really_long_parameter1,
+                         really_long_parameter2,
+                         really_long_parameter3);
+
+if (cond1 && cond2 &&
+        cond3) {
+    ...
+}
+```
+
+### Braces
+
+Opening braces should always be on the same line as whatever came before it
+(e.g., if/else, function name, class/struct name, etc.).
+
+```cpp
+auto foo() {
+    if (condition) {
+        ...
+    }
+    else {
+        ...
+    }
+}
+
+class Widget {
+    private:
+        bool m_foo;
+    public:
+        Widget() : m_foo{false} {}
+}
+```
 
 
 
