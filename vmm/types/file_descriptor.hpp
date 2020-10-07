@@ -14,8 +14,7 @@ namespace vmm::types {
 
 class FileDescriptor {
     public:
-        explicit FileDescriptor(int fd) noexcept
-            : m_fd{fd} {};
+        explicit FileDescriptor(int fd) noexcept : m_fd{fd} {};
 
         ~FileDescriptor() noexcept;
 

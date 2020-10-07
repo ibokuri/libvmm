@@ -22,7 +22,7 @@ namespace vmm::kvm::detail {
  * assert(kvm.api_version() == KVM_API_VERSION))
  * ```
  */
-auto system::api_version() const -> unsigned int {
+auto system::api_version() const -> unsigned {
     return m_fd.ioctl(KVM_GET_API_VERSION);
 }
 
@@ -31,7 +31,7 @@ auto system::api_version() const -> unsigned int {
  *
  * This method should only be used by `system::vm()`.
  */
-auto system::create_vm(unsigned int machine_type) const -> int {
+auto system::create_vm(unsigned machine_type) const -> int {
      return m_fd.ioctl(KVM_CREATE_VM, machine_type);
 }
 
@@ -57,7 +57,7 @@ auto system::create_vm(unsigned int machine_type) const -> int {
  * auto vm = kvm.vm(KVM_VM_TYPE_ARM_IPA_SIZE(48);
  * ```
  */
-auto system::vm(unsigned int machine_type) const -> vmm::kvm::detail::vm {
+auto system::vm(unsigned machine_type) const -> vmm::kvm::detail::vm {
     return vmm::kvm::detail::vm{create_vm(machine_type), vcpu_mmap_size()};
 }
 
@@ -78,7 +78,7 @@ auto system::vm(unsigned int machine_type) const -> vmm::kvm::detail::vm {
  * assert(kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
-auto system::check_extension(unsigned int cap) const -> unsigned int {
+auto system::check_extension(unsigned cap) const -> unsigned {
     return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
@@ -127,7 +127,7 @@ auto system::vcpu_mmap_size() const -> std::size_t {
  * auto ipa_size = kvm.host_ipa_limit();
  * ```
  */
-auto system::host_ipa_limit() const -> unsigned int {
+auto system::host_ipa_limit() const -> unsigned {
     return check_extension(KVM_CAP_ARM_VM_IPA_SIZE);
 }
 

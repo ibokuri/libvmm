@@ -23,8 +23,7 @@ class vm;
 
 class system {
     public:
-        system()
-            : m_fd{open()} {}
+        system() : m_fd{open()} {}
 
         /**
          * Constructs a kvm object from a file descriptor.
@@ -37,8 +36,7 @@ class system {
          * ========
          * See kvm::system::open().
          */
-        explicit system(int fd)
-            : m_fd{fd} {}
+        explicit system(int fd) : m_fd{fd} {}
 
         system(const system& other) = delete;
         system(system&& other) = default;
@@ -73,15 +71,15 @@ class system {
         }
 
         // General routines
-        [[nodiscard]] auto api_version() const -> unsigned int;
+        [[nodiscard]] auto api_version() const -> unsigned;
 
         // Creation routines
-        [[nodiscard]] auto vm(unsigned int machine_type=0) const -> vmm::kvm::detail::vm;
+        [[nodiscard]] auto vm(unsigned machine_type=0) const -> vmm::kvm::detail::vm;
 
         // Control routines
-        [[nodiscard]] auto check_extension(unsigned int cap) const -> unsigned int;
+        [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
         [[nodiscard]] auto vcpu_mmap_size() const -> std::size_t;
-        [[nodiscard]] auto host_ipa_limit() const -> unsigned int;
+        [[nodiscard]] auto host_ipa_limit() const -> unsigned;
 
         // TODO: Allocator variants for FAM struct methods
 
@@ -163,9 +161,9 @@ class system {
          * ```
          */
         template<typename T,
-                 typename = std::enable_if_t<std::is_same_v<typename T::value_type,
-                                                            kvm_msr_entry>>>
-        auto read_msrs(T &msrs) const -> unsigned int {
+                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                          kvm_msr_entry>>>
+        auto read_msrs(T &msrs) const -> unsigned {
             return m_fd.ioctl(KVM_GET_MSRS, msrs.data());
         }
 
@@ -217,7 +215,7 @@ class system {
     private:
         KvmFd m_fd;
 
-        [[nodiscard]] auto create_vm(unsigned int machine_type) const -> int;
+        [[nodiscard]] auto create_vm(unsigned machine_type) const -> int;
 };
 
 }  // namespace vmm::kvm::detail

@@ -14,11 +14,10 @@ lines in a readable manner, you may go up to 100 characters.
 Use 4-space tabs for indentation. Tabs should be converted to spaces.
 
 If a function is being broken up across multiple lines at its parameters,
-prefer indenting all non-first parameters to align with the first one.
-
-If an if/else/while condition, class inheritance line, or constructor member
-initializer list is broken across multiple lines, then indent the broken off
-lines by two tabs to avoid confusion about what is what.
+prefer indenting all non-first parameters to align with the first one. If an
+if/else/for/while condition, class inheritance line, or constructor member
+initializer list is broken across multiple lines, the broken off lines should
+be by two tabs.
 
 ```cpp
 auto long_function_name1(arg1, arg2, arg3,
@@ -37,7 +36,7 @@ if (cond1 && cond2 &&
 ### Braces
 
 Opening braces should always be on the same line as whatever came before it
-(e.g., if/else, function name, class/struct name, etc.).
+(e.g., if/else/for/while, function name, class/struct name, etc.).
 
 ```cpp
 auto foo() {

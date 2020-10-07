@@ -23,7 +23,7 @@ namespace vmm::kvm::detail {
  * auto vcpu = vm.vcpu(0);
  * ```
  */
-auto vm::vcpu(unsigned int vcpu_id) const -> vmm::kvm::detail::vcpu {
+auto vm::vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu {
     return vmm::kvm::detail::vcpu{m_fd.ioctl(KVM_CREATE_VCPU, vcpu_id)};
 }
 
@@ -65,7 +65,7 @@ auto vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device
  * assert(vm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
-auto vm::check_extension(unsigned int cap) const -> unsigned int {
+auto vm::check_extension(unsigned cap) const -> unsigned {
     return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
@@ -91,7 +91,7 @@ auto vm::check_extension(unsigned int cap) const -> unsigned int {
  * vm.set_bsp(0);
  * ```
  */
-auto vm::set_bsp(unsigned int vcpu_id) const -> void {
+auto vm::set_bsp(unsigned vcpu_id) const -> void {
     m_fd.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
@@ -243,7 +243,7 @@ auto vm::mmap_size() const -> std::size_t {
 /**
  * Returns the recommended number for max_vcpus.
  */
-auto vm::num_vcpus() const -> unsigned int {
+auto vm::num_vcpus() const -> unsigned {
     auto ret = check_extension(KVM_CAP_NR_VCPUS);
     return ret > 0 ? ret : 4;
 }
@@ -251,7 +251,7 @@ auto vm::num_vcpus() const -> unsigned int {
 /**
  * Returns the maximum possible value for max_vcpus.
  */
-auto vm::max_vcpus() const -> unsigned int {
+auto vm::max_vcpus() const -> unsigned {
     auto ret = check_extension(KVM_CAP_MAX_VCPUS);
     return ret > 0 ? ret : num_vcpus();
 }
@@ -259,7 +259,7 @@ auto vm::max_vcpus() const -> unsigned int {
 /**
  * Returns the maximum number of allowed memory slots for a VM.
  */
-auto vm::num_memslots() const -> unsigned int {
+auto vm::num_memslots() const -> unsigned {
     auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
     return ret > 0 ? ret : 32;
 }

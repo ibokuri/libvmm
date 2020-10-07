@@ -58,31 +58,24 @@ class FamStruct {
         static const auto storage_size = sizeof(Struct) + N * sizeof(Entry);
 
         explicit FamStruct(const allocator_type& alloc)
-            : m_alloc{alloc},
-              m_ptr{static_cast<Struct*>(alloc.resource()->allocate(storage_size,
-                                                                    alignment))}
-        {
+                : m_alloc{alloc},
+                  m_ptr{static_cast<Struct*>(alloc.resource()->allocate(storage_size, alignment))} {
             static_assert(N <= std::numeric_limits<size_type>::max());
             std::memset(m_ptr, 0, storage_size);
             m_ptr->*SizeMember = N;
         }
 
-        FamStruct()
-            : FamStruct(std::pmr::new_delete_resource()) {}
+        FamStruct() : FamStruct(std::pmr::new_delete_resource()) {}
 
         // TODO: SFINAE
         template <typename InputIt>
         FamStruct(InputIt first, InputIt last, const allocator_type& alloc)
-            : FamStruct(alloc)
-        {
+                : FamStruct(alloc) {
             if (auto n = std::distance(first, last); n != 0) {
                 auto abs = std::abs(n);
-
-                if (abs > std::numeric_limits<size_type>::max())
+                if (abs > std::numeric_limits<size_type>::max() ||
+                        static_cast<size_type>(abs) > N)
                     VMM_THROW(std::overflow_error("Range too large"));
-
-                if (N < static_cast<size_type>(abs))
-                    VMM_THROW(std::length_error("Range exceeds storage"));
 
                 m_ptr->*SizeMember = static_cast<size_type>(abs);
                 std::copy(first, last, begin());
@@ -91,26 +84,26 @@ class FamStruct {
 
         template <typename InputIt>
         FamStruct(InputIt first, InputIt last)
-            : FamStruct(first, last, std::pmr::new_delete_resource()) {}
+                : FamStruct(first, last, std::pmr::new_delete_resource()) {}
 
         explicit FamStruct(std::initializer_list<value_type> ilist)
-            : FamStruct(ilist.begin(), ilist.end()) {}
+                : FamStruct(ilist.begin(), ilist.end()) {}
 
         FamStruct(std::initializer_list<value_type> ilist,
                   const allocator_type& alloc)
-            : FamStruct(ilist.begin(), ilist.end(), alloc) {}
+                : FamStruct(ilist.begin(), ilist.end(), alloc) {}
 
         FamStruct(const FamStruct& other)
-            : FamStruct(other.begin(), other.end(), other.get_allocator()) {}
+                : FamStruct(other.begin(), other.end(),
+                            other.get_allocator()) {}
 
         FamStruct(const FamStruct& other, const allocator_type& alloc)
-            : FamStruct(other.begin(), other.end(), alloc) {}
+                : FamStruct(other.begin(), other.end(), alloc) {}
 
-        //FamStruct(FamStruct&& other)
-            //: m_entries{std::move(other.m_entries)} {}
+        //FamStruct(FamStruct&& other) : m_entries{std::move(other.m_entries)} {}
 
         //FamStruct(FamStruct&& other, const allocator_type& alloc)
-            //: m_entries{std::move(other.m_entries), alloc} {}
+                //: m_entries{std::move(other.m_entries), alloc} {}
 
         ~FamStruct() {
             m_alloc.resource()->deallocate(m_ptr, storage_size, alignment);
@@ -129,27 +122,67 @@ class FamStruct {
             return (m_ptr->*EntriesMember)[pos];
         }
 
-        [[nodiscard]] auto front() noexcept -> reference { return *begin(); }
-        [[nodiscard]] auto front() const noexcept -> const_reference { return *begin(); }
+        [[nodiscard]] auto front() noexcept -> reference {
+            return *begin();
+        }
 
-        [[nodiscard]] auto back() noexcept -> reference { return *end(); }
-        [[nodiscard]] auto back() const noexcept -> const_reference { return *end(); }
+        [[nodiscard]] auto front() const noexcept -> const_reference {
+            return *begin();
+        }
 
-        [[nodiscard]] constexpr auto data() noexcept -> Struct* { return m_ptr; }
-        [[nodiscard]] constexpr auto data() const noexcept -> const Struct* { return m_ptr; }
+        [[nodiscard]] auto back() noexcept -> reference {
+            return *end();
+        }
+
+        [[nodiscard]] auto back() const noexcept -> const_reference {
+            return *end();
+        }
+
+        [[nodiscard]] constexpr auto data() noexcept -> Struct* {
+            return m_ptr;
+        }
+
+        [[nodiscard]] constexpr auto data() const noexcept -> const Struct* {
+            return m_ptr;
+        }
 
         /* Iterators */
-        auto begin() noexcept -> iterator { return m_ptr->*EntriesMember; }
-        auto begin() const noexcept -> const_iterator { return m_ptr->*EntriesMember; }
-        auto end() noexcept -> iterator { return begin() + size(); }
-        auto end() const noexcept -> const_iterator { return begin() + size(); }
-        auto cbegin() const noexcept -> const_iterator { return begin(); }
-        auto cend() const noexcept -> const_iterator { return end(); }
+        auto begin() noexcept -> iterator {
+            return m_ptr->*EntriesMember;
+        }
+
+        auto begin() const noexcept -> const_iterator {
+			return m_ptr->*EntriesMember;
+        }
+
+        auto end() noexcept -> iterator {
+			return begin() + size();
+        }
+
+        auto end() const noexcept -> const_iterator {
+			return begin() + size();
+        }
+
+        auto cbegin() const noexcept -> const_iterator {
+			return begin();
+        }
+
+        auto cend() const noexcept -> const_iterator {
+			return end();
+        }
 
         /* Capacity */
-        [[nodiscard]] auto size() const noexcept -> size_type { return m_ptr->*SizeMember; }
-        [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0; }
-        [[nodiscard]] constexpr auto capacity() const noexcept -> size_type { return N; }
+        [[nodiscard]] auto size() const noexcept -> size_type {
+            return m_ptr->*SizeMember;
+        }
+
+        [[nodiscard]] auto empty() const noexcept -> bool {
+            return size() == 0;
+        }
+
+        [[nodiscard]] constexpr auto capacity() const noexcept -> size_type {
+            return N;
+        }
     private:
         allocator_type m_alloc;
         Struct *m_ptr = nullptr;
@@ -168,8 +201,7 @@ class MsrList : public FamStruct<kvm_msr_list,
                                  uint32_t,
                                  &kvm_msr_list::nmsrs,
                                  &kvm_msr_list::indices,
-                                 N>
-{
+                                 N> {
     using Base = FamStruct<kvm_msr_list,
                            uint32_t,
                            &kvm_msr_list::nmsrs,
@@ -183,7 +215,7 @@ class MsrList : public FamStruct<kvm_msr_list,
 
         MsrList() : Base::FamStruct() {}
         explicit MsrList(const allocator_type& alloc)
-            : Base::FamStruct(alloc) {}
+                : Base::FamStruct(alloc) {}
 };
 
 template<std::size_t N>
@@ -191,8 +223,7 @@ class Msrs : public FamStruct<kvm_msrs,
                               kvm_msr_entry,
                               &kvm_msrs::nmsrs,
                               &kvm_msrs::entries,
-                              N>
-{
+                              N> {
     using Base = FamStruct<kvm_msrs,
                            kvm_msr_entry,
                            &kvm_msrs::nmsrs,
@@ -206,8 +237,7 @@ class Cpuids : public FamStruct<kvm_cpuid2,
                                 kvm_cpuid_entry2,
                                 &kvm_cpuid2::nent,
                                 &kvm_cpuid2::entries,
-                                N>
-{
+                                N> {
     using Base = FamStruct<kvm_cpuid2,
                            kvm_cpuid_entry2,
                            &kvm_cpuid2::nent,
@@ -221,8 +251,7 @@ class IrqRouting : public FamStruct<kvm_irq_routing,
                                     kvm_irq_routing_entry,
                                     &kvm_irq_routing::nr,
                                     &kvm_irq_routing::entries,
-                                    N>
-{
+                                    N> {
     using Base = FamStruct<kvm_irq_routing,
                            kvm_irq_routing_entry,
                            &kvm_irq_routing::nr,

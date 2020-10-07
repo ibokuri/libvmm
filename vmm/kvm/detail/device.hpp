@@ -25,9 +25,9 @@ class device {
         uint32_t m_flags;
 
         device(const kvm_create_device& dev) noexcept
-            : m_fd{static_cast<int>(dev.fd)},
-              m_type{dev.type},
-              m_flags{dev.flags} {}
+                : m_fd{static_cast<int>(dev.fd)},
+                  m_type{dev.type},
+                  m_flags{dev.flags} {}
 };
 
 }  // namespace vmm::kvm::detail

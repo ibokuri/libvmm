@@ -18,7 +18,7 @@ class vcpu;
 class device;
 
 class vm {
-    friend vm system::vm(unsigned int machine_type) const;
+    friend vm system::vm(unsigned machine_type) const;
 
     public:
         vm(const vm& other) = delete;
@@ -27,12 +27,12 @@ class vm {
         auto operator=(vm&& other) -> vm& = default;
 
         // Creation routines
-        [[nodiscard]] auto vcpu(unsigned int vcpu_id) const -> vmm::kvm::detail::vcpu;
+        [[nodiscard]] auto vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu;
         [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) const -> vmm::kvm::detail::device;
 
         // Control routines
-        [[nodiscard]] auto check_extension(unsigned int cap) const -> unsigned int;
-        auto set_bsp(unsigned int vcpu_id) const -> void;
+        [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
+        auto set_bsp(unsigned vcpu_id) const -> void;
         auto memslot(kvm_userspace_memory_region) const -> void;
         auto irqchip() const -> void;
         auto get_irqchip(kvm_irqchip&) const -> void;
@@ -46,8 +46,8 @@ class vm {
          * See the documentation for `KVM_SET_GSI_ROUTING`.
          */
         template<typename T,
-                 typename = std::enable_if_t<std::is_same_v<typename T::value_type,
-                                                            kvm_irq_routing_entry>>>
+                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                          kvm_irq_routing_entry>>>
         auto gsi_routing(T &table) const -> void {
             m_fd.ioctl(KVM_SET_GSI_ROUTING, table.data());
         }
@@ -77,7 +77,8 @@ class vm {
          * ```
          */
         template<vmm::types::IoEventAddress T>
-        auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) const -> void {
+        auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr,
+                            uint64_t datamatch=0) const -> void {
             auto flags = uint32_t{};
 
             if (datamatch > 0) {
@@ -124,7 +125,8 @@ class vm {
          * ```
          */
         template<vmm::types::IoEventAddress T>
-        auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr, uint64_t datamatch=0) const -> void {
+        auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr,
+                            uint64_t datamatch=0) const -> void {
             auto flags = uint32_t{KVM_IOEVENTFD_FLAG_DEASSIGN};
 
             if (datamatch > 0) {
@@ -148,15 +150,15 @@ class vm {
 
         // Convenient routines
         [[nodiscard]] auto mmap_size() const -> std::size_t;
-        [[nodiscard]] auto num_vcpus() const -> unsigned int;
-        [[nodiscard]] auto max_vcpus() const -> unsigned int;
-        [[nodiscard]] auto num_memslots() const -> unsigned int;
+        [[nodiscard]] auto num_vcpus() const -> unsigned;
+        [[nodiscard]] auto max_vcpus() const -> unsigned;
+        [[nodiscard]] auto num_memslots() const -> unsigned;
     private:
         KvmFd m_fd;
         size_t m_mmap_size;
 
         vm(int fd, std::size_t mmap_size) noexcept
-            : m_fd{fd}, m_mmap_size{mmap_size} {}
+                : m_fd{fd}, m_mmap_size{mmap_size} {}
 };
 
 }  // namespace vmm::kvm::detail
