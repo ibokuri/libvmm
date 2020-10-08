@@ -42,16 +42,76 @@ class MockWrapper : public FamStruct<N> {
 //      }
 //  }
 
-TEST_CASE("FAM struct creation", "[all]") {
-    SECTION("Entries (N)") {
-        auto fam = MockWrapper<5>{1, 2, 3, 4, 5};
+TEST_CASE("Create FAM struct", "[all]") {
+    SECTION("Entries: 0") {
+        auto fam = MockWrapper<0>{};
 
-        REQUIRE(fam.size() == 5);
+        REQUIRE(fam.size() == 0);
+        REQUIRE(fam.empty() == true);
+        REQUIRE(fam.size() == fam.capacity());
+    }
 
+    SECTION("Entries: N") {
+        auto fam = MockWrapper<2>{1, 2};
+
+        REQUIRE(fam.size() == 2);
+        REQUIRE(fam.empty() == false);
+        REQUIRE(fam.size() == fam.capacity());
         REQUIRE(fam[0] == 1);
         REQUIRE(fam[1] == 2);
-        REQUIRE(fam[2] == 3);
-        REQUIRE(fam[3] == 4);
-        REQUIRE(fam[4] == 5);
     }
+
+    SECTION("Entries: N (empty)") {
+        auto fam = MockWrapper<2>{};
+
+        REQUIRE(fam.size() == 2);
+        REQUIRE(fam.empty() == false);
+        REQUIRE(fam.size() == fam.capacity());
+        REQUIRE(fam[0] == 0);
+        REQUIRE(fam[1] == 0);
+    }
+}
+
+TEST_CASE("Copy/move FAM struct", "[all]") {
+    auto fam = MockWrapper<2>{1, 2};
+
+    SECTION("Copy constructor") {
+        auto copy{fam};
+
+        REQUIRE(copy.size() == fam.size());
+        REQUIRE(copy.empty() == fam.empty());
+        REQUIRE(copy.size() == fam.capacity());
+        REQUIRE(copy[0] == fam[0]);
+        REQUIRE(copy[1] == fam[1]);
+    }
+
+    SECTION("Copy assignment") {
+        auto copy = fam;
+
+        REQUIRE(copy.size() == fam.size());
+        REQUIRE(copy.empty() == fam.empty());
+        REQUIRE(copy.size() == fam.capacity());
+        REQUIRE(copy[0] == fam[0]);
+        REQUIRE(copy[1] == fam[1]);
+    }
+
+    //SECTION("Move constructor") {
+        //auto copy{std::move(fam)};
+
+        //REQUIRE(copy.size() == fam.size());
+        //REQUIRE(copy.empty() == fam.empty());
+        //REQUIRE(copy.size() == fam.capacity());
+        //REQUIRE(copy[0] == fam[0]);
+        //REQUIRE(copy[1] == fam[1]);
+    //}
+
+    //SECTION("Move assignment") {
+        //auto copy = std::move(fam);
+
+        //REQUIRE(copy.size() == fam.size());
+        //REQUIRE(copy.empty() == fam.empty());
+        //REQUIRE(copy.size() == fam.capacity());
+        //REQUIRE(copy[0] == fam[0]);
+        //REQUIRE(copy[1] == fam[1]);
+    //}
 }
