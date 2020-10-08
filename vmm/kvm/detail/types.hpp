@@ -108,10 +108,8 @@ class FamStruct {
          * Copy assignment operator
          */
         auto operator=(const FamStruct& other) -> FamStruct& {
-            if (this != &other) {
-                std::memset(m_ptr, 0, storage_size);
+            if (this != &other)
                 std::memcpy(m_ptr, other.m_ptr, storage_size);
-            }
 
             return *this;
         }
