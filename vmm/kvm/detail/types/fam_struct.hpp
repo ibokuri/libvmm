@@ -1,41 +1,28 @@
 /*
- * types.hpp - KVM types
+ * fam_struct.hpp - KVM FAM struct wrapper
  */
 
 #pragma once
 
 #include <algorithm> // copy
-#include <cstddef> // byte, size_t
 #include <cmath> // abs
+#include <cstddef> // byte, size_t
 #include <cstring> // memcpy, memset
-#include <iterator> // distance
 #include <initializer_list> // initializer_list
+#include <iterator> // distance
 #include <limits> // numeric_limits
 #include <linux/kvm.h> // kvm_*
 #include <memory_resource> // polymorphic_allocator
 #include <stdexcept> // overflow_error
-#include <iostream>
 
-#include "vmm/kvm/detail/macros.hpp"
-#include "vmm/types/file_descriptor.hpp"
+#include "vmm/types/detail/exceptions.hpp"
 
 namespace vmm::kvm::detail {
 
 class system;
 
-class KvmFd : public vmm::types::FileDescriptor {
-    public:
-        explicit KvmFd(int fd) noexcept
-            : vmm::types::FileDescriptor(fd) {}
-
-        KvmFd(const KvmFd& other) = delete;
-        KvmFd(KvmFd&& other) = default;
-        auto operator=(const KvmFd& other) -> KvmFd& = delete;
-        auto operator=(KvmFd&& other) -> KvmFd& = default;
-};
-
-template <class Struct, typename T>
-T DataMemberPtrType(T Struct::*v);
+template <typename T, typename Struct>
+T MemberPtrType(T Struct::*);
 
 template<typename Struct,
          typename Entry,
@@ -45,7 +32,7 @@ template<typename Struct,
 class FamStruct {
     public:
         using value_type = Entry;
-        using size_type = decltype(DataMemberPtrType(SizeMember));
+        using size_type = decltype(MemberPtrType(SizeMember));
         using allocator_type = std::pmr::polymorphic_allocator<std::byte>;
         using pointer = value_type*;
         using const_pointer = const value_type*;
@@ -104,9 +91,6 @@ class FamStruct {
             return *this;
         }
 
-        /**
-         * Copy assignment operator
-         */
         auto operator=(const FamStruct& other) -> FamStruct& {
             if (this != &other)
                 std::memcpy(m_ptr, other.m_ptr, storage_size);
@@ -114,9 +98,6 @@ class FamStruct {
             return *this;
         }
 
-        /**
-         * Move assignment operator
-         */
         auto operator=(FamStruct&& other) -> FamStruct& {
             if (m_alloc == other.m_alloc)
                 std::swap(m_ptr, other.m_ptr);
@@ -126,17 +107,11 @@ class FamStruct {
             return *this;
         }
 
-        /**
-         * Copy constructor
-         */
         FamStruct(const FamStruct& other, const allocator_type& alloc={})
                 : FamStruct(alloc) {
             operator=(other);
         }
 
-        /**
-         * Move constructors
-         */
         FamStruct(FamStruct&& other) : m_alloc{other.get_allocator()} {
             operator=(std::move(other));
         }
@@ -146,9 +121,6 @@ class FamStruct {
             operator=(std::move(other));
         }
 
-        /**
-         * Destructor
-         */
         ~FamStruct() {
             deallocate_fam();
         }

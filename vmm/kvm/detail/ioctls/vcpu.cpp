@@ -2,7 +2,7 @@
  * vcpu.cpp - vCPU ioctls
  */
 
-#include "vmm/kvm/detail/vcpu.hpp"
+#include "vmm/kvm/detail/ioctls/vcpu.hpp"
 
 namespace vmm::kvm::detail {
 

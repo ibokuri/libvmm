@@ -2,11 +2,11 @@
 
 #include <cstddef> // size_t
 
-#include "vmm/kvm/detail/system.hpp"
-#include "vmm/kvm/detail/vm.hpp"
-#include "vmm/kvm/detail/vcpu.hpp"
-#include "vmm/kvm/detail/device.hpp"
-#include "vmm/kvm/detail/types.hpp"
+#include "vmm/kvm/detail/ioctls/system.hpp"
+#include "vmm/kvm/detail/ioctls/vm.hpp"
+#include "vmm/kvm/detail/ioctls/vcpu.hpp"
+#include "vmm/kvm/detail/ioctls/device.hpp"
+#include "vmm/kvm/detail/types/fam_struct.hpp"
 
 namespace vmm::kvm {
 

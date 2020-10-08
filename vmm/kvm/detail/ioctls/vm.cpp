@@ -2,9 +2,9 @@
  * vm.cpp - VM ioctls
  */
 
-#include "vmm/kvm/detail/vm.hpp"
-#include "vmm/kvm/detail/vcpu.hpp"
-#include "vmm/kvm/detail/device.hpp"
+#include "vmm/kvm/detail/ioctls/vm.hpp"
+#include "vmm/kvm/detail/ioctls/vcpu.hpp"
+#include "vmm/kvm/detail/ioctls/device.hpp"
 
 namespace vmm::kvm::detail {
 

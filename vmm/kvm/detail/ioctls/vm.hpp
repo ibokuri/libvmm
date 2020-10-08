@@ -8,8 +8,9 @@
 #include <cstdint> // uint32_t, uint64_t
 #include <linux/kvm.h> // kvm_*, KVM_*
 
-#include "vmm/kvm/detail/system.hpp"
-#include "vmm/kvm/detail/types.hpp"
+#include "vmm/kvm/detail/ioctls/system.hpp"
+#include "vmm/kvm/detail/types/file_descriptor.hpp"
+#include "vmm/kvm/detail/types/fam_struct.hpp"
 #include "vmm/types/event.hpp"
 
 namespace vmm::kvm::detail {

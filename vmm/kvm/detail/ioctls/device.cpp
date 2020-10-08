@@ -2,7 +2,7 @@
  * device.cpp - device ioctls
  */
 
-#include "vmm/kvm/detail/device.hpp"
+#include "vmm/kvm/detail/ioctls/device.hpp"
 
 namespace vmm::kvm::detail {
 

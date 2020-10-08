@@ -4,7 +4,7 @@
 #include <cassert>
 #include <initializer_list>
 
-#include "vmm/kvm/detail/types.hpp"
+#include "vmm/kvm/detail/types/fam_struct.hpp"
 
 struct MockFamStruct {
     uint32_t len;

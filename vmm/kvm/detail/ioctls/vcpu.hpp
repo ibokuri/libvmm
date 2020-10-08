@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "vmm/kvm/detail/types.hpp"
-#include "vmm/kvm/detail/vm.hpp"
+#include "vmm/kvm/detail/ioctls/vm.hpp"
+#include "vmm/kvm/detail/types/file_descriptor.hpp"
 
 namespace vmm::kvm::detail {
 

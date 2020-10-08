@@ -7,14 +7,14 @@
 #include <cstddef> // size_t
 #include <system_error> // error_code, system_category, system_error
 #include <type_traits> // enable_if_t, is_same_v
-
 #include <fcntl.h> // open
 #include <sys/stat.h> // open
 #include <sys/types.h> // open
 #include <linux/kvm.h> // kvm_*, KVM_*
 
 #include "vmm/kvm/detail/macros.hpp"
-#include "vmm/kvm/detail/types.hpp"
+#include "vmm/kvm/detail/types/file_descriptor.hpp"
+#include "vmm/kvm/detail/types/fam_struct.hpp"
 #include "vmm/types/detail/exceptions.hpp"
 
 namespace vmm::kvm::detail {
