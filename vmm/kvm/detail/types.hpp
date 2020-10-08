@@ -161,10 +161,12 @@ class FamStruct {
 
         /* Element access */
         [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference {
+            static_assert(N > 0);
             return (m_ptr->*EntriesMember)[pos];
         }
 
         [[nodiscard]] auto operator[](std::size_t pos) const noexcept -> const_reference {
+            static_assert(N > 0);
             return (m_ptr->*EntriesMember)[pos];
         }
 
@@ -218,11 +220,11 @@ class FamStruct {
         }
 
         /* Capacity */
-        [[nodiscard]] auto size() const noexcept -> size_type {
+        [[nodiscard]] constexpr auto size() const noexcept -> size_type {
             return m_ptr->*SizeMember;
         }
 
-        [[nodiscard]] auto empty() const noexcept -> bool {
+        [[nodiscard]] constexpr auto empty() const noexcept -> bool {
             return size() == 0;
         }
 
