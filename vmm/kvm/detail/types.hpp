@@ -54,18 +54,16 @@ class FamStruct {
         using iterator = pointer;
         using const_iterator = const_pointer;
 
+        static_assert(N <= std::numeric_limits<size_type>::max());
+
         static const auto alignment = alignof(Struct);
         static const auto storage_size = sizeof(Struct) + N * sizeof(Entry);
 
-        explicit FamStruct(const allocator_type& alloc)
-                : m_alloc{alloc},
-                  m_ptr{static_cast<Struct*>(alloc.resource()->allocate(storage_size, alignment))} {
-            static_assert(N <= std::numeric_limits<size_type>::max());
+        explicit FamStruct(const allocator_type& alloc={})
+                : m_alloc{alloc}, m_ptr{allocate_fam(alloc)} {
             std::memset(m_ptr, 0, storage_size);
             m_ptr->*SizeMember = N;
         }
-
-        FamStruct() : FamStruct(std::pmr::new_delete_resource()) {}
 
         // TODO: SFINAE
         template <typename InputIt>
@@ -93,20 +91,68 @@ class FamStruct {
                   const allocator_type& alloc)
                 : FamStruct(ilist.begin(), ilist.end(), alloc) {}
 
-        FamStruct(const FamStruct& other)
-                : FamStruct(other.begin(), other.end(),
-                            other.get_allocator()) {}
+        auto operator=(std::initializer_list<value_type> ilist) -> FamStruct& {
+            if (auto n = ilist.size(); n != 0) {
+                if (n > std::numeric_limits<size_type>::max() || n > N)
+                    VMM_THROW(std::overflow_error("Range too large"));
 
-        FamStruct(const FamStruct& other, const allocator_type& alloc)
-                : FamStruct(other.begin(), other.end(), alloc) {}
+                m_ptr->*SizeMember = n;
+                std::memset(m_ptr->*EntriesMember, 0, N * sizeof(Entry));
+                std::copy(ilist.begin(), ilist.end(), begin());
+            }
 
-        //FamStruct(FamStruct&& other) : m_entries{std::move(other.m_entries)} {}
+            return *this;
+        }
 
-        //FamStruct(FamStruct&& other, const allocator_type& alloc)
-                //: m_entries{std::move(other.m_entries), alloc} {}
+        /**
+         * Copy assignment operator
+         */
+        auto operator=(const FamStruct& other) -> FamStruct& {
+            if (this != &other) {
+                std::memset(m_ptr, 0, storage_size);
+                std::memcpy(m_ptr, other.m_ptr, storage_size);
+            }
 
+            return *this;
+        }
+
+        /**
+         * Move assignment operator
+         */
+        auto operator=(FamStruct&& other) -> FamStruct& {
+            if (m_alloc == other.m_alloc)
+                std::swap(m_ptr, other.m_ptr);
+            else
+                operator=(other);
+
+            return *this;
+        }
+
+        /**
+         * Copy constructor
+         */
+        FamStruct(const FamStruct& other, const allocator_type& alloc={})
+                : FamStruct(alloc) {
+            operator=(other);
+        }
+
+        /**
+         * Move constructors
+         */
+        FamStruct(FamStruct&& other) : m_alloc{other.get_allocator()} {
+            operator=(std::move(other));
+        }
+
+        FamStruct(FamStruct&& other, const allocator_type& alloc)
+                : FamStruct(alloc) {
+            operator=(std::move(other));
+        }
+
+        /**
+         * Destructor
+         */
         ~FamStruct() {
-            m_alloc.resource()->deallocate(m_ptr, storage_size, alignment);
+            deallocate_fam();
         }
 
         [[nodiscard]] allocator_type get_allocator() const noexcept {
@@ -186,6 +232,15 @@ class FamStruct {
     private:
         allocator_type m_alloc;
         Struct *m_ptr = nullptr;
+
+        auto allocate_fam(const allocator_type& alloc) -> Struct* {
+            return static_cast<Struct*>(alloc.resource()->allocate(storage_size, alignment));
+        }
+
+        auto deallocate_fam() -> void {
+            m_alloc.resource()->deallocate(m_ptr, storage_size, alignment);
+            m_ptr = nullptr;
+        }
 };
 
 /**
