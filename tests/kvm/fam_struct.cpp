@@ -24,24 +24,6 @@ class MockWrapper : public FamStruct<N> {
     using Base::Base;
 };
 
-//  fn test_new() {
-//      let num_entries = 10;
-
-//      let adapter = MockFamStructWrapper::new(num_entries);
-//      assert_eq!(num_entries, adapter.capacity());
-
-//      let u32_slice = unsafe {
-//          std::slice::from_raw_parts(
-//              adapter.as_fam_struct_ptr() as *const u32,
-//              num_entries + ENTRIES_OFFSET,
-//          )
-//      };
-//      assert_eq!(num_entries, u32_slice[0] as usize);
-//      for entry in u32_slice[1..].iter() {
-//          assert_eq!(*entry, 0);
-//      }
-//  }
-
 TEST_CASE("Create FAM struct", "[all]") {
     SECTION("Entries: 0") {
         auto fam = MockWrapper<0>{};
