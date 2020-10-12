@@ -40,6 +40,8 @@ class vm
         auto get_irqchip(kvm_irqchip&) const -> void;
         auto set_irqchip(const kvm_irqchip&) const -> void;
         auto set_irq_line(const uint32_t irq, bool active) const -> void;
+        auto register_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
+        auto unregister_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
         [[nodiscard]] auto get_clock() const -> kvm_clock_data;
         auto set_clock(kvm_clock_data&) const -> void;
 

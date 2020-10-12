@@ -186,3 +186,52 @@ TEST_CASE("IRQ Line (x86)", "[.x86]") {
     //
     // TODO: requires dummy GIC device
 //}
+
+TEST_CASE("IRQ File Descriptor (x86)", "[.x86]") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
+
+    REQUIRE_NOTHROW(vm.irqchip());
+
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
+
+    // Duplicate registrations
+    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
+
+    // NOTE: KVM doesn't report duplicate unregisters as errors
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+
+    // NOTE: KVM doesn't report unregisters with different levels as errors
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
+}
+
+//TEST_CASE("IRQ File Descriptor (arm64)", "[.arm64]") {
+    //auto kvm = vmm::kvm::system{};
+    //auto vm = kvm.vm();
+    //auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
+    //auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
+    //auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
+
+    //// TODO: Create vGIC device, set supported # of IRQs, and request
+    ////       initialization of the vGIC.
+
+    //REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
+    //REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
+    //REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
+
+    //// Duplicate registrations
+    //REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
+
+    //// NOTE: KVM doesn't report duplicate unregisters as errors
+    //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+    //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+
+    //// NOTE: KVM doesn't report unregisters with different levels as errors
+    //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
+//}
