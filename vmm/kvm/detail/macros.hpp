@@ -4,8 +4,6 @@
 
 #pragma once
 
-namespace vmm::kvm::detail {
-
 /**
  * Size of reserved range for KVM-specific MSRs (0x4b564d00 to 0x4b564dff)
  */
@@ -20,5 +18,3 @@ namespace vmm::kvm::detail {
  * Defined in linux/arch/x86/include/asm/kvm_host.h
  */
 #define MAX_CPUID_ENTRIES 80
-
-} // vmm::kvm::detail
