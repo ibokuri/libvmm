@@ -168,3 +168,21 @@ TEST_CASE("GSI routing (x86)", "[.x86]") {
         REQUIRE_NOTHROW(vm.gsi_routing(table));
     }
 }
+
+TEST_CASE("IRQ Line (x86)", "[.x86]") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    REQUIRE_NOTHROW(vm.irqchip());
+    REQUIRE_NOTHROW(vm.set_irq_line(4, true));
+    REQUIRE_NOTHROW(vm.set_irq_line(4, false));
+    REQUIRE_NOTHROW(vm.set_irq_line(4, true));
+}
+
+//TEST_CASE("IRQ Line (arm, arm64)", "[.arm][.arm64]") {
+    //auto kvm = vmm::kvm::system{};
+    //auto vm = kvm.vm();
+    //auto vcpu = vm.vcpu(0);
+    //
+    // TODO: requires dummy GIC device
+//}

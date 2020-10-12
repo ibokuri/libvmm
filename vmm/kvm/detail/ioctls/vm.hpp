@@ -38,7 +38,8 @@ class vm
         auto memslot(kvm_userspace_memory_region) const -> void;
         auto irqchip() const -> void;
         auto get_irqchip(kvm_irqchip&) const -> void;
-        auto set_irqchip(kvm_irqchip const&) const -> void;
+        auto set_irqchip(const kvm_irqchip&) const -> void;
+        auto set_irq_line(const uint32_t irq, bool active) const -> void;
         [[nodiscard]] auto get_clock() const -> kvm_clock_data;
         auto set_clock(kvm_clock_data&) const -> void;
 

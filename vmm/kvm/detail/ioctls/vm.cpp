@@ -199,6 +199,16 @@ auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void
     m_fd.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
 }
 
+auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
+{
+    auto irq_level = kvm_irq_level {
+        .irq = irq,
+        .level = active ? uint32_t{1} : uint32_t{0}
+    };
+
+    m_fd.ioctl(KVM_IRQ_LINE, &irq_level);
+}
+
 /**
  * Gets the current timestamp of kvmclock as seen by the current guest.
  *
