@@ -153,80 +153,80 @@ class FamStruct
 
         [[nodiscard]] auto front() noexcept -> reference
         {
-			return *begin();
-		}
+            return *begin();
+        }
 
         [[nodiscard]] auto front() const noexcept -> const_reference
         {
-			return *begin();
-		}
+            return *begin();
+        }
 
         [[nodiscard]] auto back() noexcept -> reference
         {
-			return *end();
-		}
+            return *end();
+        }
 
         [[nodiscard]] auto back() const noexcept -> const_reference
         {
-			return *end();
-		}
+            return *end();
+        }
 
         [[nodiscard]] constexpr auto data() noexcept -> Struct*
         {
-			return m_ptr;
-		}
+            return m_ptr;
+        }
 
         [[nodiscard]] constexpr auto data() const noexcept -> const Struct*
         {
-			return m_ptr;
-		}
+            return m_ptr;
+        }
 
         /* Iterators */
         auto begin() noexcept -> iterator
         {
-			return m_ptr->*EntriesMember;
-		}
+            return m_ptr->*EntriesMember;
+        }
 
         auto begin() const noexcept -> const_iterator
         {
-			return m_ptr->*EntriesMember;
-		}
+            return m_ptr->*EntriesMember;
+        }
 
         auto end() noexcept -> iterator
         {
-			return begin() + size();
-		}
+            return begin() + size();
+        }
 
         auto end() const noexcept -> const_iterator
         {
-			return begin() + size();
-		}
+            return begin() + size();
+        }
 
         auto cbegin() const noexcept -> const_iterator
         {
-			return begin();
-		}
+            return begin();
+        }
 
         auto cend() const noexcept -> const_iterator
         {
-			return end();
-		}
+            return end();
+        }
 
         /* Capacity */
         [[nodiscard]] constexpr auto size() const noexcept -> size_type
         {
-			return m_ptr->*SizeMember;
-		}
+            return m_ptr->*SizeMember;
+        }
 
         [[nodiscard]] constexpr auto empty() const noexcept -> bool
         {
-			return size() == 0;
-		}
+            return size() == 0;
+        }
 
         [[nodiscard]] constexpr auto capacity() const noexcept -> size_type
         {
-			return N;
-		}
+            return N;
+        }
     private:
         allocator_type m_alloc;
         Struct *m_ptr = nullptr;
