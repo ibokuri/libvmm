@@ -13,7 +13,8 @@ namespace vmm::types {
  * auto fd = vmm::types::EventFd{Em_fdNONBLOCK};
  * ```
  */
-EventFd::EventFd(int flags) {
+EventFd::EventFd(int flags)
+{
     m_fd = ::eventfd(0, flags);
 
     if (m_fd < 0)
@@ -32,7 +33,8 @@ EventFd::EventFd(int flags) {
  * fd.write(99);
  * ```
  */
-auto EventFd::write(uint64_t value) const -> void {
+auto EventFd::write(uint64_t value) const -> void
+{
     auto ret = ::write(m_fd, &value, sizeof(uint64_t));
 
     if (ret < 0)
@@ -52,7 +54,8 @@ auto EventFd::write(uint64_t value) const -> void {
  * auto data = fd.read();
  * ```
  */
-[[nodiscard]] auto EventFd::read() const -> uint64_t {
+[[nodiscard]] auto EventFd::read() const -> uint64_t
+{
     auto buf = uint64_t{};
     auto ret = ::read(m_fd, &buf, sizeof(uint64_t));
 

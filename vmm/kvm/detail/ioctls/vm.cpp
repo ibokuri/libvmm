@@ -23,7 +23,8 @@ namespace vmm::kvm::detail {
  * auto vcpu = vm.vcpu(0);
  * ```
  */
-auto vm::vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu {
+auto vm::vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu
+{
     return vmm::kvm::detail::vcpu{m_fd.ioctl(KVM_CREATE_VCPU, vcpu_id)};
 }
 
@@ -42,7 +43,8 @@ auto vm::vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu {
  * auto device = vm.device(KVM_DEV_TYPE_VFIO);
  * ```
  */
-auto vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device {
+auto vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device
+{
     auto dev = kvm_create_device{ .type = type, .flags = flags };
     return vmm::kvm::detail::device{dev};
 }
@@ -65,7 +67,8 @@ auto vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device
  * assert(vm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
  * ```
  */
-auto vm::check_extension(unsigned cap) const -> unsigned {
+auto vm::check_extension(unsigned cap) const -> unsigned
+{
     return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
@@ -91,7 +94,8 @@ auto vm::check_extension(unsigned cap) const -> unsigned {
  * vm.set_bsp(0);
  * ```
  */
-auto vm::set_bsp(unsigned vcpu_id) const -> void {
+auto vm::set_bsp(unsigned vcpu_id) const -> void
+{
     m_fd.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
@@ -118,7 +122,8 @@ auto vm::set_bsp(unsigned vcpu_id) const -> void {
  * vm.memslot(mem_region);
  * ```
  */
-auto vm::memslot(kvm_userspace_memory_region region) const -> void {
+auto vm::memslot(kvm_userspace_memory_region region) const -> void
+{
     m_fd.ioctl(KVM_SET_USER_MEMORY_REGION, &region);
 }
 
@@ -137,7 +142,8 @@ auto vm::memslot(kvm_userspace_memory_region region) const -> void {
  * vm.irqchip();
  * ```
  */
-auto vm::irqchip() const -> void {
+auto vm::irqchip() const -> void
+{
     m_fd.ioctl(KVM_CREATE_IRQCHIP);
 }
 
@@ -160,7 +166,8 @@ auto vm::irqchip() const -> void {
  * vm.get_irqchip(irqchip);
  * ```
  */
-auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void {
+auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void
+{
     m_fd.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
 }
 
@@ -187,7 +194,8 @@ auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void {
  * vm.set_irqchip(irqchip);
  * ```
  */
-auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void {
+auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void
+{
     m_fd.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
 }
 
@@ -206,7 +214,8 @@ auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void {
  * auto clock = vm.get_clock();
  * ```
  */
-auto vm::get_clock() const -> kvm_clock_data {
+auto vm::get_clock() const -> kvm_clock_data
+{
     auto clock = kvm_clock_data{};
     m_fd.ioctl(KVM_GET_CLOCK, &clock);
     return clock;
@@ -229,21 +238,24 @@ auto vm::get_clock() const -> kvm_clock_data {
  * vm.set_clock(&clock);
  * ```
  */
-auto vm::set_clock(kvm_clock_data &clock) const -> void {
+auto vm::set_clock(kvm_clock_data &clock) const -> void
+{
     m_fd.ioctl(KVM_SET_CLOCK, &clock);
 }
 
 /**
  * Returns KVM_RUN's shared memory region size.
  */
-auto vm::mmap_size() const -> std::size_t {
+auto vm::mmap_size() const -> std::size_t
+{
     return m_mmap_size;
 }
 
 /**
  * Returns the recommended number for max_vcpus.
  */
-auto vm::num_vcpus() const -> unsigned {
+auto vm::num_vcpus() const -> unsigned
+{
     auto ret = check_extension(KVM_CAP_NR_VCPUS);
     return ret > 0 ? ret : 4;
 }
@@ -251,7 +263,8 @@ auto vm::num_vcpus() const -> unsigned {
 /**
  * Returns the maximum possible value for max_vcpus.
  */
-auto vm::max_vcpus() const -> unsigned {
+auto vm::max_vcpus() const -> unsigned
+{
     auto ret = check_extension(KVM_CAP_MAX_VCPUS);
     return ret > 0 ? ret : num_vcpus();
 }
@@ -259,7 +272,8 @@ auto vm::max_vcpus() const -> unsigned {
 /**
  * Returns the maximum number of allowed memory slots for a VM.
  */
-auto vm::num_memslots() const -> unsigned {
+auto vm::num_memslots() const -> unsigned
+{
     auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
     return ret > 0 ? ret : 32;
 }

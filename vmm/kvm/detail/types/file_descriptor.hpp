@@ -8,7 +8,8 @@
 
 namespace vmm::kvm::detail {
 
-class KvmFd : public vmm::types::FileDescriptor {
+class KvmFd : public vmm::types::FileDescriptor
+{
     public:
         explicit KvmFd(int fd) noexcept : vmm::types::FileDescriptor(fd) {}
 

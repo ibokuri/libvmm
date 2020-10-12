@@ -9,7 +9,8 @@
 
 namespace vmm::kvm::detail {
 
-class vcpu {
+class vcpu
+{
     friend vcpu vm::vcpu(unsigned vcpu_id) const;
 
     private:

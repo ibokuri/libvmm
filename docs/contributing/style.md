@@ -35,11 +35,13 @@ if (cond1 && cond2 &&
 
 ### Braces
 
-Opening braces should always be on the same line as whatever came before it
-(e.g., if/else/for/while, function name, class/struct name, etc.).
+For functions and classes, opening braces should be on a separate line unless
+the function/class is empty. for everything else, the braces do not go on a
+separate line.
 
 ```cpp
-auto foo() {
+auto foo()
+{
     if (condition) {
         ...
     }
@@ -48,7 +50,8 @@ auto foo() {
     }
 }
 
-class Widget {
+class Widget
+{
     private:
         bool m_foo;
     public:

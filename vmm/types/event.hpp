@@ -16,7 +16,8 @@ enum class IoEventAddress {
     Mmio,
 };
 
-class EventFd : public FileDescriptor {
+class EventFd : public FileDescriptor
+{
     public:
         EventFd(int flags=0);
 

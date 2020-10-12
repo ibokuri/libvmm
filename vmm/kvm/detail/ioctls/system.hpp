@@ -21,7 +21,8 @@ namespace vmm::kvm::detail {
 
 class vm;
 
-class system {
+class system
+{
     public:
         system() : m_fd{open()} {}
 
@@ -60,7 +61,8 @@ class system {
          * auto kvm = vmm::kvm::system{fd};
          * ```
          */
-        [[nodiscard]] static auto open(bool cloexec=true) -> int {
+        [[nodiscard]] static auto open(bool cloexec=true) -> int
+        {
             const auto fd = ::open("/dev/kvm",
                                    cloexec ? O_RDWR | O_CLOEXEC : O_RDWR);
 
@@ -100,7 +102,8 @@ class system {
          * ```
          */
         template<std::size_t N=MAX_IO_MSRS>
-        [[nodiscard]] auto msr_index_list() const -> MsrList<N> {
+        [[nodiscard]] auto msr_index_list() const -> MsrList<N>
+        {
             auto msrs = MsrList<N>{};
             m_fd.ioctl(KVM_GET_MSR_INDEX_LIST, msrs.data());
             return msrs;
@@ -123,7 +126,8 @@ class system {
          * ```
          */
         template<std::size_t N=MAX_IO_MSRS_FEATURES>
-        [[nodiscard]] auto msr_feature_list() const -> MsrList<N> {
+        [[nodiscard]] auto msr_feature_list() const -> MsrList<N>
+        {
             auto msrs = MsrList<N>{};
             m_fd.ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST, msrs.data());
             return msrs;
@@ -163,7 +167,8 @@ class system {
         template<typename T,
                  typename=std::enable_if_t<std::is_same_v<typename T::value_type,
                                                           kvm_msr_entry>>>
-        auto read_msrs(T &msrs) const -> unsigned {
+        auto read_msrs(T &msrs) const -> unsigned
+        {
             return m_fd.ioctl(KVM_GET_MSRS, msrs.data());
         }
 
@@ -188,7 +193,8 @@ class system {
          * ```
          */
         template<std::size_t N=MAX_CPUID_ENTRIES>
-        [[nodiscard]] auto supported_cpuids() const -> Cpuids<N> {
+        [[nodiscard]] auto supported_cpuids() const -> Cpuids<N>
+        {
             auto cpuids = Cpuids<N>{};
             m_fd.ioctl(KVM_GET_SUPPORTED_CPUID, cpuids.data());
             return cpuids;
@@ -207,7 +213,8 @@ class system {
          * ```
          */
         template<std::size_t N=MAX_CPUID_ENTRIES>
-        [[nodiscard]] auto emulated_cpuids() const -> Cpuids<N> {
+        [[nodiscard]] auto emulated_cpuids() const -> Cpuids<N>
+        {
             auto cpuids = Cpuids<N>{};
             m_fd.ioctl(KVM_GET_EMULATED_CPUID, cpuids.data());
             return cpuids;
