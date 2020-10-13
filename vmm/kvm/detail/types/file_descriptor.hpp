@@ -1,6 +1,6 @@
-/*
- * fd.hpp - KVM file descriptor
- */
+//
+// file_descriptor.hpp - KVM file descriptor
+//
 
 #pragma once
 

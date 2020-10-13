@@ -1,6 +1,6 @@
-/*
- * vcpu.cpp - vCPU ioctls
- */
+//
+// vcpu.cpp - vCPU ioctls
+//
 
 #include "vmm/kvm/detail/ioctls/vcpu.hpp"
 

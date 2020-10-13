@@ -1,6 +1,6 @@
-/*
- * fam_struct.hpp - KVM FAM struct wrapper
- */
+//
+// fam_struct.hpp - KVM FAM struct wrapper
+//
 
 #pragma once
 
@@ -138,7 +138,6 @@ class FamStruct
             return m_alloc;
         }
 
-        /* Element access */
         [[nodiscard]] auto operator[](std::size_t pos) noexcept -> reference
         {
             static_assert(N > 0);
@@ -181,7 +180,6 @@ class FamStruct
             return m_ptr;
         }
 
-        /* Iterators */
         auto begin() noexcept -> iterator
         {
             return m_ptr->*EntriesMember;
@@ -212,7 +210,6 @@ class FamStruct
             return end();
         }
 
-        /* Capacity */
         [[nodiscard]] constexpr auto size() const noexcept -> size_type
         {
             return m_ptr->*SizeMember;
@@ -244,14 +241,12 @@ class FamStruct
         }
 };
 
-/**
- * NOTE: Because MsrList's value_type is an integer, it is very easy to confuse
- *       the size_type initializer_list and constructor. That is, one may think
- *       that `auto msr_list = MsrList{10}` constructs a FAM struct with enough
- *       space for 10 entries, but really it constructs a FAM struct with an
- *       initializer list, resulting in a FAM struct with only 1 entry with a
- *       value of 10. To use the size_type constructor, use `MsrList(10)`.
- */
+// NOTE: Because MsrList's value_type is an integer, it is very easy to confuse
+//       the size_type initializer_list and constructor. That is, one may think
+//       that `auto msr_list = MsrList{10}` constructs a FAM struct with enough
+//       space for 10 entries, but really it constructs a FAM struct with an
+//       initializer list, resulting in a FAM struct with only 1 entry with a
+//       value of 10. To use the size_type constructor, use `MsrList(10)`.
 template<std::size_t N>
 class MsrList
     : public FamStruct<kvm_msr_list, uint32_t, &kvm_msr_list::nmsrs,

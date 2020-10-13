@@ -1,6 +1,6 @@
-/*
- * vcpu.hpp - vcpu ioctls
- */
+//
+// vcpu.hpp - vcpu ioctls
+//
 
 #pragma once
 

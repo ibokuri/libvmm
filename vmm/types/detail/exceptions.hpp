@@ -1,3 +1,7 @@
+//
+// exceptions.hpp - Exception-related macros
+//
+
 #pragma once
 
 #if (defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)) && !defined(VMM_NOEXCEPTION)

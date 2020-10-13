@@ -143,17 +143,6 @@ TEST_CASE("Detach ioevent", "[all]") {
     }
 }
 
-TEST_CASE("GSI routing (arm, aarch64, s390)", "[.arm][.arm64][.s390]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
-        auto entry = kvm_irq_routing_entry{};
-        auto routing_list = vmm::kvm::IrqRouting<1>{entry};
-        REQUIRE_NOTHROW(vm.gsi_routing(routing_list));
-    }
-}
-
 TEST_CASE("GSI routing (x86)", "[.x86]") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
@@ -169,6 +158,17 @@ TEST_CASE("GSI routing (x86)", "[.x86]") {
     }
 }
 
+TEST_CASE("GSI routing (arm, aarch64, s390)", "[.arm][.aarch64][.s390]") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
+        auto entry = kvm_irq_routing_entry{};
+        auto routing_list = vmm::kvm::IrqRouting<1>{entry};
+        REQUIRE_NOTHROW(vm.gsi_routing(routing_list));
+    }
+}
+
 TEST_CASE("IRQ Line (x86)", "[.x86]") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
@@ -179,7 +179,7 @@ TEST_CASE("IRQ Line (x86)", "[.x86]") {
     REQUIRE_NOTHROW(vm.set_irq_line(4, true));
 }
 
-//TEST_CASE("IRQ Line (arm, arm64)", "[.arm][.arm64]") {
+//TEST_CASE("IRQ Line (arm, aarch64)", "[.arm][.aarch64]") {
     //auto kvm = vmm::kvm::system{};
     //auto vm = kvm.vm();
     //auto vcpu = vm.vcpu(0);
@@ -211,7 +211,7 @@ TEST_CASE("IRQ File Descriptor (x86)", "[.x86]") {
     REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
 }
 
-//TEST_CASE("IRQ File Descriptor (arm64)", "[.arm64]") {
+//TEST_CASE("IRQ File Descriptor (aarch64)", "[.aarch64]") {
     //auto kvm = vmm::kvm::system{};
     //auto vm = kvm.vm();
     //auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};

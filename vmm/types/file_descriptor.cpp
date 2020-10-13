@@ -1,3 +1,7 @@
+//
+// file_descriptor.cpp - File descriptor
+//
+
 #include <unistd.h> // close, dup
 
 #include "vmm/types/file_descriptor.hpp"
