@@ -33,7 +33,7 @@ TEST_CASE("Invalid memory slot", "[all]") {
     }
 }
 
-TEST_CASE("IRQ Chip creation (x86)", "[.x86][.arm][.aarch64]") {
+TEST_CASE("IRQ Chip creation (x86, arm, aarch64)", "[.x86][.arm][.aarch64]") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 

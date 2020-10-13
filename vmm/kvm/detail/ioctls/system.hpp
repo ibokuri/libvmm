@@ -83,6 +83,7 @@ class system
         [[nodiscard]] auto vcpu_mmap_size() const -> std::size_t;
         [[nodiscard]] auto host_ipa_limit() const -> unsigned;
 
+#if defined(__i386__) || defined(__x86_64__)
         // TODO: Allocator variants for FAM struct methods
 
         /**
@@ -219,6 +220,7 @@ class system
             m_fd.ioctl(KVM_GET_EMULATED_CPUID, cpuids.data());
             return cpuids;
         }
+#endif
     private:
         KvmFd m_fd;
 

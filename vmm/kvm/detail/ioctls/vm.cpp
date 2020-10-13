@@ -73,33 +73,6 @@ auto vm::check_extension(unsigned cap) const -> unsigned
 }
 
 /**
- * Defines which vcpu is the Bootstrap Processor (BSP).
- *
- * The KVM_SET_BOOT_CPU_ID ioctl must be called before any vcpus are created
- * for a VM, otherwise the call will fail.
- *
- * See the documentation for KVM_SET_BOOT_CPU_ID.
- *
- * Examples
- * ========
- * ```
- * #include <vmm/kvm.hpp>
- *
- * auto kvm = vmm::kvm::system{};
- * auto vm = kvm.vm();
- *
- * if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0)
- *     throw;
- *
- * vm.set_bsp(0);
- * ```
- */
-auto vm::set_bsp(unsigned vcpu_id) const -> void
-{
-    m_fd.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
-}
-
-/**
  * Creates, modifies, or deletes a guest physical memory slot.
  *
  * See the documentation for KVM_SET_USER_MEMORY_REGION.
@@ -128,9 +101,48 @@ auto vm::memslot(kvm_userspace_memory_region region) const -> void
 }
 
 /**
- * Creates an interrupt controller model in the kernel
+ * Returns KVM_RUN's shared memory region size.
+ */
+auto vm::mmap_size() const -> std::size_t
+{
+    return m_mmap_size;
+}
+
+/**
+ * Returns the recommended number for max_vcpus.
+ */
+auto vm::num_vcpus() const -> unsigned
+{
+    auto ret = check_extension(KVM_CAP_NR_VCPUS);
+    return ret > 0 ? ret : 4;
+}
+
+/**
+ * Returns the maximum possible value for max_vcpus.
+ */
+auto vm::max_vcpus() const -> unsigned
+{
+    auto ret = check_extension(KVM_CAP_MAX_VCPUS);
+    return ret > 0 ? ret : num_vcpus();
+}
+
+/**
+ * Returns the maximum number of allowed memory slots for a VM.
+ */
+auto vm::num_memslots() const -> unsigned
+{
+    auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
+    return ret > 0 ? ret : 32;
+}
+
+#if defined(__i386__) || defined(__x86_64__)
+/**
+ * Defines which vcpu is the Bootstrap Processor (BSP).
  *
- * See the documentation for `KVM_CREATE_IRQCHIP`.
+ * The KVM_SET_BOOT_CPU_ID ioctl must be called before any vcpus are created
+ * for a VM, otherwise the call will fail.
+ *
+ * See the documentation for KVM_SET_BOOT_CPU_ID.
  *
  * Examples
  * ========
@@ -139,12 +151,16 @@ auto vm::memslot(kvm_userspace_memory_region region) const -> void
  *
  * auto kvm = vmm::kvm::system{};
  * auto vm = kvm.vm();
- * vm.irqchip();
+ *
+ * if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0)
+ *     throw;
+ *
+ * vm.set_bsp(0);
  * ```
  */
-auto vm::irqchip() const -> void
+auto vm::set_bsp(unsigned vcpu_id) const -> void
 {
-    m_fd.ioctl(KVM_CREATE_IRQCHIP);
+    m_fd.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
 }
 
 /**
@@ -199,37 +215,6 @@ auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void
     m_fd.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
 }
 
-auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
-{
-    auto irq_level = kvm_irq_level {
-        .irq = irq,
-        .level = active ? uint32_t{1} : uint32_t{0}
-    };
-
-    m_fd.ioctl(KVM_IRQ_LINE, &irq_level);
-}
-
-auto vm::register_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> void
-{
-    auto irqfd = kvm_irqfd {
-        .fd = static_cast<uint32_t>(eventfd.fd()),
-        .gsi = gsi
-    };
-
-    m_fd.ioctl(KVM_IRQFD, &irqfd);
-}
-
-auto vm::unregister_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> void
-{
-    auto irqfd = kvm_irqfd {
-        .fd = static_cast<uint32_t>(eventfd.fd()),
-        .gsi = gsi,
-        .flags = KVM_IRQFD_FLAG_DEASSIGN
-    };
-
-    m_fd.ioctl(KVM_IRQFD, &irqfd);
-}
-
 /**
  * Gets the current timestamp of kvmclock as seen by the current guest.
  *
@@ -273,40 +258,64 @@ auto vm::set_clock(kvm_clock_data &clock) const -> void
 {
     m_fd.ioctl(KVM_SET_CLOCK, &clock);
 }
+#endif
 
-/**
- * Returns KVM_RUN's shared memory region size.
- */
-auto vm::mmap_size() const -> std::size_t
+#if defined(__i386__) || defined(__x86_64__)  || \
+    defined(__arm__)  || defined(__aarch64__)
+auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
 {
-    return m_mmap_size;
+    auto irq_level = kvm_irq_level {
+        .irq = irq,
+        .level = active ? uint32_t{1} : uint32_t{0}
+    };
+
+    m_fd.ioctl(KVM_IRQ_LINE, &irq_level);
+}
+#endif
+
+#if defined(__i386__) || defined(__x86_64__)  || \
+    defined(__arm__)  || defined(__aarch64__) || \
+    defined(__s390__)
+/**
+ * Creates an interrupt controller model in the kernel
+ *
+ * See the documentation for `KVM_CREATE_IRQCHIP`.
+ *
+ * Examples
+ * ========
+ * ```
+ * #include <vmm/kvm.hpp>
+ *
+ * auto kvm = vmm::kvm::system{};
+ * auto vm = kvm.vm();
+ * vm.irqchip();
+ * ```
+ */
+auto vm::irqchip() const -> void
+{
+    m_fd.ioctl(KVM_CREATE_IRQCHIP);
 }
 
-/**
- * Returns the recommended number for max_vcpus.
- */
-auto vm::num_vcpus() const -> unsigned
+auto vm::register_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> void
 {
-    auto ret = check_extension(KVM_CAP_NR_VCPUS);
-    return ret > 0 ? ret : 4;
+    auto irqfd = kvm_irqfd {
+        .fd = static_cast<uint32_t>(eventfd.fd()),
+        .gsi = gsi
+    };
+
+    m_fd.ioctl(KVM_IRQFD, &irqfd);
 }
 
-/**
- * Returns the maximum possible value for max_vcpus.
- */
-auto vm::max_vcpus() const -> unsigned
+auto vm::unregister_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> void
 {
-    auto ret = check_extension(KVM_CAP_MAX_VCPUS);
-    return ret > 0 ? ret : num_vcpus();
-}
+    auto irqfd = kvm_irqfd {
+        .fd = static_cast<uint32_t>(eventfd.fd()),
+        .gsi = gsi,
+        .flags = KVM_IRQFD_FLAG_DEASSIGN
+    };
 
-/**
- * Returns the maximum number of allowed memory slots for a VM.
- */
-auto vm::num_memslots() const -> unsigned
-{
-    auto ret = check_extension(KVM_CAP_NR_MEMSLOTS);
-    return ret > 0 ? ret : 32;
+    m_fd.ioctl(KVM_IRQFD, &irqfd);
 }
+#endif
 
 }  // namespace vmm::kvm::detail

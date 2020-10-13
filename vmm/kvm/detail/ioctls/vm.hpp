@@ -28,35 +28,11 @@ class vm
         auto operator=(const vm& other) -> vm& = delete;
         auto operator=(vm&& other) -> vm& = default;
 
-        // Creation routines
         [[nodiscard]] auto vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu;
         [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) const -> vmm::kvm::detail::device;
 
-        // Control routines
         [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
-        auto set_bsp(unsigned vcpu_id) const -> void;
         auto memslot(kvm_userspace_memory_region) const -> void;
-        auto irqchip() const -> void;
-        auto get_irqchip(kvm_irqchip&) const -> void;
-        auto set_irqchip(const kvm_irqchip&) const -> void;
-        auto set_irq_line(const uint32_t irq, bool active) const -> void;
-        auto register_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
-        auto unregister_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
-        [[nodiscard]] auto get_clock() const -> kvm_clock_data;
-        auto set_clock(kvm_clock_data&) const -> void;
-
-        /**
-         * Sets the GSI routing table entries, overwriting previous entries.
-         *
-         * See the documentation for `KVM_SET_GSI_ROUTING`.
-         */
-        template<typename T,
-                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
-                                                          kvm_irq_routing_entry>>>
-        auto gsi_routing(T &table) const -> void
-        {
-            m_fd.ioctl(KVM_SET_GSI_ROUTING, table.data());
-        }
 
         /**
          * Attaches an ioeventfd to a legal pio/mmio address within the guest.
@@ -161,6 +137,40 @@ class vm
         [[nodiscard]] auto num_vcpus() const -> unsigned;
         [[nodiscard]] auto max_vcpus() const -> unsigned;
         [[nodiscard]] auto num_memslots() const -> unsigned;
+
+#if defined(__i386__) || defined(__x86_64__)
+        auto set_bsp(unsigned vcpu_id) const -> void;
+        auto get_irqchip(kvm_irqchip&) const -> void;
+        auto set_irqchip(const kvm_irqchip&) const -> void;
+        [[nodiscard]] auto get_clock() const -> kvm_clock_data;
+        auto set_clock(kvm_clock_data&) const -> void;
+#endif
+
+#if defined(__i386__) || defined(__x86_64__)  || \
+    defined(__arm__)  || defined(__aarch64__)
+        auto set_irq_line(const uint32_t irq, bool active) const -> void;
+#endif
+
+#if defined(__i386__) || defined(__x86_64__)  || \
+    defined(__arm__)  || defined(__aarch64__) || \
+    defined(__s390__)
+        auto irqchip() const -> void;
+        auto register_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
+        auto unregister_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
+
+        /**
+         * Sets the GSI routing table entries, overwriting previous entries.
+         *
+         * See the documentation for `KVM_SET_GSI_ROUTING`.
+         */
+        template<typename T,
+                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                          kvm_irq_routing_entry>>>
+        auto gsi_routing(T &table) const -> void
+        {
+            m_fd.ioctl(KVM_SET_GSI_ROUTING, table.data());
+        }
+#endif
     private:
         KvmFd m_fd;
         size_t m_mmap_size;
