@@ -14,23 +14,31 @@
 #include <linux/kvm.h> // kvm_*
 #include <memory_resource> // polymorphic_allocator
 #include <stdexcept> // overflow_error
+#include <type_traits> // decltype
+#include <utility> // declval
 
 #include "vmm/types/detail/exceptions.hpp"
 
 namespace vmm::kvm::detail {
 
+// Forward declaration for MsrIndexList, which may only be constructed by
+// kvm::system::msr_index_list().
 class system;
 
-template <typename T, typename Struct>
-T MemberPtrType(T Struct::*);
+// Primary FAM struct template
+template<auto SizeMember, auto EntriesMember, std::size_t N>
+class FamStruct;
 
-template<typename Struct, typename Entry, auto SizeMember, auto EntriesMember,
+// Partial specialization with data member pointer type deduction
+template<typename Struct,
+         typename Size, Size Struct::*SizeMember,
+         typename Entry, Entry Struct::*EntriesMember,
          std::size_t N>
-class FamStruct
+class FamStruct<SizeMember, EntriesMember, N>
 {
     public:
-        using value_type = Entry;
-        using size_type = decltype(MemberPtrType(SizeMember));
+        using value_type = std::decay_t<decltype(std::declval<Entry&>()[0])>;
+        using size_type = Size;
         using allocator_type = std::pmr::polymorphic_allocator<std::byte>;
         using pointer = value_type*;
         using const_pointer = const value_type*;
@@ -42,7 +50,7 @@ class FamStruct
         static_assert(N <= std::numeric_limits<size_type>::max());
 
         static const auto alignment = alignof(Struct);
-        static const auto storage_size = sizeof(Struct) + N * sizeof(Entry);
+        static const auto storage_size = sizeof(Struct) + N * sizeof(value_type);
 
         explicit FamStruct(const allocator_type& alloc={})
             : m_alloc{alloc}, m_ptr{allocate_fam(alloc)}
@@ -86,7 +94,7 @@ class FamStruct
                     VMM_THROW(std::overflow_error("Range too large"));
 
                 m_ptr->*SizeMember = n;
-                std::memset(m_ptr->*EntriesMember, 0, N * sizeof(Entry));
+                std::memset(m_ptr->*EntriesMember, 0, N * sizeof(value_type));
                 std::copy(ilist.begin(), ilist.end(), begin());
             }
 
@@ -249,11 +257,9 @@ class FamStruct
 //       value of 10. To use the size_type constructor, use `MsrList(10)`.
 template<std::size_t N>
 class MsrList
-    : public FamStruct<kvm_msr_list, uint32_t, &kvm_msr_list::nmsrs,
-                       &kvm_msr_list::indices, N>
+    : public FamStruct<&kvm_msr_list::nmsrs, &kvm_msr_list::indices, N>
 {
-    using Base = FamStruct<kvm_msr_list, uint32_t, &kvm_msr_list::nmsrs,
-                           &kvm_msr_list::indices, N>;
+    using Base = FamStruct<&kvm_msr_list::nmsrs, &kvm_msr_list::indices, N>;
     using Base::Base;
 
     using allocator_type = typename Base::allocator_type;
@@ -269,31 +275,25 @@ class MsrList
 
 template<std::size_t N>
 class Msrs
-    : public FamStruct<kvm_msrs, kvm_msr_entry, &kvm_msrs::nmsrs,
-                       &kvm_msrs::entries, N>
+    : public FamStruct<&kvm_msrs::nmsrs, &kvm_msrs::entries, N>
 {
-    using Base = FamStruct<kvm_msrs, kvm_msr_entry, &kvm_msrs::nmsrs,
-                           &kvm_msrs::entries, N>;
+    using Base = FamStruct<&kvm_msrs::nmsrs, &kvm_msrs::entries, N>;
     using Base::Base;
 };
 
 template<std::size_t N>
 class Cpuids
-    : public FamStruct<kvm_cpuid2, kvm_cpuid_entry2, &kvm_cpuid2::nent,
-                       &kvm_cpuid2::entries, N>
+    : public FamStruct<&kvm_cpuid2::nent, &kvm_cpuid2::entries, N>
 {
-    using Base = FamStruct<kvm_cpuid2, kvm_cpuid_entry2, &kvm_cpuid2::nent,
-                           &kvm_cpuid2::entries, N>;
+    using Base = FamStruct<&kvm_cpuid2::nent, &kvm_cpuid2::entries, N>;
     using Base::Base;
 };
 
 template<std::size_t N>
 class IrqRouting
-    : public FamStruct<kvm_irq_routing, kvm_irq_routing_entry,
-                       &kvm_irq_routing::nr, &kvm_irq_routing::entries, N>
+    : public FamStruct<&kvm_irq_routing::nr, &kvm_irq_routing::entries, N>
 {
-    using Base = FamStruct<kvm_irq_routing, kvm_irq_routing_entry,
-                           &kvm_irq_routing::nr, &kvm_irq_routing::entries, N>;
+    using Base = FamStruct<&kvm_irq_routing::nr, &kvm_irq_routing::entries, N>;
     using Base::Base;
 };
 

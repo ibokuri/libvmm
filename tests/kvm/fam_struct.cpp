@@ -12,11 +12,8 @@ struct MockFamStruct {
 };
 
 template<std::size_t N>
-using FamStruct = vmm::kvm::detail::FamStruct<MockFamStruct,
-                                              uint32_t,
-                                              &MockFamStruct::len,
-                                              &MockFamStruct::entries,
-                                              N>;
+using FamStruct = vmm::kvm::detail::FamStruct<&MockFamStruct::len,
+                                              &MockFamStruct::entries, N>;
 
 template<std::size_t N>
 class MockWrapper : public FamStruct<N> {
