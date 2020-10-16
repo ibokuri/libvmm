@@ -7,7 +7,7 @@ TEST_CASE("VM creation") {
     REQUIRE_NOTHROW(vmm::kvm::system{}.vm());
 }
 
-TEST_CASE("vcpu and memory slots") {
+TEST_CASE("Querying vCPU and memory slot information") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -16,29 +16,21 @@ TEST_CASE("vcpu and memory slots") {
     REQUIRE(vm.num_memslots() >= 32);
 }
 
-TEST_CASE("Invalid memory slot") {
+TEST_CASE("Set invalid memory slot") {
     auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto mem_region = kvm_userspace_memory_region{0};
 
-    if (kvm.check_extension(KVM_CAP_USER_MEMORY) > 0) {
-        auto vm = kvm.vm();
-        auto mem_region = kvm_userspace_memory_region{
-            .slot = 0,
-            .flags = 0,
-            .guest_phys_addr = 0,
-            .memory_size = 0,
-            .userspace_addr = 0,
-        };
-
-        REQUIRE_THROWS(vm.memslot(mem_region));
-    }
+    REQUIRE_THROWS(vm.memslot(mem_region));
 }
 
-TEST_CASE("Attach ioevent", "[all]") {
+TEST_CASE("Attach ioevent") {
+    using EventFd = vmm::types::EventFd;
     using IoEventAddress = vmm::types::IoEventAddress;
 
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
-    auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd = EventFd{EFD_NONBLOCK};
 
     if (vm.check_extension(KVM_CAP_IOEVENTFD) > 0) {
         REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Mmio>(eventfd, 0x1000));
@@ -50,22 +42,25 @@ TEST_CASE("Attach ioevent", "[all]") {
     }
 }
 
-TEST_CASE("Detach ioevent", "[all]") {
+TEST_CASE("Detach ioevent") {
+    using EventFd = vmm::types::EventFd;
+    using IoEventAddress = vmm::types::IoEventAddress;
+
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IOEVENTFD) > 0) {
-        auto eventfd = vmm::types::EventFd{EFD_NONBLOCK};
+        auto eventfd = EventFd{EFD_NONBLOCK};
         auto pio_addr = 0xf4;
         auto mmio_addr = 0x1000;
 
-        REQUIRE_THROWS(vm.detach_ioevent<vmm::types::IoEventAddress::Pio>(eventfd, pio_addr));
-        REQUIRE_THROWS(vm.detach_ioevent<vmm::types::IoEventAddress::Pio>(eventfd, mmio_addr));
+        REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+        REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr));
 
-        REQUIRE_NOTHROW(vm.attach_ioevent<vmm::types::IoEventAddress::Pio>(eventfd, pio_addr));
-        REQUIRE_NOTHROW(vm.attach_ioevent<vmm::types::IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
-        REQUIRE_NOTHROW(vm.detach_ioevent<vmm::types::IoEventAddress::Pio>(eventfd, pio_addr));
-        REQUIRE_NOTHROW(vm.detach_ioevent<vmm::types::IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
+        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
+        REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+        REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
     }
 }
 

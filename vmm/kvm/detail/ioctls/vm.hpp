@@ -80,48 +80,12 @@ class vm
         // Creates, modifies, or deletes a guest physical memory slot.
         //
         // See the documentation for KVM_SET_USER_MEMORY_REGION.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // vmm::kvm::vm vm = kvm.vm();
-        // auto mem_region = kvm_userspace_memory_region{
-        //     .slot = 0,
-        //     .flags = 0,
-        //     .guest_phys_addr = 0x10000,
-        //     .memory_size = 0x10000,
-        //     .userspace_addr = 0,
-        // };
-        //
-        // vm.memslot(mem_region);
-        // ```
         auto memslot(kvm_userspace_memory_region) const -> void;
 
         // Attaches an ioeventfd to a legal pio/mmio address within the guest.
         //
         // A guest write in the registered address will signal the provided
         // event instead of triggering an exit.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include "vmm/kvm.hpp"
-        // #include "vmm/types.hpp"
-        //
-        // using Pio = vmm::types::IoEventAddress::Pio;
-        // using Mmio = vmm::types::IoEventAddress::Mmio;
-        // using EventFd = vmm::types::EventFd;
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto eventfd = EventFd{EFD_NONBLOCK};
-        //
-        // vm.attach_ioevent<Pio>(eventfd, 0xf4);
-        // vm.attach_ioevent<Mmio>(eventfd, 0x1000);
-        // ```
         template<vmm::types::IoEventAddress T>
         auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr,
                             uint64_t datamatch=0) const -> void
@@ -147,28 +111,7 @@ class vm
             m_fd.ioctl(KVM_IOEVENTFD, &ioeventfd);
         }
 
-        // Detaches an ioeventfd to a legal pio/mmio address within the guest.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include "vmm/kvm.hpp"
-        // #include "vmm/types.hpp"
-        //
-        // using Pio = vmm::types::IoEventAddress::Pio;
-        // using Mmio = vmm::types::IoEventAddress::Mmio;
-        // using EventFd = vmm::types::EventFd;
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto eventfd = EventFd{EFD_NONBLOCK};
-        //
-        // vm.attach_ioevent<Pio>(eventfd, 0xf4);
-        // vm.attach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
-        //
-        // vm.detach_ioevent<Pio>(eventfd, 0xf4);
-        // vm.detach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);
-        // ```
+        // Detaches an ioeventfd from a legal pio/mmio address within the guest.
         template<vmm::types::IoEventAddress T>
         auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr,
                             uint64_t datamatch=0) const -> void
@@ -213,94 +156,28 @@ class vm
         // created for a VM, otherwise the call will fail.
         //
         // See the documentation for KVM_SET_BOOT_CPU_ID.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        //
-        // if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0)
-        //     throw;
-        //
-        // vm.set_bsp(0);
-        // ```
         auto set_bsp(unsigned vcpu_id) const -> void;
 
         // Reads the state of a kernel interrupt controller into a buffer
         // provided by the caller.
         //
         // See the documentation for `KVM_GET_IRQCHIP`.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto irqchip = kvm_irqchip{ .chip_id = KVM_IRQCHIP_PIC_MASTER };
-        //
-        // vm.irqchip();
-        // vm.get_irqchip(irqchip);
-        // ```
         auto get_irqchip(kvm_irqchip&) const -> void;
 
         // Sets the state of a kernel interrupt controller from a buffer
         // provided by the caller.
         //
         // See the documentation for `KVM_SET_IRQCHIP`.
-        //
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto irqchip = kvm_irqchip{
-        //     .chip_id = KVM_IRQCHIP_PIC_MASTER,
-        //     .chip.pic.irq_base = 99
-        // };
-        //
-        // vm.irqchip();
-        // vm.set_irqchip(irqchip);
-        // ```
         auto set_irqchip(const kvm_irqchip&) const -> void;
 
         // Gets the current timestamp of kvmclock as seen by the current guest.
         //
         // See the documentation for `KVM_GET_CLOCK`.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto clock = vm.get_clock();
-        // ```
         [[nodiscard]] auto get_clock() const -> kvm_clock_data;
 
         // Sets the current timestamp of kvmclock.
         //
         // See the documentation for `KVM_SET_CLOCK`.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto clock = kvm_clock_data{ .clock = 10 };
-        //
-        // vm.set_clock(&clock);
-        // ```
         auto set_clock(kvm_clock_data&) const -> void;
 #endif
 

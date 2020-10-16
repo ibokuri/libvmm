@@ -25,40 +25,9 @@ class FileDescriptor
         auto operator=(FileDescriptor&& other) -> FileDescriptor& = default;
 
         // Closes a file descriptor.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/types.hpp>
-        //
-        // auto fd = FileDescriptor{open("/dev/kvm", O_RDWR | O_CLOEXEC)};
-        //
-        // // do stuff
-        // ...
-        //
-        // try {
-        //     fd.close();
-        // }
-        // catch (std::system_error& e) {
-        //     throw
-        // }
-        // ```
         auto close() -> void;
 
         // Runs an ioctl.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <fcntl.h>
-        // #include <sys/stat.h>
-        // #include <linux/kvm.h>
-        // #include <vmm/types/file_descriptor.hpp>
-        //
-        // auto fd = FileDescriptor{open("/dev/kvm", O_RDWR | O_CLOEXEC)};
-        // auto version = fd.ioctl(KVM_GET_API_VERSION);
-        // auto supported = fd.ioctl(KVM_CHECK_EXTENSION, KVM_CAP_USER_MEMORY);
-        // ```
         template<typename T=int>
         auto ioctl(int req, T arg=T{}) const -> int
         {
