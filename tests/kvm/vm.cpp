@@ -24,6 +24,9 @@ TEST_CASE("Set invalid memory slot") {
     REQUIRE_THROWS(vm.memslot(mem_region));
 }
 
+// TODO: TEST_CASE("vCPU creation");
+// TODO: TEST_CASE("Device creation");
+
 TEST_CASE("Attach ioevent") {
     using EventFd = vmm::types::EventFd;
     using IoEventAddress = vmm::types::IoEventAddress;

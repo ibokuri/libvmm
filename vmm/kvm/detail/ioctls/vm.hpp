@@ -31,31 +31,11 @@ class vm
         // Adds a vcpu to a virtual machine.
         //
         // See the documentation for KVM_CREATE_VCPU.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto vcpu = vm.vcpu(0);
-        // ```
         [[nodiscard]] auto vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu;
 
         // Adds a device to a virtual machine.
         //
         // See the documentation for KVM_CREATE_DEVICE.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto device = vm.device(KVM_DEV_TYPE_VFIO);
-        // ```
         [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) const -> vmm::kvm::detail::device;
 
         // Returns a positive integer if a KVM extension is available; 0
@@ -64,17 +44,6 @@ class vm
         // Based on their initialization, VMs may have different capabilities.
         // Thus, `kvm::vm::check_extension()` is preferred when querying for
         // most capabilities.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <cassert>
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // assert(vm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) >= 32);
-        // ```
         [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
 
         // Creates, modifies, or deletes a guest physical memory slot.
@@ -200,16 +169,6 @@ class vm
         // Creates an interrupt controller model in the kernel
         //
         // See the documentation for `KVM_CREATE_IRQCHIP`.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // vm.irqchip();
-        // ```
         auto irqchip() const -> void;
         auto register_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
         auto unregister_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
