@@ -3,48 +3,76 @@
 #include <catch2/catch.hpp>
 #include "vmm/kvm/kvm.hpp"
 
-TEST_CASE("KVM object creation", "[all]") {
-    REQUIRE_NOTHROW(vmm::kvm::system{});
+TEST_CASE("KVM system creation (fd)") {
+    SECTION("Normal") {
+        REQUIRE_NOTHROW(vmm::kvm::system{});
+    }
+
+    SECTION("Good file descriptor") {
+        REQUIRE_NOTHROW(vmm::kvm::system{vmm::kvm::system::open()});
+    }
+
+    SECTION("Bad file descriptor") {
+        auto kvm = vmm::kvm::system{999};
+
+        REQUIRE_THROWS(kvm.api_version());
+        REQUIRE_THROWS(kvm.vm());
+        REQUIRE_THROWS(kvm.check_extension(KVM_CAP_EXT_CPUID));
+        REQUIRE_THROWS(kvm.vcpu_mmap_size());
+    }
 }
 
-TEST_CASE("API version", "[all]") {
+TEST_CASE("API version") {
     auto kvm = vmm::kvm::system{};
     REQUIRE(kvm.api_version() == KVM_API_VERSION);
 }
 
-
-TEST_CASE("KVM object creation (external fd)", "[all]") {
-    REQUIRE_NOTHROW(vmm::kvm::system{vmm::kvm::system::open()});
+TEST_CASE("VM creation") {
+    auto kvm = vmm::kvm::system{};
+    REQUIRE(kvm.vm().mmap_size() == kvm.vcpu_mmap_size());
 }
 
-TEST_CASE("KVM object creation (bad fd)", "[all]") {
-    auto kvm = vmm::kvm::system{999};
-
-    REQUIRE_THROWS(kvm.api_version());
-    REQUIRE_THROWS(kvm.vm());
-    REQUIRE_THROWS(kvm.check_extension(KVM_CAP_EXT_CPUID));
-    REQUIRE_THROWS(kvm.vcpu_mmap_size());
-}
-
-TEST_CASE("vCPU mmap size", "[all]") {
+TEST_CASE("vCPU mmap size") {
     auto kvm = vmm::kvm::system{};
     REQUIRE(kvm.vcpu_mmap_size() > 0);
 }
 
-TEST_CASE("IPA limit", "[.aarch64]") {
+#if defined(__i386__) || defined(__x86_64__)
+TEST_CASE("MSR lists") {
     auto kvm = vmm::kvm::system{};
-    auto ipa_limit = kvm.host_ipa_limit();
 
-    if (ipa_limit > 0)
-        REQUIRE(ipa_limit >= 32);
-    else
-        REQUIRE(ipa_limit == 0);
+    SECTION("Index list") {
+        auto msrs = kvm.msr_index_list();
+        REQUIRE(msrs.size() <= MAX_IO_MSRS);
+    }
+
+    SECTION("Feature list") {
+        if (kvm.check_extension(KVM_CAP_GET_MSR_FEATURES) > 0) {
+            auto features = kvm.msr_feature_list();
+            REQUIRE(features.size() <= MAX_IO_MSRS_FEATURES);
+        }
+    }
 }
 
-TEST_CASE("x86 cpuids", "[.x86]") {
+TEST_CASE("Read MSR features") {
     auto kvm = vmm::kvm::system{};
 
-    SECTION("Host-supported cpuids") {
+    SECTION("Index list") {
+        auto indices = kvm.msr_index_list();
+        auto entries = std::vector<kvm_msr_entry>{};
+
+        for (auto index : indices)
+            entries.push_back(kvm_msr_entry{index});
+
+        auto msrs = vmm::kvm::Msrs<MAX_IO_MSRS>{entries.begin(), entries.end()};
+        REQUIRE_NOTHROW(kvm.read_msrs(msrs));
+    }
+}
+
+TEST_CASE("Cpuids") {
+    auto kvm = vmm::kvm::system{};
+
+    SECTION("Supported cpuids") {
         if (kvm.check_extension(KVM_CAP_EXT_CPUID) > 0) {
             auto cpuids = kvm.supported_cpuids();
             REQUIRE(cpuids.size() <= MAX_CPUID_ENTRIES);
@@ -67,25 +95,20 @@ TEST_CASE("x86 cpuids", "[.x86]") {
         //}
     //}
 }
+#endif
 
-TEST_CASE("MSR index list", "[.x86]") {
+#if defined(__arm__) || defined(__arch64__)
+TEST_CASE("Host IPA limit") {
     auto kvm = vmm::kvm::system{};
+    auto ipa_limit = kvm.host_ipa_limit();
 
-    auto msrs = kvm.msr_index_list();
-    REQUIRE(msrs.size() <= MAX_IO_MSRS);
-
-    if (kvm.check_extension(KVM_CAP_GET_MSR_FEATURES) > 0) {
-        auto features = kvm.msr_feature_list();
-        REQUIRE(features.size() <= MAX_IO_MSRS_FEATURES);
-    }
+    if (ipa_limit > 0)
+        REQUIRE(ipa_limit >= 32);
+    else
+        REQUIRE(ipa_limit == 0);
 }
 
-TEST_CASE("VM creation") {
-    auto kvm = vmm::kvm::system{};
-    REQUIRE(kvm.vm().mmap_size() == kvm.vcpu_mmap_size());
-}
-
-TEST_CASE("VM creation (with IPA size)", "[.aarch64]") {
+TEST_CASE("VM creation (with IPA size)") {
     auto kvm = vmm::kvm::system{};
 
     if (kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) > 0) {
@@ -104,3 +127,4 @@ TEST_CASE("VM creation (with IPA size)", "[.aarch64]") {
         REQUIRE_THROWS(kvm.vm(40));
     }
 }
+#endif

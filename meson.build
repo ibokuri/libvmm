@@ -83,45 +83,10 @@ if not meson.is_subproject()
 
   foreach n_suite, s : test_suites
     foreach n_test, f : s
-      if host_machine.cpu_family() == 'x86' or host_machine.cpu_family() == 'x86_64'
         test(n_test, executable(n_test,
                                 f,
                                 dependencies : [project_dep, test_dep],
-                                install : false),
-                                args : ['[all],[x86]'])
-      elif host_machine.cpu_family() == 'arm'
-        test(n_test, executable(n_test,
-                                f,
-                                dependencies : [project_dep, test_dep],
-                                install : false),
-                                args : ['[all],[arm]'])
-      elif host_machine.cpu_family() == 'aarch64'
-        test(n_test, executable(n_test,
-                                f,
-                                dependencies : [project_dep, test_dep],
-                                install : false),
-                                args : ['[all],[aarch64]'])
-      elif host_machine.cpu_family() == 'mips'
-        test(n_test, executable(n_test,
-                                f,
-                                dependencies : [project_dep, test_dep],
-                                install : false),
-                                args : ['[all],[mips]'])
-      elif host_machine.cpu_family() == 'ppc' # or host_machine.cpu_family() == 'ppc64'
-        test(n_test, executable(n_test,
-                                f,
-                                dependencies : [project_dep, test_dep],
-                                install : false),
-                                args : ['[all],[ppc]'])
-      elif host_machine.cpu_family() == 's390'
-        test(n_test, executable(n_test,
-                                f,
-                                dependencies : [project_dep, test_dep],
-                                install : false),
-                                args : ['[all],[s390]'])
-      else
-        error('MESON_SKIP_TEST: skipping test on this platform')
-      endif
+                                install : false))
     endforeach
   endforeach
 endif

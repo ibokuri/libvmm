@@ -21,7 +21,7 @@ class MockWrapper : public FamStruct<N> {
     using Base::Base;
 };
 
-TEST_CASE("Create FAM struct", "[all]") {
+TEST_CASE("Create FAM struct") {
     SECTION("Entries: 0") {
         auto fam = MockWrapper<0>{};
 
@@ -51,7 +51,7 @@ TEST_CASE("Create FAM struct", "[all]") {
     }
 }
 
-TEST_CASE("Copy/move FAM struct", "[all]") {
+TEST_CASE("Copy/move FAM struct") {
     auto fam = MockWrapper<2>{1, 2};
 
     SECTION("Copy constructor") {

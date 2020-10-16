@@ -3,11 +3,11 @@
 #include <catch2/catch.hpp>
 #include "vmm/kvm/kvm.hpp"
 
-TEST_CASE("VM creation", "[all]") {
+TEST_CASE("VM creation") {
     REQUIRE_NOTHROW(vmm::kvm::system{}.vm());
 }
 
-TEST_CASE("vcpu and memory slots", "[all]") {
+TEST_CASE("vcpu and memory slots") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -16,7 +16,7 @@ TEST_CASE("vcpu and memory slots", "[all]") {
     REQUIRE(vm.num_memslots() >= 32);
 }
 
-TEST_CASE("Invalid memory slot", "[all]") {
+TEST_CASE("Invalid memory slot") {
     auto kvm = vmm::kvm::system{};
 
     if (kvm.check_extension(KVM_CAP_USER_MEMORY) > 0) {
@@ -30,80 +30,6 @@ TEST_CASE("Invalid memory slot", "[all]") {
         };
 
         REQUIRE_THROWS(vm.memslot(mem_region));
-    }
-}
-
-TEST_CASE("IRQ Chip creation (x86, arm, aarch64)", "[.x86][.arm][.aarch64]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
-        REQUIRE_NOTHROW(vm.irqchip());
-    }
-}
-
-TEST_CASE("IRQ Chip creation (s390)", "[.s390]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_S390_IRQCHIP) > 0) {
-        REQUIRE_NOTHROW(vm.irqchip());
-    }
-}
-
-TEST_CASE("IRQ Chip (x86)", "[.x86]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
-        REQUIRE_NOTHROW(vm.irqchip());
-
-        auto irqchip1 = kvm_irqchip{
-            .chip_id = KVM_IRQCHIP_PIC_MASTER,
-            .chip = { .pic = {.irq_base = 10} }
-        };
-        auto irqchip2 = kvm_irqchip{
-            .chip_id = KVM_IRQCHIP_PIC_MASTER
-        };
-
-        REQUIRE_NOTHROW(vm.set_irqchip(irqchip1));
-        REQUIRE_NOTHROW(vm.get_irqchip(irqchip2));
-
-        REQUIRE(irqchip1.chip.pic.irq_base == irqchip2.chip.pic.irq_base);
-    }
-}
-
-TEST_CASE("Clock", "[.x86]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_ADJUST_CLOCK) > 0) {
-        auto orig = kvm_clock_data{ vm.get_clock() };
-        auto other = kvm_clock_data{ .clock = 10 };
-
-        vm.set_clock(other);
-        auto newtime = kvm_clock_data{ vm.get_clock() };
-
-        REQUIRE(orig.clock > newtime.clock);
-        REQUIRE(newtime.clock > other.clock);
-    }
-}
-
-TEST_CASE("Bootstrap Processor (BSP)", "[.x86]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0) {
-        SECTION("No vcpu") {
-            REQUIRE_NOTHROW(vm.set_bsp(0));
-        }
-
-        // TODO: Comment the logic behind the test. I think it was b/c you
-        // can't set the BSP after a vcpu is already created.
-        SECTION("Existing vcpu") {
-            auto vcpu = vm.vcpu(0);
-            REQUIRE_THROWS(vm.set_bsp(0));
-        }
     }
 }
 
@@ -143,7 +69,76 @@ TEST_CASE("Detach ioevent", "[all]") {
     }
 }
 
-TEST_CASE("GSI routing (x86)", "[.x86]") {
+#if defined(__i386__) || defined(__x86_64__) || \
+    defined(__arm__)  || defined(__arch64__)
+TEST_CASE("IRQ Chip creation") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
+        REQUIRE_NOTHROW(vm.irqchip());
+    }
+}
+#endif
+
+#if defined(__i386__) || defined(__x86_64__)
+TEST_CASE("IRQ Chip") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
+        REQUIRE_NOTHROW(vm.irqchip());
+
+        auto irqchip1 = kvm_irqchip{
+            .chip_id = KVM_IRQCHIP_PIC_MASTER,
+            .chip = { .pic = {.irq_base = 10} }
+        };
+        auto irqchip2 = kvm_irqchip{
+            .chip_id = KVM_IRQCHIP_PIC_MASTER
+        };
+
+        REQUIRE_NOTHROW(vm.set_irqchip(irqchip1));
+        REQUIRE_NOTHROW(vm.get_irqchip(irqchip2));
+
+        REQUIRE(irqchip1.chip.pic.irq_base == irqchip2.chip.pic.irq_base);
+    }
+}
+
+TEST_CASE("Clock") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_ADJUST_CLOCK) > 0) {
+        auto orig = kvm_clock_data{ vm.get_clock() };
+        auto other = kvm_clock_data{ .clock = 10 };
+
+        vm.set_clock(other);
+        auto newtime = kvm_clock_data{ vm.get_clock() };
+
+        REQUIRE(orig.clock > newtime.clock);
+        REQUIRE(newtime.clock > other.clock);
+    }
+}
+
+TEST_CASE("Bootstrap Processor (BSP)") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0) {
+        SECTION("No vcpu") {
+            REQUIRE_NOTHROW(vm.set_bsp(0));
+        }
+
+        // TODO: Comment the logic behind the test. I think it was b/c you
+        // can't set the BSP after a vcpu is already created.
+        SECTION("Existing vcpu") {
+            auto vcpu = vm.vcpu(0);
+            REQUIRE_THROWS(vm.set_bsp(0));
+        }
+    }
+}
+
+TEST_CASE("GSI routing") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -158,18 +153,7 @@ TEST_CASE("GSI routing (x86)", "[.x86]") {
     }
 }
 
-TEST_CASE("GSI routing (arm, aarch64, s390)", "[.arm][.aarch64][.s390]") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
-        auto entry = kvm_irq_routing_entry{};
-        auto routing_list = vmm::kvm::IrqRouting<1>{entry};
-        REQUIRE_NOTHROW(vm.gsi_routing(routing_list));
-    }
-}
-
-TEST_CASE("IRQ Line (x86)", "[.x86]") {
+TEST_CASE("IRQ Line") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -178,16 +162,19 @@ TEST_CASE("IRQ Line (x86)", "[.x86]") {
     REQUIRE_NOTHROW(vm.set_irq_line(4, false));
     REQUIRE_NOTHROW(vm.set_irq_line(4, true));
 }
+#endif
 
-//TEST_CASE("IRQ Line (arm, aarch64)", "[.arm][.aarch64]") {
-    //auto kvm = vmm::kvm::system{};
-    //auto vm = kvm.vm();
-    //auto vcpu = vm.vcpu(0);
-    //
-    // TODO: requires dummy GIC device
-//}
+#if defined(__s390__)
+TEST_CASE("IRQ Chip creation") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
 
-TEST_CASE("IRQ File Descriptor (x86)", "[.x86]") {
+    if (vm.check_extension(KVM_CAP_S390_IRQCHIP) > 0) {
+        REQUIRE_NOTHROW(vm.irqchip());
+    }
+}
+
+TEST_CASE("IRQ File Descriptor") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
     auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
@@ -211,7 +198,33 @@ TEST_CASE("IRQ File Descriptor (x86)", "[.x86]") {
     REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
 }
 
-//TEST_CASE("IRQ File Descriptor (aarch64)", "[.aarch64]") {
+#endif
+
+#if defined(__arm__) || defined(__aarch64__) || defined(__s390__)
+TEST_CASE("GSI routing") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
+        auto entry = kvm_irq_routing_entry{};
+        auto routing_list = vmm::kvm::IrqRouting<1>{entry};
+        REQUIRE_NOTHROW(vm.gsi_routing(routing_list));
+    }
+}
+#endif
+
+//#if defined(__arm__) || defined(__aarch64__)
+//TEST_CASE("IRQ Line") {
+    //auto kvm = vmm::kvm::system{};
+    //auto vm = kvm.vm();
+    //auto vcpu = vm.vcpu(0);
+    //
+    // TODO: requires dummy GIC device
+//}
+//#endif
+
+//#if defined(__aarch64__)
+//TEST_CASE("IRQ File Descriptor") {
     //auto kvm = vmm::kvm::system{};
     //auto vm = kvm.vm();
     //auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
@@ -235,3 +248,4 @@ TEST_CASE("IRQ File Descriptor (x86)", "[.x86]") {
     //// NOTE: KVM doesn't report unregisters with different levels as errors
     //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
 //}
+//#endif
