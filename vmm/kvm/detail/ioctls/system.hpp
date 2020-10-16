@@ -57,8 +57,7 @@ class system
 
         // Returns the kvm API version.
         //
-        // Applications should refuse to run if a value other than 12 is
-        // returned.
+        // See the documentation for KVM_GET_API_VERSION.
         [[nodiscard]] auto api_version() const -> unsigned;
 
         // Creates and returns a virtual machine (with a custom machine type).
@@ -66,42 +65,26 @@ class system
         // The VM's vcpu mmap area will be initialized with the KVM_GET_VCPU_MMAP_SIZE
         // ioctl's result.
         //
-        // By default, the physical address size for a VM (IPA Size limit) on AArch64
-        // is limited to 40-bits. However, this limit can be configured if the host
-        // supports the KVM_CAP_ARM_VM_IPA_SIZE extension. When supported, use
-        // KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
-        // identifier, where IPA_Bits is the maximum width of any physical address used
-        // by the VM.
+        // See the documentation for KVM_CREATE_VM.
         [[nodiscard]] auto vm(unsigned machine_type=0) const -> vmm::kvm::detail::vm;
 
         // Returns a positive integer if a KVM extension is available; 0 otherwise.
         //
-        // Based on their initialization, VMs may have different capabilities. Thus,
-        // `kvm::vm::check_extension()` is preferred when querying for most
-        // capabilities.
-        //
-        // TODO: No test. rust-vmm doesn't have any for this either.
+        // Based on their initialization, VMs may have different capabilities.
+        // Therefore, `kvm::vm::check_extension()` is preferred when querying
+        // for most capabilities.
         [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
 
         // Returns the size of the memory region used by the KVM_RUN ioctl to
         // communicate CPU information to userspace.
-        //
-        // Each vcpu has an associated `kvm_run` struct for communicating information
-        // about the CPU between kernel and userspace. In particular, whenever hardware
-        // virtualization stops (called a VM-exit), the `kvm_run` struct will contain
-        // information about why it stopped. We map this structure into userspace via
-        // mmap(), but we need to know beforehand how much memory to map. We get that
-        // information with the KVM_GET_VCPU_MMAP_SIZE ioctl.
-        //
-        // Note that the mmap size typically exceeds that of the `kvm_run` struct since
-        // the kernel will also use that space to store other transient structures that
-        // kvm_run may point to.
         [[nodiscard]] auto vcpu_mmap_size() const -> std::size_t;
 
 #if defined(__i386__) || defined(__x86_64__)
         // TODO: Allocator variants for FAM struct methods
 
         // Returns a list of host-supported and kvm-specific MSRs.
+        //
+        // See the documentation for KVM_GET_MSR_INDEX_LIST.
         template<std::size_t N=MAX_IO_MSRS>
         [[nodiscard]] auto msr_index_list() const -> MsrList<N>
         {
@@ -111,6 +94,8 @@ class system
         }
 
         // Returns a list of MSRs exposing MSR-based CPU features.
+        //
+        // See the documentation for KVM_GET_MSR_FEATURE_INDEX_LIST.
         template<std::size_t N=MAX_IO_MSRS_FEATURES>
         [[nodiscard]] auto msr_feature_list() const -> MsrList<N>
         {
@@ -121,6 +106,8 @@ class system
 
         // Reads the values of MSR-based features available for VMs. Returns
         // the number of successfully read values.
+        //
+        // See the documentation for KVM_GET_MSRS.
         template<typename T,
                  typename=std::enable_if_t<std::is_same_v<typename T::value_type,
                                                           kvm_msr_entry>>>
@@ -131,10 +118,7 @@ class system
 
         // Returns a list of host- and kvm-supported x86 cpuid features.
         //
-        // In x86, the CPU identification (CPUID) instruction is a
-        // supplementary instruction allowing software to discover details of
-        // the processor. A program can use the CPUID to determine processor
-        // type and whether certain features are implemented.
+        // See the documentation for KVM_GET_SUPPORTED_CPUID.
         template<std::size_t N=MAX_CPUID_ENTRIES>
         [[nodiscard]] auto supported_cpuids() const -> Cpuids<N>
         {
@@ -144,6 +128,8 @@ class system
         }
 
         // Returns a list of kvm-emulated x86 cpuid features.
+        //
+        // See the documentation for KVM_GET_EMULATED_CPUID.
         template<std::size_t N=MAX_CPUID_ENTRIES>
         [[nodiscard]] auto emulated_cpuids() const -> Cpuids<N>
         {
@@ -155,12 +141,6 @@ class system
 
 #if defined(__arm__)  || defined(__aarch64__)
         // Returns the IPA size for a VM; 0 if the capability isn't available.
-        //
-        // On AArch64, a guest OS has a set of translation tables that map
-        // from the virtual address space to what it thinks is the physical
-        // address space, also called the Intermediate Physical Address (IPA)
-        // space. However, addresses in the IPA space undergo a second
-        // translation into the real physical address space by the hypervisor.
         [[nodiscard]] auto host_ipa_limit() const -> unsigned;
 #endif
     private:

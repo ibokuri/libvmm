@@ -42,8 +42,8 @@ class vm
         // otherwise.
         //
         // Based on their initialization, VMs may have different capabilities.
-        // Thus, `kvm::vm::check_extension()` is preferred when querying for
-        // most capabilities.
+        // Therefore, `kvm::vm::check_extension()` is preferred when querying
+        // for most capabilities.
         [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
 
         // Creates, modifies, or deletes a guest physical memory slot.
@@ -53,8 +53,7 @@ class vm
 
         // Attaches an ioeventfd to a legal pio/mmio address within the guest.
         //
-        // A guest write in the registered address will signal the provided
-        // event instead of triggering an exit.
+        // See the documentation for KVM_IOEVENTFD.
         template<vmm::types::IoEventAddress T>
         auto attach_ioevent(vmm::types::EventFd eventfd, uint64_t addr,
                             uint64_t datamatch=0) const -> void
@@ -121,8 +120,7 @@ class vm
 #if defined(__i386__) || defined(__x86_64__)
         // Defines which vcpu is the Bootstrap Processor (BSP).
         //
-        // The KVM_SET_BOOT_CPU_ID ioctl must be called before any vcpus are
-        // created for a VM, otherwise the call will fail.
+        // If a vCPU exists for a VM before this is called, the call will fail.
         //
         // See the documentation for KVM_SET_BOOT_CPU_ID.
         auto set_bsp(unsigned vcpu_id) const -> void;
@@ -130,31 +128,28 @@ class vm
         // Reads the state of a kernel interrupt controller into a buffer
         // provided by the caller.
         //
-        // See the documentation for `KVM_GET_IRQCHIP`.
+        // See the documentation for KVM_GET_IRQCHIP.
         auto get_irqchip(kvm_irqchip&) const -> void;
 
         // Sets the state of a kernel interrupt controller from a buffer
         // provided by the caller.
         //
-        // See the documentation for `KVM_SET_IRQCHIP`.
+        // See the documentation for KVM_SET_IRQCHIP.
         auto set_irqchip(const kvm_irqchip&) const -> void;
 
         // Gets the current timestamp of kvmclock as seen by the current guest.
         //
-        // See the documentation for `KVM_GET_CLOCK`.
+        // See the documentation for KVM_GET_CLOCK.
         [[nodiscard]] auto get_clock() const -> kvm_clock_data;
 
         // Sets the current timestamp of kvmclock.
         //
-        // See the documentation for `KVM_SET_CLOCK`.
+        // See the documentation for KVM_SET_CLOCK.
         auto set_clock(kvm_clock_data&) const -> void;
 
         // Sets the address of a three-page region in a VM's address space.
         //
-        // The region must be within the first 4GB of the guest physical
-        // address space and must not conflict with any memory slot or any mmio
-        // address. The guest may malfunction if it accesses this memory
-        // region.
+        // See the documentation for KVM_SET_TSS_ADDR.
         auto set_tss_address(unsigned long address) const -> void;
 #endif
 

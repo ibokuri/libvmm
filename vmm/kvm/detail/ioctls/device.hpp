@@ -17,10 +17,19 @@ class device
     friend device vm::device(uint32_t type, uint32_t flags) const;
 
     public:
+        // Gets a specified piece of device configuration/state.
+        //
+        // See the documentation for KVM_GET_DEVICE_ATTR.
         auto get_attr(kvm_device_attr&) -> void;
+
+        // Sets a specified piece of device configuration/state.
+        //
+        // See the documentation for KVM_SET_DEVICE_ATTR.
         auto set_attr(kvm_device_attr&) -> void;
 
         // Checks whether an attribute for a device is supported.
+        //
+        // See the documentation for KVM_HAS_DEVICE_ATTR.
         //
         // Examples
         // ========
