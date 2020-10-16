@@ -79,6 +79,10 @@ auto vm::set_clock(kvm_clock_data &clock) const -> void
 {
     m_fd.ioctl(KVM_SET_CLOCK, &clock);
 }
+
+auto vm::set_tss_address(unsigned long address) const -> void {
+    m_fd.ioctl(KVM_SET_TSS_ADDR, address);
+}
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)  || \

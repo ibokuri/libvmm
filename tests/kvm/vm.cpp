@@ -37,8 +37,8 @@ TEST_CASE("Attach ioevent") {
         REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xf4));
         REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc1, 0x7f));
         REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc2, 0x1337));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc4, 0xdeadbeef));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc8, 0xdeadbeefdeadbeef));
+        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc4, 0xdead'beef));
+        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc8, 0xdead'beef'dead'beef));
     }
 }
 
@@ -155,6 +155,13 @@ TEST_CASE("IRQ Line") {
     REQUIRE_NOTHROW(vm.set_irq_line(4, true));
     REQUIRE_NOTHROW(vm.set_irq_line(4, false));
     REQUIRE_NOTHROW(vm.set_irq_line(4, true));
+}
+
+TEST_CASE("TSS address") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    REQUIRE_NOTHROW(vm.set_tss_address(0xfffb'd000));
 }
 #endif
 

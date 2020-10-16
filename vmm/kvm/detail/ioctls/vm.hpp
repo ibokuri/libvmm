@@ -179,6 +179,14 @@ class vm
         //
         // See the documentation for `KVM_SET_CLOCK`.
         auto set_clock(kvm_clock_data&) const -> void;
+
+        // Sets the address of a three-page region in a VM's address space.
+        //
+        // The region must be within the first 4GB of the guest physical
+        // address space and must not conflict with any memory slot or any mmio
+        // address. The guest may malfunction if it accesses this memory
+        // region.
+        auto set_tss_address(unsigned long address) const -> void;
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)  || \
