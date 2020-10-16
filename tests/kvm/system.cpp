@@ -56,16 +56,22 @@ TEST_CASE("MSR lists") {
 
 TEST_CASE("Read MSR features") {
     auto kvm = vmm::kvm::system{};
+    auto entries = std::vector<kvm_msr_entry>{};
 
-    SECTION("Index list") {
-        auto indices = kvm.msr_index_list();
-        auto entries = std::vector<kvm_msr_entry>{};
+    SECTION("Feature list") {
+        auto indices = kvm.msr_feature_list();
 
         for (auto index : indices)
             entries.push_back(kvm_msr_entry{index});
 
-        auto msrs = vmm::kvm::Msrs<MAX_IO_MSRS>{entries.begin(), entries.end()};
-        REQUIRE_NOTHROW(kvm.read_msrs(msrs));
+        auto msrs = vmm::kvm::Msrs<MAX_IO_MSRS_FEATURES>{entries.begin(),
+                                                         entries.end()};
+
+        REQUIRE_NOTHROW(kvm.get_msr_features(msrs));
+
+        // TODO: Are the base values of MSR features always > 0?
+        for (auto msr : msrs)
+            REQUIRE(msr.data > 0);
     }
 }
 

@@ -117,7 +117,7 @@ class vm
         //
         // auto kvm = vmm::kvm::system{};
         // auto vm = kvm.vm();
-        // auto eventfd = EventFd{Em_fdNONBLOCK};
+        // auto eventfd = EventFd{EFD_NONBLOCK};
         //
         // vm.attach_ioevent<Pio>(eventfd, 0xf4);
         // vm.attach_ioevent<Mmio>(eventfd, 0x1000);
@@ -161,7 +161,7 @@ class vm
         //
         // auto kvm = vmm::kvm::system{};
         // auto vm = kvm.vm();
-        // auto eventfd = EventFd{Em_fdNONBLOCK};
+        // auto eventfd = EventFd{EFD_NONBLOCK};
         //
         // vm.attach_ioevent<Pio>(eventfd, 0xf4);
         // vm.attach_ioevent<Mmio>(eventfd, 0x1000, 0x1234);

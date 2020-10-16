@@ -32,9 +32,11 @@ auto system::vcpu_mmap_size() const -> std::size_t
     return m_fd.ioctl(KVM_GET_VCPU_MMAP_SIZE);
 }
 
+#if defined(__arm__)  || defined(__aarch64__)
 auto system::host_ipa_limit() const -> unsigned
 {
     return check_extension(KVM_CAP_ARM_VM_IPA_SIZE);
 }
+#endif
 
 }  // namespace vmm::kvm::detail
