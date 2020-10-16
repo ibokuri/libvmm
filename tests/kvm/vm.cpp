@@ -84,13 +84,12 @@ TEST_CASE("IRQ Chip") {
     if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
         REQUIRE_NOTHROW(vm.irqchip());
 
-        auto irqchip1 = kvm_irqchip{
-            .chip_id = KVM_IRQCHIP_PIC_MASTER,
-            .chip = { .pic = {.irq_base = 10} }
-        };
-        auto irqchip2 = kvm_irqchip{
-            .chip_id = KVM_IRQCHIP_PIC_MASTER
-        };
+        auto irqchip1 = kvm_irqchip{};
+        irqchip1.chip_id = KVM_IRQCHIP_PIC_MASTER;
+        irqchip1.chip.pic.irq_base = 10;
+
+        auto irqchip2 = kvm_irqchip{};
+        irqchip2.chip_id = KVM_IRQCHIP_PIC_MASTER;
 
         REQUIRE_NOTHROW(vm.set_irqchip(irqchip1));
         REQUIRE_NOTHROW(vm.get_irqchip(irqchip2));
@@ -104,11 +103,11 @@ TEST_CASE("Clock") {
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_ADJUST_CLOCK) > 0) {
-        auto orig = kvm_clock_data{ vm.get_clock() };
-        auto other = kvm_clock_data{ .clock = 10 };
+        auto orig = vm.get_clock();
+        auto other = kvm_clock_data{10};
 
         vm.set_clock(other);
-        auto newtime = kvm_clock_data{ vm.get_clock() };
+        auto newtime = vm.get_clock();
 
         REQUIRE(orig.clock > newtime.clock);
         REQUIRE(newtime.clock > other.clock);

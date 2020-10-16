@@ -101,11 +101,11 @@ class vm
             }
 
             auto ioeventfd = kvm_ioeventfd {
-                .datamatch = datamatch,
-                .addr = addr,
-                .len = sizeof(uint64_t),
-                .fd = eventfd.fd(),
-                .flags = flags
+                datamatch,
+                addr,
+                sizeof(uint64_t),
+                eventfd.fd(),
+                flags
             };
 
             m_fd.ioctl(KVM_IOEVENTFD, &ioeventfd);
@@ -127,11 +127,11 @@ class vm
             }
 
             auto ioeventfd = kvm_ioeventfd {
-                .datamatch = datamatch,
-                .addr = addr,
-                .len = sizeof(uint64_t),
-                .fd = eventfd.fd(),
-                .flags = flags
+                datamatch,
+                addr,
+                sizeof(uint64_t),
+                eventfd.fd(),
+                flags
             };
 
             m_fd.ioctl(KVM_IOEVENTFD, &ioeventfd);

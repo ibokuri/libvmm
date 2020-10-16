@@ -86,8 +86,8 @@ auto vm::set_clock(kvm_clock_data &clock) const -> void
 auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
 {
     auto irq_level = kvm_irq_level {
-        .irq = irq,
-        .level = active ? uint32_t{1} : uint32_t{0}
+        { irq },
+        active ? uint32_t{1} : uint32_t{0} // level
     };
 
     m_fd.ioctl(KVM_IRQ_LINE, &irq_level);
@@ -105,8 +105,8 @@ auto vm::irqchip() const -> void
 auto vm::register_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> void
 {
     auto irqfd = kvm_irqfd {
-        .fd = static_cast<uint32_t>(eventfd.fd()),
-        .gsi = gsi
+        static_cast<uint32_t>(eventfd.fd()),
+        gsi
     };
 
     m_fd.ioctl(KVM_IRQFD, &irqfd);
@@ -115,9 +115,9 @@ auto vm::register_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> void
 auto vm::unregister_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> void
 {
     auto irqfd = kvm_irqfd {
-        .fd = static_cast<uint32_t>(eventfd.fd()),
-        .gsi = gsi,
-        .flags = KVM_IRQFD_FLAG_DEASSIGN
+        static_cast<uint32_t>(eventfd.fd()),
+        gsi,
+        KVM_IRQFD_FLAG_DEASSIGN
     };
 
     m_fd.ioctl(KVM_IRQFD, &irqfd);
