@@ -249,6 +249,7 @@ class FamStruct<SizeMember, EntriesMember, N>
         }
 };
 
+#if defined(__i386__) || defined(__x86_64__)
 // NOTE: Because MsrList's value_type is an integer, it is very easy to confuse
 //       the size_type initializer_list and constructor. That is, one may think
 //       that `auto msr_list = MsrList{10}` constructs a FAM struct with enough
@@ -288,6 +289,7 @@ class Cpuids
     using Base = FamStruct<&kvm_cpuid2::nent, &kvm_cpuid2::entries, N>;
     using Base::Base;
 };
+#endif
 
 template<std::size_t N>
 class IrqRouting
