@@ -1,6 +1,7 @@
 image: archlinux
 packages:
   - catch2
+  - gcc
   - meson
   - ninja
 sources:
