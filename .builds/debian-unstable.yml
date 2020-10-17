@@ -18,4 +18,4 @@ tasks:
       ninja -C build
   - test: |
       cd libvmm/build
-      meson test -v
+      sudo meson test -v
