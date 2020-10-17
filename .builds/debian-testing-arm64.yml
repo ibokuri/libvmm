@@ -1,0 +1,22 @@
+image: debian/testing
+arch: arm64
+packages:
+  - catch2
+  - g++-9
+  - meson
+  - ninja-build
+  - pkg-config
+sources:
+  - https://git.sr.ht/~satchmo/libvmm
+secrets:
+  - a6eeb31f-6075-4866-a6e0-929056201f78
+tasks:
+  - setup: |
+      cd libvmm
+      meson build
+  - build: |
+      cd libvmm
+      ninja -C build
+  - test: |
+      cd libvmm/build
+      sudo meson test -v
