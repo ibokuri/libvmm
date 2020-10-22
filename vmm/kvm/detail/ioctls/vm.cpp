@@ -106,7 +106,7 @@ auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void
     m_fd.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
 }
 
-auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void
+auto vm::set_irqchip(const kvm_irqchip &irqchip_p) const -> void
 {
     m_fd.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
 }
@@ -118,7 +118,7 @@ auto vm::get_clock() const -> kvm_clock_data
     return clock;
 }
 
-auto vm::set_clock(kvm_clock_data &clock) const -> void
+auto vm::set_clock(const kvm_clock_data &clock) const -> void
 {
     m_fd.ioctl(KVM_SET_CLOCK, &clock);
 }

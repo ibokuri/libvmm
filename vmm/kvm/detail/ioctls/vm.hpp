@@ -172,7 +172,7 @@ class vm
         // Sets the current timestamp of kvmclock.
         //
         // See the documentation for KVM_SET_CLOCK.
-        auto set_clock(kvm_clock_data&) const -> void;
+        auto set_clock(const kvm_clock_data&) const -> void;
 
         // Sets the address of a three-page region in a VM's address space.
         //
