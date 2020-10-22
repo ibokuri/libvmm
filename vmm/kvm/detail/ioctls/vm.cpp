@@ -129,7 +129,7 @@ auto vm::set_tss_address(unsigned long address) const -> void {
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)
-[[nodiscard]] auto vm::preferred_target() const -> kvm_vcpu_init
+auto vm::preferred_target() const -> kvm_vcpu_init
 {
     auto kvi = kvm_vcpu_init{};
     m_fd.ioctl(KVM_GET_CLOCK, &kvi);
