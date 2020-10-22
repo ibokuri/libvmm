@@ -52,52 +52,6 @@ auto vm::num_memslots() const -> unsigned
     return ret > 0 ? ret : 32;
 }
 
-#if defined(__i386__) || defined(__x86_64__)
-auto vm::set_bsp(unsigned vcpu_id) const -> void
-{
-    m_fd.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
-}
-
-auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void
-{
-    m_fd.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
-}
-
-auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void
-{
-    m_fd.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
-}
-
-auto vm::get_clock() const -> kvm_clock_data
-{
-    auto clock = kvm_clock_data{};
-    m_fd.ioctl(KVM_GET_CLOCK, &clock);
-    return clock;
-}
-
-auto vm::set_clock(kvm_clock_data &clock) const -> void
-{
-    m_fd.ioctl(KVM_SET_CLOCK, &clock);
-}
-
-auto vm::set_tss_address(unsigned long address) const -> void {
-    m_fd.ioctl(KVM_SET_TSS_ADDR, address);
-}
-#endif
-
-#if defined(__i386__) || defined(__x86_64__)  || \
-    defined(__arm__)  || defined(__aarch64__)
-auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
-{
-    auto irq_level = kvm_irq_level {
-        { irq },
-        active ? uint32_t{1} : uint32_t{0} // level
-    };
-
-    m_fd.ioctl(KVM_IRQ_LINE, &irq_level);
-}
-#endif
-
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__) || \
     defined(__s390__)
@@ -123,6 +77,46 @@ auto vm::unregister_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> vo
         gsi,
         KVM_IRQFD_FLAG_DEASSIGN
     };
+
+    m_fd.ioctl(KVM_IRQFD, &irqfd);
+}
+#endif
+
+#if defined(__i386__) || defined(__x86_64__)  || \
+    defined(__arm__)  || defined(__aarch64__)
+auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
+{
+    auto irq_level = kvm_irq_level {
+        { irq },
+        active ? uint32_t{1} : uint32_t{0} // level
+    };
+
+    m_fd.ioctl(KVM_IRQ_LINE, &irq_level);
+}
+#endif
+
+#if defined(__i386__) || defined(__x86_64__)
+auto vm::set_bsp(unsigned vcpu_id) const -> void
+{
+    m_fd.ioctl(KVM_SET_BOOT_CPU_ID, vcpu_id);
+}
+
+auto vm::get_irqchip(kvm_irqchip &irqchip_p) const -> void
+{
+    m_fd.ioctl(KVM_GET_IRQCHIP, &irqchip_p);
+}
+
+auto vm::set_irqchip(kvm_irqchip const &irqchip_p) const -> void
+{
+    m_fd.ioctl(KVM_SET_IRQCHIP, &irqchip_p);
+}
+
+auto vm::get_clock() const -> kvm_clock_data
+{
+    auto clock = kvm_clock_data{};
+    m_fd.ioctl(KVM_GET_CLOCK, &clock);
+    return clock;
+}
 
 auto vm::set_clock(kvm_clock_data &clock) const -> void
 {

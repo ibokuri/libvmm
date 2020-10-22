@@ -80,7 +80,7 @@ TEST_CASE("IRQ Chip creation") {
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)
-TEST_CASE("IRQ Chip") {
+TEST_CASE("IRQ chip") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -117,7 +117,7 @@ TEST_CASE("Clock") {
     }
 }
 
-TEST_CASE("Bootstrap Processor (BSP)") {
+TEST_CASE("Bootstrap processor (BSP)") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -150,7 +150,7 @@ TEST_CASE("GSI routing") {
     }
 }
 
-TEST_CASE("IRQ Line") {
+TEST_CASE("IRQ line") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -166,42 +166,6 @@ TEST_CASE("TSS address") {
 
     REQUIRE_NOTHROW(vm.set_tss_address(0xfffb'd000));
 }
-#endif
-
-#if defined(__s390__)
-TEST_CASE("IRQ Chip creation") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_S390_IRQCHIP) > 0) {
-        REQUIRE_NOTHROW(vm.irqchip());
-    }
-}
-
-TEST_CASE("IRQ File Descriptor") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
-    auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
-    auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
-
-    REQUIRE_NOTHROW(vm.irqchip());
-
-    REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
-    REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
-    REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
-
-    // Duplicate registrations
-    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
-
-    // NOTE: KVM doesn't report duplicate unregisters as errors
-    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
-    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
-
-    // NOTE: KVM doesn't report unregisters with different levels as errors
-    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
-}
-
 #endif
 
 #if defined(__arm__) || defined(__aarch64__) || defined(__s390__)
@@ -234,7 +198,7 @@ TEST_CASE("Preferred target") {
 #endif
 
 //#if defined(__aarch64__)
-//TEST_CASE("IRQ File Descriptor") {
+//TEST_CASE("IRQ file descriptor") {
     //auto kvm = vmm::kvm::system{};
     //auto vm = kvm.vm();
     //auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
@@ -259,3 +223,38 @@ TEST_CASE("Preferred target") {
     //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
 //}
 //#endif
+
+#if defined(__s390__)
+TEST_CASE("IRQ chip creation") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_S390_IRQCHIP) > 0) {
+        REQUIRE_NOTHROW(vm.irqchip());
+    }
+}
+
+TEST_CASE("IRQ file descriptor") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
+
+    REQUIRE_NOTHROW(vm.irqchip());
+
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
+
+    // Duplicate registrations
+    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
+
+    // NOTE: KVM doesn't report duplicate unregisters as errors
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+
+    // NOTE: KVM doesn't report unregisters with different levels as errors
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
+}
+#endif
