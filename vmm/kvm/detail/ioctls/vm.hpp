@@ -178,6 +178,10 @@ class vm
         //
         // See the documentation for KVM_SET_TSS_ADDR.
         auto set_tss_address(unsigned long address) const -> void;
+
+        auto create_pit2(uint32_t flags=0) const -> void;
+        auto pit2(uint32_t flags=0) const -> kvm_pit_state2;
+        auto set_pit2(const kvm_pit_state2&) const -> void;
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)

@@ -126,6 +126,22 @@ auto vm::set_clock(kvm_clock_data &clock) const -> void
 auto vm::set_tss_address(unsigned long address) const -> void {
     m_fd.ioctl(KVM_SET_TSS_ADDR, address);
 }
+
+auto vm::create_pit2(uint32_t flags) const -> void {
+    auto config = kvm_pit_config{};
+    config.flags = flags;
+    m_fd.ioctl(KVM_CREATE_PIT2, &config);
+}
+
+auto vm::pit2(uint32_t flags) const -> kvm_pit_state2 {
+    auto state = kvm_pit_state2{};
+    m_fd.ioctl(KVM_GET_PIT2, &state);
+    return state;
+}
+
+auto vm::set_pit2(const kvm_pit_state2 &state) const -> void {
+    m_fd.ioctl(KVM_SET_PIT2, &state);
+}
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)

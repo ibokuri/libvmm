@@ -166,6 +166,43 @@ TEST_CASE("TSS address") {
 
     REQUIRE_NOTHROW(vm.set_tss_address(0xfffb'd000));
 }
+
+TEST_CASE("PIT2") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    SECTION("Creation/get") {
+        REQUIRE_NOTHROW(vm.create_pit2());
+        REQUIRE_NOTHROW(vm.pit2());
+    }
+
+    SECTION("Set") {
+        REQUIRE_NOTHROW(vm.create_pit2());
+        auto pit2 = vm.pit2();
+        REQUIRE_NOTHROW(vm.set_pit2(pit2));
+        auto other = vm.pit2();
+
+        // Overwrite load times as they may differ
+        other.channels[0].count_load_time = pit2.channels[0].count_load_time;
+        other.channels[1].count_load_time = pit2.channels[1].count_load_time;
+        other.channels[2].count_load_time = pit2.channels[2].count_load_time;
+
+        for (std::size_t i = 0; i < 3; i++) {
+            REQUIRE(pit2.channels[i].count == other.channels[i].count);
+            REQUIRE(pit2.channels[i].latched_count == other.channels[i].latched_count);
+            REQUIRE(pit2.channels[i].count_latched == other.channels[i].count_latched);
+            REQUIRE(pit2.channels[i].status_latched == other.channels[i].status_latched);
+            REQUIRE(pit2.channels[i].status == other.channels[i].status);
+            REQUIRE(pit2.channels[i].read_state == other.channels[i].read_state);
+            REQUIRE(pit2.channels[i].write_state == other.channels[i].write_state);
+            REQUIRE(pit2.channels[i].write_latch == other.channels[i].write_latch);
+            REQUIRE(pit2.channels[i].rw_mode == other.channels[i].rw_mode);
+            REQUIRE(pit2.channels[i].mode == other.channels[i].mode);
+            REQUIRE(pit2.channels[i].bcd == other.channels[i].bcd);
+            REQUIRE(pit2.channels[i].gate == other.channels[i].gate);
+        }
+    }
+}
 #endif
 
 #if defined(__arm__) || defined(__aarch64__) || defined(__s390__)
