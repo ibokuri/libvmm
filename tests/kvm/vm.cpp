@@ -217,15 +217,21 @@ TEST_CASE("GSI routing") {
 }
 #endif
 
-//#if defined(__arm__) || defined(__aarch64__)
-//TEST_CASE("IRQ Line") {
+#if defined(__arm__) || defined(__aarch64__)
+//TEST_CASE("IRQ line") {
     //auto kvm = vmm::kvm::system{};
     //auto vm = kvm.vm();
     //auto vcpu = vm.vcpu(0);
     //
     // TODO: requires dummy GIC device
 //}
-//#endif
+
+TEST_CASE("Preferred target") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    REQUIRE_NOTHROW(vm.preferred_target());
+}
+#endif
 
 //#if defined(__aarch64__)
 //TEST_CASE("IRQ File Descriptor") {

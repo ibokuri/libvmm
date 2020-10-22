@@ -124,7 +124,22 @@ auto vm::unregister_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> vo
         KVM_IRQFD_FLAG_DEASSIGN
     };
 
-    m_fd.ioctl(KVM_IRQFD, &irqfd);
+auto vm::set_clock(kvm_clock_data &clock) const -> void
+{
+    m_fd.ioctl(KVM_SET_CLOCK, &clock);
+}
+
+auto vm::set_tss_address(unsigned long address) const -> void {
+    m_fd.ioctl(KVM_SET_TSS_ADDR, address);
+}
+#endif
+
+#if defined(__arm__) || defined(__aarch64__)
+[[nodiscard]] auto vm::preferred_target() const -> kvm_vcpu_init
+{
+    auto kvi = kvm_vcpu_init{};
+    m_fd.ioctl(KVM_GET_CLOCK, &kvi);
+    return kvi;
 }
 #endif
 

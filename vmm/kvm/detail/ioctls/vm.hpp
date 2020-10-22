@@ -153,31 +153,12 @@ class vm
         auto set_tss_address(unsigned long address) const -> void;
 #endif
 
-#if defined(__i386__) || defined(__x86_64__)  || \
-    defined(__arm__)  || defined(__aarch64__)
-        auto set_irq_line(const uint32_t irq, bool active) const -> void;
-#endif
-
-#if defined(__i386__) || defined(__x86_64__)  || \
-    defined(__arm__)  || defined(__aarch64__) || \
-    defined(__s390__)
-        // Creates an interrupt controller model in the kernel
+#if defined(__arm__) || defined(__aarch64__)
+        // Returns the preferred CPU target type which can be emulated by KVM
+        // on underlying host.
         //
-        // See the documentation for `KVM_CREATE_IRQCHIP`.
-        auto irqchip() const -> void;
-        auto register_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
-        auto unregister_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
-
-        // Sets the GSI routing table entries, overwriting previous entries.
-        //
-        // See the documentation for `KVM_SET_GSI_ROUTING`.
-        template<typename T,
-                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
-                                                          kvm_irq_routing_entry>>>
-        auto gsi_routing(T &table) const -> void
-        {
-            m_fd.ioctl(KVM_SET_GSI_ROUTING, table.data());
-        }
+        // See documentation for KVM_ARM_PREFERRED_TARGET.
+        [[nodiscard]] auto preferred_target() const -> kvm_vcpu_init;
 #endif
     private:
         KvmFd m_fd;
