@@ -185,11 +185,15 @@ TEST_CASE("PIT2") {
     auto vm = kvm.vm();
 
     SECTION("Creation/get") {
+        // NOTE: For some reason, create_pit2() doesn't throw even when irqchip
+        // support isn't enabled via irqchip().
+        REQUIRE_NOTHROW(vm.irqchip());
         REQUIRE_NOTHROW(vm.create_pit2());
         REQUIRE_NOTHROW(vm.pit2());
     }
 
     SECTION("Set") {
+        REQUIRE_NOTHROW(vm.irqchip());
         REQUIRE_NOTHROW(vm.create_pit2());
         auto pit2 = vm.pit2();
         REQUIRE_NOTHROW(vm.set_pit2(pit2));
