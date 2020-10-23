@@ -93,6 +93,10 @@ auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
 
     m_fd.ioctl(KVM_IRQ_LINE, &irq_level);
 }
+
+auto vm::signal_msi(const kvm_msi &msi) const -> int {
+    return m_fd.ioctl(KVM_SIGNAL_MSI, &msi);
+}
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)

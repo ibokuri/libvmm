@@ -141,7 +141,17 @@ class vm
 
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__)
+        // Sets the level of a GSI input to the interrupt controller model in
+        // the kernel.
+        //
+        // See the documentation for KVM_IRQ_LINE.
         auto set_irq_line(const uint32_t irq, bool active) const -> void;
+
+        // Directly injects a MSI message. Returns > 0 when the MSI is
+        // delivered and 0 when the guest blocked the MSI.
+        //
+        // See the documentation for KVM_SIGNAL_MSI.
+        auto signal_msi(const kvm_msi &msi) const -> int;
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)

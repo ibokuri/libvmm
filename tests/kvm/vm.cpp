@@ -77,6 +77,19 @@ TEST_CASE("IRQ Chip creation") {
         REQUIRE_NOTHROW(vm.irqchip());
     }
 }
+
+// The call the signal_msi() throws b/c MSI vectors are not chosen from the HW
+// side (VMM). The guest OS (or anything that runs inside the VM) is supposed
+// to allocate the MSI vectors, and usually communicates back through PCI
+// configuration space.  Sending a random MSI vector through signal_msi() will
+// always result in a failure.
+TEST_CASE("Fail MSI signal") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto msi = kvm_msi{};
+
+    REQUIRE_THROWS(vm.signal_msi(msi));
+}
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)
