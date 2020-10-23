@@ -189,8 +189,19 @@ class vm
         // See the documentation for KVM_SET_TSS_ADDR.
         auto set_tss_address(unsigned long address) const -> void;
 
+        // Creates an in-kernel device model for the i8254 PIT.
+        //
+        // See the documentation for KVM_CREATE_PIT2.
         auto create_pit2(uint32_t flags=0) const -> void;
+
+        // Retrieves the state of the in-kernel PIT model.
+        //
+        // See the documentation for KVM_GET_PIT2.
         auto pit2(uint32_t flags=0) const -> kvm_pit_state2;
+
+        // Sets the state of the in-kernel PIT model.
+        //
+        // See the documentation for KVM_SET_PIT2.
         auto set_pit2(const kvm_pit_state2&) const -> void;
 #endif
 
