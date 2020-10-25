@@ -68,7 +68,7 @@ TEST_CASE("Detach ioevent") {
 }
 
 #if defined(__i386__) || defined(__x86_64__) || \
-    defined(__arm__)  || defined(__arch64__)
+    defined(__arm__)  || defined(__aarch64__)
 TEST_CASE("IRQ Chip creation") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();

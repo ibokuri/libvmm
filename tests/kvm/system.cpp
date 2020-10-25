@@ -103,7 +103,7 @@ TEST_CASE("Cpuids") {
 }
 #endif
 
-#if defined(__arm__) || defined(__arch64__)
+#if defined(__arm__) || defined(__aarch64__)
 TEST_CASE("Host IPA limit") {
     auto kvm = vmm::kvm::system{};
     auto ipa_limit = kvm.host_ipa_limit();
