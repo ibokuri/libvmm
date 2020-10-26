@@ -17,11 +17,7 @@ class vcpu
 {
     friend vcpu vm::vcpu(unsigned vcpu_id) const;
 
-    private:
-        KvmFd m_fd;
-
-        explicit vcpu(int fd) noexcept : m_fd{fd} {}
-
+    public:
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__) || \
     defined(__s390__)
@@ -62,6 +58,10 @@ class vcpu
         auto regs() const -> kvm_regs;
         auto set_regs(const kvm_regs&) const -> void;
 #endif
+    private:
+        KvmFd m_fd;
+
+        explicit vcpu(int fd) noexcept : m_fd{fd} {}
 };
 
 }  // namespace vmm::kvm::detail
