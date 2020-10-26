@@ -16,7 +16,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_mp_state(const kvm_mp_state& mp_state) const -> void {
-            m_fd.ioctl(KVM_SET_MP_STATE, mp_state);
+            m_fd.ioctl(KVM_SET_MP_STATE, &mp_state);
         }
 #endif
 
@@ -29,7 +29,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_sregs(const kvm_sregs& sregs) const -> void {
-            m_fd.ioctl(KVM_SET_SREGS, sregs);
+            m_fd.ioctl(KVM_SET_SREGS, &sregs);
         }
 #endif
 
@@ -42,7 +42,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_vcpu_events(const kvm_vcpu_events& vcpu_events) const -> void {
-            m_fd.ioctl(KVM_SET_VCPU_EVENTS, vcpu_events);
+            m_fd.ioctl(KVM_SET_VCPU_EVENTS, &vcpu_events);
         }
 #endif
 
@@ -54,7 +54,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_fpu(const kvm_fpu& fpu) const -> void {
-            m_fd.ioctl(KVM_SET_FPU, fpu);
+            m_fd.ioctl(KVM_SET_FPU, &fpu);
         }
 
         auto vcpu::lapic() const -> kvm_lapic_state {
@@ -64,7 +64,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_lapic(const kvm_lapic_state& lapic) const -> void {
-            m_fd.ioctl(KVM_SET_LAPIC, lapic);
+            m_fd.ioctl(KVM_SET_LAPIC, &lapic);
         }
 
         auto vcpu::xsave() const -> kvm_xsave {
@@ -74,7 +74,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_xsave(const kvm_xsave& xsave) const -> void {
-            m_fd.ioctl(KVM_SET_XSAVE, xsave);
+            m_fd.ioctl(KVM_SET_XSAVE, &xsave);
         }
 
         auto vcpu::xcrs() const -> kvm_xcrs {
@@ -84,7 +84,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_xcrs(const kvm_xcrs& xcrs) const -> void {
-            m_fd.ioctl(KVM_SET_XCRS, xcrs);
+            m_fd.ioctl(KVM_SET_XCRS, &xcrs);
         }
 
         auto vcpu::debug_regs() const -> kvm_debugregs {
@@ -94,7 +94,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_debug_regs(const kvm_debugregs& debug_regs) const -> void {
-            m_fd.ioctl(KVM_SET_DEBUGREGS, debug_regs);
+            m_fd.ioctl(KVM_SET_DEBUGREGS, &debug_regs);
         }
 #endif
 
@@ -112,7 +112,7 @@ namespace vmm::kvm::detail {
         }
 
         auto vcpu::set_regs(const kvm_regs& regs) const -> void {
-            m_fd.ioctl(KVM_SET_REGS, regs);
+            m_fd.ioctl(KVM_SET_REGS, &regs);
         }
 #endif
 
