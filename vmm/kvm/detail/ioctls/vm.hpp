@@ -20,8 +20,14 @@ class device;
 
 class vm
 {
-    friend vm system::vm(unsigned machine_type) const;
+    private:
+        KvmFd m_fd;
+        size_t m_mmap_size;
 
+        friend vm system::vm(unsigned machine_type) const;
+
+        vm(int fd, std::size_t mmap_size) noexcept
+            : m_fd{fd}, m_mmap_size{mmap_size} {}
     public:
         vm(const vm& other) = delete;
         vm(vm&& other) = default;
@@ -212,12 +218,6 @@ class vm
         // See documentation for KVM_ARM_PREFERRED_TARGET.
         [[nodiscard]] auto preferred_target() const -> kvm_vcpu_init;
 #endif
-    private:
-        KvmFd m_fd;
-        size_t m_mmap_size;
-
-        vm(int fd, std::size_t mmap_size) noexcept
-            : m_fd{fd}, m_mmap_size{mmap_size} {}
 };
 
 }  // namespace vmm::kvm::detail
