@@ -25,16 +25,16 @@ class vcpu
         auto set_mp_state(const kvm_mp_state&) const -> void;
 #endif
 
-#if defined(__i386__) || defined(__x86_64__) || \
-    defined(__ppc__)  || defined(__ppc64__)
-        auto sregs() const -> kvm_sregs;
-        auto set_sregs(const kvm_sregs&) const -> void;
-#endif
-
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__)
         auto vcpu_events() const -> kvm_vcpu_events;
         auto set_vcpu_events(const kvm_vcpu_events&) const -> void;
+#endif
+
+#if defined(__i386__) || defined(__x86_64__) || \
+    defined(__ppc__)  || defined(__ppc64__)
+        auto sregs() const -> kvm_sregs;
+        auto set_sregs(const kvm_sregs&) const -> void;
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -52,9 +52,7 @@ class vcpu
 
 #if defined(__arm__) || defined(__aarch64__)
         auto init(const kvm_vcpu_init&) const -> void;
-#endif
-
-#if !defined(__arm__) && !defined(__aarch64__)
+#else
         auto regs() const -> kvm_regs;
         auto set_regs(const kvm_regs&) const -> void;
 #endif

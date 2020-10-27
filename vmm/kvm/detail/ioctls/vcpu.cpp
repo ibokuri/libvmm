@@ -20,19 +20,6 @@ namespace vmm::kvm::detail {
         }
 #endif
 
-#if defined(__i386__) || defined(__x86_64__) || \
-    defined(__ppc__)  || defined(__ppc64__)
-        auto vcpu::sregs() const -> kvm_sregs {
-            auto sregs = kvm_sregs{};
-            m_fd.ioctl(KVM_GET_SREGS, &sregs);
-            return sregs;
-        }
-
-        auto vcpu::set_sregs(const kvm_sregs& sregs) const -> void {
-            m_fd.ioctl(KVM_SET_SREGS, &sregs);
-        }
-#endif
-
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__)
         auto vcpu::vcpu_events() const -> kvm_vcpu_events {
@@ -43,6 +30,19 @@ namespace vmm::kvm::detail {
 
         auto vcpu::set_vcpu_events(const kvm_vcpu_events& vcpu_events) const -> void {
             m_fd.ioctl(KVM_SET_VCPU_EVENTS, &vcpu_events);
+        }
+#endif
+
+#if defined(__i386__) || defined(__x86_64__) || \
+    defined(__ppc__)  || defined(__ppc64__)
+        auto vcpu::sregs() const -> kvm_sregs {
+            auto sregs = kvm_sregs{};
+            m_fd.ioctl(KVM_GET_SREGS, &sregs);
+            return sregs;
+        }
+
+        auto vcpu::set_sregs(const kvm_sregs& sregs) const -> void {
+            m_fd.ioctl(KVM_SET_SREGS, &sregs);
         }
 #endif
 
