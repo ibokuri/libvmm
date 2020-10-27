@@ -52,6 +52,30 @@ class vcpu
         auto set_xcrs(const kvm_xcrs&) const -> void;
         auto debug_regs() const -> kvm_debugregs;
         auto set_debug_regs(const kvm_debugregs&) const -> void;
+
+        // Reads MSRs from the vcpu. Returns the number of successfully read
+        // values.
+        //
+        // See the documentation for KVM_GET_MSRS.
+        template<typename T,
+                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                          kvm_msr_entry>>>
+        auto get_msrs(T &msrs) const -> unsigned
+        {
+            return m_fd.ioctl(KVM_GET_MSRS, msrs.data());
+        }
+
+        // Writes MSRs to the vcpu. Returns the number of successfully written
+        // values.
+        //
+        // See the documentation for KVM_SET_MSRS.
+        template<typename T,
+                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                          kvm_msr_entry>>>
+        auto set_msrs(T &msrs) const -> unsigned
+        {
+            return m_fd.ioctl(KVM_SET_MSRS, msrs.data());
+        }
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)
