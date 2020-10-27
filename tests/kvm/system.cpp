@@ -68,10 +68,6 @@ TEST_CASE("Read MSR features") {
                                                          entries.end()};
 
         REQUIRE_NOTHROW(kvm.get_msr_features(msrs));
-
-        // TODO: Are the base values of MSR features always > 0?
-        for (auto msr : msrs)
-            REQUIRE(msr.data > 0);
     }
 }
 
