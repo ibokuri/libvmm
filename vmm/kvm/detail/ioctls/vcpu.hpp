@@ -88,7 +88,7 @@ class vcpu
             m_fd.ioctl(KVM_SET_CPUID2, cpuids.data());
         }
 
-        // Returns CPUID registers of vCPU.
+        // Returns CPUID registers of a vCPU.
         //
         // See the documentation for KVM_GET_CPUID2.
         template<uint32_t N>
