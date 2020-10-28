@@ -76,6 +76,28 @@ class vcpu
         {
             return m_fd.ioctl(KVM_SET_MSRS, msrs.data());
         }
+
+        // Sets the vCPU's responses to the passed-in CPUID instruction.
+        //
+        // See the documentation for KVM_SET_CPUID2.
+        template<typename T,
+                 typename=std::enable_if_t<std::is_same_v<typename T::value_type,
+                                                          kvm_cpuid_entry2>>>
+        auto set_cpuid2(T &cpuids) const -> void
+        {
+            m_fd.ioctl(KVM_SET_CPUID2, cpuids.data());
+        }
+
+        // Returns CPUID registers of vCPU.
+        //
+        // See the documentation for KVM_GET_CPUID2.
+        template<uint32_t N>
+        auto cpuid2() const -> vmm::kvm::detail::Cpuids<N>
+        {
+            auto cpuids = vmm::kvm::detail::Cpuids<N>{};
+            m_fd.ioctl(KVM_GET_CPUID2, cpuids.data());
+            return cpuids;
+        }
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)

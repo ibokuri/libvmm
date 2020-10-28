@@ -39,8 +39,34 @@ TEST_CASE("Multi-processing state") {
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)
-//TEST_CASE("CPUID2") {
-//}
+TEST_CASE("CPUID2") {
+    auto kvm = vmm::kvm::system{};
+
+    if (kvm.check_extension(KVM_CAP_EXT_CPUID)) {
+        auto vm = kvm.vm();
+        auto num_vcpus = vm.num_vcpus();
+        auto supported_cpuids = kvm.supported_cpuids();
+
+        REQUIRE(supported_cpuids.size() <= MAX_CPUID_ENTRIES);
+
+        for (std::size_t id = 0; id < num_vcpus; id++) {
+            auto vcpu = vm.vcpu(id);
+            vcpu.set_cpuid2(supported_cpuids);
+            auto cpuids = vcpu.cpuid2<MAX_CPUID_ENTRIES>();
+
+            // Check the first few leafs since some (e.g. 13) are reserved.
+            for (std::size_t i = 0; i < 3; i++) {
+                REQUIRE(supported_cpuids[i].function == cpuids[i].function);
+                REQUIRE(supported_cpuids[i].index == cpuids[i].index);
+                REQUIRE(supported_cpuids[i].flags == cpuids[i].flags);
+                REQUIRE(supported_cpuids[i].eax == cpuids[i].eax);
+                REQUIRE(supported_cpuids[i].ebx == cpuids[i].ebx);
+                REQUIRE(supported_cpuids[i].ecx == cpuids[i].ecx);
+                REQUIRE(supported_cpuids[i].edx == cpuids[i].edx);
+            }
+        }
+    }
+}
 
 TEST_CASE("FPU") {
     // From https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/fpu/internal.h
