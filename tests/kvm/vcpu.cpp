@@ -140,12 +140,14 @@ TEST_CASE("MSRs") {
         {0x0000'0174},
         {0x0000'0175, 0, 1}
     }};
-    auto msrs_to_set = vmm::kvm::Msrs<2>{entries.begin(), entries.end()};
 
+    auto msrs_to_set = vmm::kvm::Msrs<2>{entries.begin(), entries.end()};
     REQUIRE_NOTHROW(vcpu.set_msrs(msrs_to_set));
 
-    auto msrs_to_read = vmm::kvm::Msrs<2>{kvm_msr_entry{0x0000'0174},
-                                          kvm_msr_entry{0x0000'0175}};
+    auto msrs_to_read = vmm::kvm::Msrs<2>{{
+        kvm_msr_entry{0x0000'0174},
+        kvm_msr_entry{0x0000'0175}
+    }};
     auto nmsrs = vcpu.get_msrs(msrs_to_read);
 
     REQUIRE(nmsrs == msrs_to_set.size());
