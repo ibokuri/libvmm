@@ -203,7 +203,7 @@ class vm
         // Retrieves the state of the in-kernel PIT model.
         //
         // See the documentation for KVM_GET_PIT2.
-        auto pit2(uint32_t flags=0) const -> kvm_pit_state2;
+        auto pit2() const -> kvm_pit_state2;
 
         // Sets the state of the in-kernel PIT model.
         //

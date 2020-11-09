@@ -167,7 +167,7 @@ auto vm::create_pit2(uint32_t flags) const -> void {
     m_fd.ioctl(KVM_CREATE_PIT2, &config);
 }
 
-auto vm::pit2(uint32_t flags) const -> kvm_pit_state2 {
+auto vm::pit2() const -> kvm_pit_state2 {
     auto state = kvm_pit_state2{};
     m_fd.ioctl(KVM_GET_PIT2, &state);
     return state;
