@@ -1,4 +1,4 @@
 build
 .builds/extra
-tags
+.clangd
 NOTES
