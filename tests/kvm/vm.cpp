@@ -19,7 +19,7 @@ TEST_CASE("Querying vCPU and memory slot information") {
 TEST_CASE("Set invalid memory slot") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
-    auto mem_region = kvm_userspace_memory_region{0};
+    auto mem_region = kvm_userspace_memory_region{};
 
     REQUIRE_THROWS(vm.memslot(mem_region));
 }
@@ -100,8 +100,7 @@ TEST_CASE("IRQ chip") {
     if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
         REQUIRE_NOTHROW(vm.irqchip());
 
-        auto irqchip1 = kvm_irqchip{};
-        irqchip1.chip_id = KVM_IRQCHIP_PIC_MASTER;
+        auto irqchip1 = kvm_irqchip{KVM_IRQCHIP_PIC_MASTER};
         irqchip1.chip.pic.irq_base = 10;
 
         auto irqchip2 = kvm_irqchip{};
