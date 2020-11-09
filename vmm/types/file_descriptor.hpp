@@ -29,7 +29,7 @@ class FileDescriptor
 
         // Runs an ioctl.
         template<typename T=int>
-        auto ioctl(int req, T arg=T{}) const -> int
+        auto ioctl(long unsigned req, T arg=T{}) const -> int
         {
             const auto ret = ::ioctl(m_fd, req, arg);
 

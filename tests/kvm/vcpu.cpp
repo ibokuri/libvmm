@@ -49,7 +49,7 @@ TEST_CASE("CPUID2") {
 
         REQUIRE(supported_cpuids.size() <= MAX_CPUID_ENTRIES);
 
-        for (std::size_t id = 0; id < num_vcpus; id++) {
+        for (int id = 0; id < num_vcpus; id++) {
             auto vcpu = vm.vcpu(id);
             vcpu.set_cpuid2(supported_cpuids);
             auto cpuids = vcpu.cpuid2<MAX_CPUID_ENTRIES>();

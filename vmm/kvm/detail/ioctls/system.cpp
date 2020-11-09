@@ -7,7 +7,7 @@
 
 namespace vmm::kvm::detail {
 
-auto system::api_version() const -> unsigned
+auto system::api_version() const -> int
 {
     return m_fd.ioctl(KVM_GET_API_VERSION);
 }
@@ -25,13 +25,13 @@ auto system::check_extension(int cap) const -> int
 
 auto system::vcpu_mmap_size() const -> std::size_t
 {
-    return m_fd.ioctl(KVM_GET_VCPU_MMAP_SIZE);
+    return static_cast<std::size_t>(m_fd.ioctl(KVM_GET_VCPU_MMAP_SIZE));
 }
 
 #if defined(__arm__)  || defined(__aarch64__)
-auto system::host_ipa_limit() const -> unsigned
+auto system::host_ipa_limit() const -> std::size_t
 {
-    return check_extension(KVM_CAP_ARM_VM_IPA_SIZE);
+    return static_cast<std::size_t>(m_fd.ioctl(KVM_CAP_ARM_VM_IPA_SIZE));
 }
 #endif
 

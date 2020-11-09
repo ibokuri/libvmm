@@ -24,7 +24,7 @@ class vm
         KvmFd m_fd;
         std::size_t m_mmap_size;
 
-        friend vm system::vm(unsigned machine_type) const;
+        friend vm system::vm(int machine_type) const;
 
         vm(int fd, std::size_t mmap_size) noexcept
             : m_fd{fd}, m_mmap_size{mmap_size} {}
@@ -37,7 +37,7 @@ class vm
         // Adds a vcpu to a virtual machine.
         //
         // See the documentation for KVM_CREATE_VCPU.
-        [[nodiscard]] auto vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu;
+        [[nodiscard]] auto vcpu(int vcpu_id) const -> vmm::kvm::detail::vcpu;
 
         // Adds a device to a virtual machine.
         //
@@ -50,7 +50,7 @@ class vm
         // Based on their initialization, VMs may have different capabilities.
         // Therefore, `kvm::vm::check_extension()` is preferred when querying
         // for most capabilities.
-        [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
+        [[nodiscard]] auto check_extension(int cap) const -> int;
 
         // Creates, modifies, or deletes a guest physical memory slot.
         //
@@ -115,13 +115,13 @@ class vm
         [[nodiscard]] auto mmap_size() const -> std::size_t;
 
         // Returns the recommended number for max_vcpus.
-        [[nodiscard]] auto num_vcpus() const -> unsigned;
+        [[nodiscard]] auto num_vcpus() const -> int;
 
         // Returns the maximum possible value for max_vcpus.
-        [[nodiscard]] auto max_vcpus() const -> unsigned;
+        [[nodiscard]] auto max_vcpus() const -> int;
 
         // Returns the maximum number of allowed memory slots for a VM.
-        [[nodiscard]] auto num_memslots() const -> unsigned;
+        [[nodiscard]] auto num_memslots() const -> int;
 
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__) || \
@@ -166,7 +166,7 @@ class vm
         // If a vCPU exists for a VM before this is called, the call will fail.
         //
         // See the documentation for KVM_SET_BOOT_CPU_ID.
-        auto set_bsp(unsigned vcpu_id) const -> void;
+        auto set_bsp(int vcpu_id) const -> void;
 
         // Reads the state of a kernel interrupt controller into a buffer
         // provided by the caller.

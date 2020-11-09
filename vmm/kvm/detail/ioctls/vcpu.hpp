@@ -20,7 +20,7 @@ class vcpu
         std::size_t m_mmap_size;
         kvm_run *m_run = nullptr;
 
-        friend vcpu vm::vcpu(unsigned vcpu_id) const;
+        friend vcpu vm::vcpu(int vcpu_id) const;
 
         explicit vcpu(int fd, std::size_t mmap_size);
     public:
@@ -62,9 +62,9 @@ class vcpu
         template<typename T,
                  typename=std::enable_if_t<std::is_same_v<typename T::value_type,
                                                           kvm_msr_entry>>>
-        auto get_msrs(T &msrs) const -> unsigned
+        auto get_msrs(T &msrs) const -> std::size_t
         {
-            return m_fd.ioctl(KVM_GET_MSRS, msrs.data());
+            return static_cast<std::size_t>(m_fd.ioctl(KVM_GET_MSRS, msrs.data()));
         }
 
         // Writes MSRs to the vcpu. Returns the number of successfully written
@@ -74,9 +74,9 @@ class vcpu
         template<typename T,
                  typename=std::enable_if_t<std::is_same_v<typename T::value_type,
                                                           kvm_msr_entry>>>
-        auto set_msrs(T &msrs) const -> unsigned
+        auto set_msrs(T &msrs) const -> std::size_t
         {
-            return m_fd.ioctl(KVM_SET_MSRS, msrs.data());
+            return static_cast<std::size_t>(m_fd.ioctl(KVM_SET_MSRS, msrs.data()));
         }
 
         // Sets the vCPU's responses to the passed-in CPUID instruction.

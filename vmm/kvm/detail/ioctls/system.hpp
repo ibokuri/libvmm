@@ -60,7 +60,7 @@ class system
         // Returns the kvm API version.
         //
         // See the documentation for KVM_GET_API_VERSION.
-        [[nodiscard]] auto api_version() const -> unsigned;
+        [[nodiscard]] auto api_version() const -> int;
 
         // Creates and returns a virtual machine (with a custom machine type).
         //
@@ -68,14 +68,14 @@ class system
         // ioctl's result.
         //
         // See the documentation for KVM_CREATE_VM.
-        [[nodiscard]] auto vm(unsigned machine_type=0) const -> vmm::kvm::detail::vm;
+        [[nodiscard]] auto vm(int machine_type=0) const -> vmm::kvm::detail::vm;
 
         // Returns a positive integer if a KVM extension is available; 0 otherwise.
         //
         // Based on their initialization, VMs may have different capabilities.
         // Therefore, `kvm::vm::check_extension()` is preferred when querying
         // for most capabilities.
-        [[nodiscard]] auto check_extension(unsigned cap) const -> unsigned;
+        [[nodiscard]] auto check_extension(int cap) const -> int;
 
         // Returns the size of the memory region used by the KVM_RUN ioctl to
         // communicate CPU information to userspace.
@@ -113,7 +113,7 @@ class system
         template<typename T,
                  typename=std::enable_if_t<std::is_same_v<typename T::value_type,
                                                           kvm_msr_entry>>>
-        auto get_msr_features(T &msrs) const -> unsigned
+        auto get_msr_features(T &msrs) const -> int
         {
             return m_fd.ioctl(KVM_GET_MSRS, msrs.data());
         }
@@ -143,7 +143,7 @@ class system
 
 #if defined(__arm__)  || defined(__aarch64__)
         // Returns the IPA size for a VM; 0 if the capability isn't available.
-        [[nodiscard]] auto host_ipa_limit() const -> unsigned;
+        [[nodiscard]] auto host_ipa_limit() const -> std::size_t;
 #endif
 };
 
