@@ -12,7 +12,7 @@ FileDescriptor::~FileDescriptor() noexcept
 {
     if (!m_closed)
         m_closed = ::close(m_fd) == 0;
-};
+}
 
 FileDescriptor::FileDescriptor(const FileDescriptor& other)
 {
