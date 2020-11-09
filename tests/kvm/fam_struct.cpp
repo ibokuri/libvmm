@@ -1,29 +1,23 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include <cassert>
-#include <initializer_list>
+#include <linux/kvm.h>
 
 #include "vmm/kvm/detail/types/fam_struct.hpp"
 
-struct MockFamStruct {
-    uint32_t len;
-    uint32_t entries[0];
-};
+template<std::size_t N>
+using FamStruct = vmm::kvm::detail::FamStruct<&kvm_signal_mask::len,
+                                              &kvm_signal_mask::sigset, N>;
 
 template<std::size_t N>
-using FamStruct = vmm::kvm::detail::FamStruct<&MockFamStruct::len,
-                                              &MockFamStruct::entries, N>;
-
-template<std::size_t N>
-class MockWrapper : public FamStruct<N> {
+class SignalMask : public FamStruct<N> {
     using Base = FamStruct<N>;
     using Base::Base;
 };
 
 TEST_CASE("Create FAM struct") {
     SECTION("Entries: 0") {
-        auto fam = MockWrapper<0>{};
+        auto fam = SignalMask<0>{};
 
         REQUIRE(fam.size() == 0);
         REQUIRE(fam.empty() == true);
@@ -31,7 +25,7 @@ TEST_CASE("Create FAM struct") {
     }
 
     SECTION("Entries: N") {
-        auto fam = MockWrapper<2>{1, 2};
+        auto fam = SignalMask<2>{1, 2};
 
         REQUIRE(fam.size() == 2);
         REQUIRE(fam.empty() == false);
@@ -41,7 +35,7 @@ TEST_CASE("Create FAM struct") {
     }
 
     SECTION("Entries: N (empty)") {
-        auto fam = MockWrapper<2>{};
+        auto fam = SignalMask<2>{};
 
         REQUIRE(fam.size() == 2);
         REQUIRE(fam.empty() == false);
@@ -52,7 +46,7 @@ TEST_CASE("Create FAM struct") {
 }
 
 TEST_CASE("Copy/move FAM struct") {
-    auto fam = MockWrapper<2>{1, 2};
+    auto fam = SignalMask<2>{1, 2};
 
     SECTION("Copy constructor") {
         auto copy{fam};
