@@ -2,6 +2,8 @@
 // vcpu.cpp - vCPU ioctls
 //
 
+#include <sys/mman.h> // mmap, PROT_READ, PROT_WRITE, MAP_FAILED, MAP_SHARED
+
 #include "vmm/kvm/detail/ioctls/vcpu.hpp"
 
 namespace vmm::kvm::detail {
