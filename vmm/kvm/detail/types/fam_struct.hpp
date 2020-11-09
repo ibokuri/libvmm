@@ -38,7 +38,7 @@ class FamStruct<SizeMember, EntriesMember, N>
 {
     public:
         using value_type = std::decay_t<decltype(std::declval<Entry&>()[0])>;
-        using size_type = Size;
+        using size_type = std::size_t;
         using allocator_type = std::pmr::polymorphic_allocator<std::byte>;
         using pointer = value_type*;
         using const_pointer = const value_type*;
@@ -47,7 +47,7 @@ class FamStruct<SizeMember, EntriesMember, N>
         using iterator = pointer;
         using const_iterator = const_pointer;
 
-        static_assert(N <= std::numeric_limits<size_type>::max());
+        static_assert(N <= std::numeric_limits<Size>::max());
 
         static const auto alignment = alignof(Struct);
         static const auto storage_size = sizeof(Struct) + N * sizeof(value_type);
@@ -59,19 +59,17 @@ class FamStruct<SizeMember, EntriesMember, N>
             m_ptr->*SizeMember = N;
         }
 
-        // TODO: SFINAE
         template <typename InputIt>
         FamStruct(InputIt first, InputIt last, const allocator_type& alloc)
             : FamStruct(alloc)
         {
             if (auto n = std::distance(first, last); n != 0) {
-                auto abs = std::abs(n);
-                if (abs > std::numeric_limits<size_type>::max() ||
-                        static_cast<size_type>(abs) > N) {
-                    VMM_THROW(std::overflow_error("Range too large"));
-                }
+                auto abs = static_cast<Size>(std::abs(n));
 
-                m_ptr->*SizeMember = static_cast<size_type>(abs);
+                if (abs > std::numeric_limits<Size>::max() || abs > N)
+                    VMM_THROW(std::overflow_error("Range too large"));
+
+                m_ptr->*SizeMember = abs;
                 std::copy(first, last, begin());
             }
         }
@@ -90,10 +88,10 @@ class FamStruct<SizeMember, EntriesMember, N>
         auto operator=(std::initializer_list<value_type> ilist) -> FamStruct&
         {
             if (auto n = ilist.size(); n != 0) {
-                if (n > std::numeric_limits<size_type>::max() || n > N)
+                if (n > std::numeric_limits<Size>::max() || n > N)
                     VMM_THROW(std::overflow_error("Range too large"));
 
-                m_ptr->*SizeMember = n;
+                m_ptr->*SizeMember = static_cast<Size>(n);
                 std::memset(m_ptr->*EntriesMember, 0, N * sizeof(value_type));
                 std::copy(ilist.begin(), ilist.end(), begin());
             }
