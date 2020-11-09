@@ -5,6 +5,18 @@
 #include "vmm/kvm/detail/ioctls/vcpu.hpp"
 
 namespace vmm::kvm::detail {
+    vcpu::vcpu(int fd, std::size_t mmap_size)
+        : m_fd{fd},
+          m_mmap_size{mmap_size},
+          m_run{static_cast<kvm_run*>(mmap(NULL, mmap_size,
+                                           PROT_READ | PROT_WRITE, MAP_SHARED,
+                                           fd, 0))}
+    {
+        // TODO: Check to see this actually works as expected
+        // TODO: Do I need to close fd here? Or is it cleaned up elsewhere.
+        if (m_run == MAP_FAILED)
+            VMM_THROW(std::system_error(errno, std::system_category()));
+    }
 
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__) || \

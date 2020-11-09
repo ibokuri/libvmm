@@ -12,17 +12,13 @@ auto system::api_version() const -> unsigned
     return m_fd.ioctl(KVM_GET_API_VERSION);
 }
 
-auto system::create_vm(unsigned machine_type) const -> int
+auto system::vm(int machine_type) const -> vmm::kvm::detail::vm
 {
-     return m_fd.ioctl(KVM_CREATE_VM, machine_type);
+    return vmm::kvm::detail::vm{m_fd.ioctl(KVM_CREATE_VM, machine_type),
+                                vcpu_mmap_size()};
 }
 
-auto system::vm(unsigned machine_type) const -> vmm::kvm::detail::vm
-{
-    return vmm::kvm::detail::vm{create_vm(machine_type), vcpu_mmap_size()};
-}
-
-auto system::check_extension(unsigned cap) const -> unsigned
+auto system::check_extension(int cap) const -> int
 {
     return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }

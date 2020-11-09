@@ -25,11 +25,6 @@ class system
 {
     private:
         KvmFd m_fd;
-
-        // Returns a file descriptor associated with a newly created VM.
-        //
-        // This method should only be used by `system::vm()`.
-        [[nodiscard]] auto create_vm(unsigned machine_type) const -> int;
     public:
         system() : m_fd{open()} {}
 

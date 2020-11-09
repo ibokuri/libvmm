@@ -10,7 +10,8 @@ namespace vmm::kvm::detail {
 
 auto vm::vcpu(unsigned vcpu_id) const -> vmm::kvm::detail::vcpu
 {
-    return vmm::kvm::detail::vcpu{m_fd.ioctl(KVM_CREATE_VCPU, vcpu_id)};
+    return vmm::kvm::detail::vcpu{m_fd.ioctl(KVM_CREATE_VCPU, vcpu_id),
+                                  m_mmap_size};
 }
 
 auto vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device

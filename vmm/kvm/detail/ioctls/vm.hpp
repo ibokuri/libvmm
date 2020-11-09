@@ -22,7 +22,7 @@ class vm
 {
     private:
         KvmFd m_fd;
-        size_t m_mmap_size;
+        std::size_t m_mmap_size;
 
         friend vm system::vm(unsigned machine_type) const;
 

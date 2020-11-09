@@ -17,10 +17,12 @@ class vcpu
 {
     private:
         KvmFd m_fd;
+        std::size_t m_mmap_size;
+        kvm_run *m_run = nullptr;
 
         friend vcpu vm::vcpu(unsigned vcpu_id) const;
 
-        explicit vcpu(int fd) noexcept : m_fd{fd} {}
+        explicit vcpu(int fd, std::size_t mmap_size);
     public:
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__) || \
