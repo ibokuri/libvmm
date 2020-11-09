@@ -54,8 +54,8 @@ TEST_CASE("Detach ioevent") {
 
     if (vm.check_extension(KVM_CAP_IOEVENTFD) > 0) {
         auto eventfd = EventFd{EFD_NONBLOCK};
-        auto pio_addr = 0xf4;
-        auto mmio_addr = 0x1000;
+        auto pio_addr = uint64_t{0xf4};
+        auto mmio_addr = uint64_t{0x1000};
 
         REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
         REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr));
