@@ -130,7 +130,11 @@ class vm
         //
         // See the documentation for `KVM_CREATE_IRQCHIP`.
         auto irqchip() const -> void;
+
+        // Registers an event that will, when signaled, trigger the gsi IRQ.
         auto register_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
+
+        // Unregisters an event that will, when signaled, trigger the gsi IRQ.
         auto unregister_irqfd(vmm::types::EventFd, uint32_t gsi) const -> void;
 
         // Sets the GSI routing table entries, overwriting previous entries.

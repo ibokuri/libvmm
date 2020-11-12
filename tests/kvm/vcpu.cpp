@@ -80,7 +80,6 @@ TEST_CASE("CPUID2") {
 
 TEST_CASE("FPU") {
     // From https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/fpu/internal.h
-
     auto KVM_FPU_CWD = uint16_t{0x37f};
     auto KVM_FPU_MXCSR = uint32_t{0x1f80};
     auto kvm = vmm::kvm::system{};

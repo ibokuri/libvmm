@@ -20,8 +20,6 @@ namespace vmm::kvm::detail {
             VMM_THROW(std::system_error(errno, std::system_category()));
     }
 
-    // Sets the `immediate_exit` flag on the `kvm_run` struct associated with
-    // this vCPU to `val`.
     auto vcpu::set_immediate_exit(uint8_t val) -> void
     {
         m_run->immediate_exit = val;
