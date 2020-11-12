@@ -145,6 +145,26 @@ namespace vmm::kvm::detail {
         {
             m_fd.ioctl(KVM_ARM_VCPU_INIT, init);
         }
+
+        auto vcpu::reg(uint64_t id) -> uint64_t {
+            auto value = uint64_t{};
+            auto reg = kvm_one_reg {
+                id,
+                reinterpret_cast<uintptr_t>(&value)
+            };
+
+            m_fd.ioctl(KVM_GET_ONE_REG, &reg);
+            return value;
+        }
+
+        auto vcpu::set_reg(uint64_t id, uint64_t data) -> void {
+            auto reg = kvm_one_reg {
+                id,
+                reinterpret_cast<uintptr_t>(&data)
+            };
+
+            m_fd.ioctl(KVM_SET_ONE_REG, &reg);
+        }
 #endif
 
 #if !defined(__arm__) && !defined(__aarch64__)

@@ -5,7 +5,7 @@
 #pragma once
 
 #include <cstddef> // size_t
-#include <cstdint> // uint32_t, uint64_t
+#include <cstdint> // uint*_t
 #include <linux/kvm.h> // kvm_*, KVM_*
 
 #include "vmm/kvm/detail/ioctls/vm.hpp"
@@ -107,7 +107,22 @@ class vcpu
 
 #if defined(__arm__) || defined(__aarch64__)
         auto init(const kvm_vcpu_init&) const -> void;
-#else
+
+        // Returns the value of the specified vCPU register.
+        //
+        // See the documentation for KVM_GET_ONE_REG.
+        auto reg(uint64_t id) -> uint64_t;
+
+        // Sets the value of one register for this vCPU.
+        //
+        // See the documentation for KVM_SET_ONE_REG.
+        auto set_reg(uint64_t id, uint64_t data) -> void;
+#endif
+
+#if !defined(__arm__) && !defined(__aarch64__)
+        // Returns the vCPU general purpose registers.
+        //
+        // See documentation for KVM_GET_REGS.
         auto regs() const -> kvm_regs;
         auto set_regs(const kvm_regs&) const -> void;
 #endif

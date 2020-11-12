@@ -182,43 +182,41 @@ TEST_CASE("Preferred target initialization") {
     REQUIRE_NOTHROW(vcpu.init(kvi));
 }
 
-//TEST_CASE("Register") {
-    //auto kvm = vmm::kvm::system{};
-    //auto vm = kvm.vm();
-    //auto vcpu = vm.vcpu(0);
-    //auto kvi = vm.preferred_target(kvi);
-    //vcpu.init(kvi);
+TEST_CASE("Register") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+    auto kvi = vm.preferred_target(kvi);
 
-    //SECTION("Setting") {
-        //auto data = uint64_t{};
-        //auto id = uint64_t{};
+    vcpu.init(kvi);
 
-        //REQUIRE_THROWS(vcpu.set_one_reg(id, data));
+    SECTION("Setting") {
+        auto data = uint64_t{};
+        auto id = uint64_t{};
 
-        //// Exercising KVM_SET_ONE_REG by trying to alter the data inside the
-        //// PSTATE register (which is a specific aarch64 register).
-        //const auto PSTATE_REG_ID = uint64_t{0x6030'0000'0010'0042};
-        //REQUIRE_NOTHROW(vcpu.set_one_reg(PSTATE_REG_ID, data));
-    //}
+        REQUIRE_THROWS(vcpu.set_reg(id, data));
 
-    //SECTION("Getting") {
-        //// PSR (Processor State Register) bits. Taken from
-        //// arch/arm64/include/uapi/asm/ptrace.h.
-        //const auto PSR_MODE_EL1H = uint64_t{0x0000'0005};
-        //const auto PSR_F_BIT = uint64_t{0x0000'0040};
-        //const auto PSR_I_BIT = uint64_t{0x0000'0080};
-        //const auto PSR_A_BIT = uint64_t{0x0000'0100};
-        //const auto PSR_D_BIT = uint64_t{0x0000'0200};
-        //const auto PSTATE_FAULT_BITS_64 = uint64_t{(PSR_MODE_EL1H |
-                                                    //PSR_A_BIT |
-                                                    //PSR_F_BIT |
-                                                    //PSR_I_BIT |
-                                                    //PSR_D_BIT)};
-        //auto data = uint64_t{PSTATE_FAULT_BITS_64};
-        //const auto PSTATE_REG_ID = uint64_t{0x6030'0000'0010'0042};
+        // Exercising KVM_SET_ONE_REG by trying to alter the data inside the
+        // PSTATE register (which is a specific aarch64 register).
+        const auto PSTATE_REG_ID = uint64_t{0x6030'0000'0010'0042};
+        REQUIRE_NOTHROW(vcpu.set_reg(PSTATE_REG_ID, data));
+    }
 
-        //REQUIRE_NOTHROW(vcpu.set_one_reg(PSTATE_REG_ID, data));
-        //REQUIRE(vcpu.get_one_reg(PSTATE_REG_ID) == PSTATE_FAULT_BITS_64);
-    //}
-//}
+    SECTION("Getting") {
+        // PSR (Processor State Register) bits. Taken from
+        // arch/arm64/include/uapi/asm/ptrace.h.
+        const auto PSR_MODE_EL1H = uint64_t{0x0000'0005};
+        const auto PSR_F_BIT = uint64_t{0x0000'0040};
+        const auto PSR_I_BIT = uint64_t{0x0000'0080};
+        const auto PSR_A_BIT = uint64_t{0x0000'0100};
+        const auto PSR_D_BIT = uint64_t{0x0000'0200};
+        const auto PSTATE_FAULT_BITS_64 = uint64_t{PSR_MODE_EL1H | PSR_A_BIT | PSR_F_BIT | PSR_I_BIT | PSR_D_BIT};
+
+        const auto PSTATE_REG_ID = uint64_t{0x6030'0000'0010'0042};
+        auto data = PSTATE_FAULT_BITS_64;
+
+        REQUIRE_NOTHROW(vcpu.set_reg(PSTATE_REG_ID, data));
+        REQUIRE(vcpu.reg(PSTATE_REG_ID) == PSTATE_FAULT_BITS_64);
+    }
+}
 #endif
