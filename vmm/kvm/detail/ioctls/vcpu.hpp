@@ -25,6 +25,7 @@ class vcpu
         explicit vcpu(int fd, std::size_t mmap_size);
     public:
         auto set_immediate_exit(uint8_t val) -> void;
+        auto immediate_exit() -> uint8_t;
 
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__) || \

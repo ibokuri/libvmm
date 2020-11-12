@@ -10,8 +10,18 @@ TEST_CASE("vCPU creation") {
     REQUIRE_NOTHROW(vm.vcpu(0));
 }
 
+TEST_CASE("Immediate exit") {
+        auto kvm = vmm::kvm::system{};
+        auto vm = kvm.vm();
+        auto vcpu = vm.vcpu(0);
+
+        REQUIRE(vcpu.immediate_exit() == 0);
+        vcpu.set_immediate_exit(1);
+        REQUIRE(vcpu.immediate_exit() == 1);
+}
+
 #if defined(__i386__) || defined(__x86_64__) || \
-    defined(__arm__) || defined(__aarch64__) || \
+    defined(__arm__)  || defined(__aarch64__) || \
     defined(__s390__)
 TEST_CASE("Multi-processing state") {
     auto kvm = vmm::kvm::system{};
@@ -26,7 +36,7 @@ TEST_CASE("Multi-processing state") {
 #endif
 
 #if defined(__i386__) || defined(__x86_64__) || \
-    defined(__arm__) || defined(__aarch64__)
+    defined(__arm__)  || defined(__aarch64__)
 //TEST_CASE("vCPU events") {
     //auto kvm = vmm::kvm::system{};
     //auto vm = kvm.vm();
