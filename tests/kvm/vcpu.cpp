@@ -21,8 +21,7 @@ TEST_CASE("Immediate exit") {
 }
 
 #if defined(__i386__) || defined(__x86_64__) || \
-    defined(__arm__)  || defined(__aarch64__) || \
-    defined(__s390__)
+    defined(__arm__)  || defined(__aarch64__)
 TEST_CASE("Multi-processing state") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();

@@ -31,8 +31,7 @@ class vcpu
         auto set_immediate_exit(uint8_t val) -> void;
 
 #if defined(__i386__) || defined(__x86_64__)  || \
-    defined(__arm__)  || defined(__aarch64__) || \
-    defined(__s390__)
+    defined(__arm__)  || defined(__aarch64__)
         // Returns the vCPU's current "multiprocessing state".
         //
         // See the documentation for KVM_GET_MP_STATE.

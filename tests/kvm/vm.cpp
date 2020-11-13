@@ -246,7 +246,7 @@ TEST_CASE("PIT2") {
 }
 #endif
 
-#if defined(__arm__) || defined(__aarch64__) || defined(__s390__)
+#if defined(__arm__) || defined(__aarch64__)
 TEST_CASE("GSI routing") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
@@ -359,16 +359,5 @@ TEST_CASE("IRQ file descriptor") {
 
     // NOTE: KVM doesn't report unregisters with different levels as errors
     REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
-}
-#endif
-
-#if defined(__s390__)
-TEST_CASE("IRQ chip creation") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-
-    if (vm.check_extension(KVM_CAP_S390_IRQCHIP) > 0) {
-        REQUIRE_NOTHROW(vm.irqchip());
-    }
 }
 #endif

@@ -31,8 +31,7 @@ namespace vmm::kvm::detail {
     }
 
 #if defined(__i386__) || defined(__x86_64__)  || \
-    defined(__arm__)  || defined(__aarch64__) || \
-    defined(__s390__)
+    defined(__arm__)  || defined(__aarch64__)
         auto vcpu::mp_state() const -> kvm_mp_state
         {
             auto mp_state = kvm_mp_state{};
