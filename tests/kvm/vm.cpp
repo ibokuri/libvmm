@@ -171,6 +171,32 @@ TEST_CASE("IRQ line") {
     REQUIRE_NOTHROW(vm.set_irq_line(4, true));
 }
 
+TEST_CASE("IRQ file descriptor") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
+
+    REQUIRE_NOTHROW(vm.irqchip());
+
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
+
+    // NOTE: On x86_64, this fails as the event fd was already matched with
+    // a GSI.
+    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
+    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 5));
+
+    // NOTE: KVM doesn't report the 2nd, duplicate unregister as an error
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+
+    // NOTE: KVM doesn't report unregisters with different levels as errors
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
+}
+
 TEST_CASE("TSS address") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
@@ -290,30 +316,50 @@ TEST_CASE("IRQ line") {
     REQUIRE(vm.set_irq_line(0x02'00'0010, true));
 }
 
-//TEST_CASE("IRQ file descriptor") {
-    //auto kvm = vmm::kvm::system{};
-    //auto vm = kvm.vm();
-    //auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
-    //auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
-    //auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
+TEST_CASE("IRQ file descriptor") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vgic = vm.device(KVM_DEV_TYPE_ARM_VGIC_V3);
+    auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
+    auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
 
-    //// TODO: Create vGIC device, set supported # of IRQs, and request
-    ////       initialization of the vGIC.
+    // Set supported # of IRQs
+    auto attributes = kvm_device_attr {
+        0, // flags
+        KVM_DEV_ARM_VGIC_GRP_NR_IRQS, // group
+        0, // attr
+        128, // addr
+    };
 
-    //REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
-    //REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
-    //REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
+    REQUIRE_NOTHROW(vgic.set_attr(attributes));
 
-    //// Duplicate registrations
-    //REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
+    // Request vGIC initialization
+    auto attributes = kvm_device_attr {
+        0, // flags
+        KVM_DEV_ARM_VGIC_GRP_CTRL, // group
+        KVM_DEV_ARM_VGIC_CTRL_INIT, // attr
+        128, // addr
+    };
 
-    //// NOTE: KVM doesn't report duplicate unregisters as errors
-    //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
-    //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vgic.set_attr(attributes));
 
-    //// NOTE: KVM doesn't report unregisters with different levels as errors
-    //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
-//}
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
+
+    // NOTE: On aarch64, duplicate registrations fail b/c setting up the
+    // interrupt controller is mandatory before any IRQ registration.
+    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
+    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 5));
+
+    // NOTE: KVM doesn't report the 2nd, duplicate unregister as an error
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
+
+    // NOTE: KVM doesn't report unregisters with different levels as errors
+    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
+}
 #endif
 
 #if defined(__s390__)
@@ -324,29 +370,5 @@ TEST_CASE("IRQ chip creation") {
     if (vm.check_extension(KVM_CAP_S390_IRQCHIP) > 0) {
         REQUIRE_NOTHROW(vm.irqchip());
     }
-}
-
-TEST_CASE("IRQ file descriptor") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
-    auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
-    auto eventfd3 = vmm::types::EventFd{EFD_NONBLOCK};
-
-    REQUIRE_NOTHROW(vm.irqchip());
-
-    REQUIRE_NOTHROW(vm.register_irqfd(eventfd1, 4));
-    REQUIRE_NOTHROW(vm.register_irqfd(eventfd2, 8));
-    REQUIRE_NOTHROW(vm.register_irqfd(eventfd3, 4));
-
-    // Duplicate registrations
-    REQUIRE_THROWS(vm.register_irqfd(eventfd3, 4));
-
-    // NOTE: KVM doesn't report duplicate unregisters as errors
-    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
-    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd2, 8));
-
-    // NOTE: KVM doesn't report unregisters with different levels as errors
-    REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
 }
 #endif
