@@ -7,6 +7,14 @@ TEST_CASE("VM creation") {
     REQUIRE_NOTHROW(vmm::kvm::system{}.vm());
 }
 
+TEST_CASE("Set invalid memory slot") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto mem_region = kvm_userspace_memory_region{};
+
+    REQUIRE_THROWS(vm.memslot(mem_region));
+}
+
 TEST_CASE("Querying vCPU and memory slot information") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
@@ -16,16 +24,7 @@ TEST_CASE("Querying vCPU and memory slot information") {
     REQUIRE(vm.num_memslots() >= 32);
 }
 
-TEST_CASE("Set invalid memory slot") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto mem_region = kvm_userspace_memory_region{};
-
-    REQUIRE_THROWS(vm.memslot(mem_region));
-}
-
 // TODO: TEST_CASE("vCPU creation");
-// TODO: TEST_CASE("Device creation");
 
 TEST_CASE("Attach ioevent") {
     using EventFd = vmm::types::EventFd;
@@ -235,14 +234,6 @@ TEST_CASE("GSI routing") {
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)
-//TEST_CASE("IRQ line") {
-    //auto kvm = vmm::kvm::system{};
-    //auto vm = kvm.vm();
-    //auto vcpu = vm.vcpu(0);
-    //
-    // TODO: requires dummy GIC device
-//}
-
 TEST_CASE("Preferred target") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
