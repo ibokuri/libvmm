@@ -2,6 +2,8 @@
 // vm.cpp - VM ioctls
 //
 
+#include <unistd.h> // sysconf, _SC_PAGESIZE
+
 #include "vmm/kvm/detail/ioctls/vm.hpp"
 #include "vmm/kvm/detail/ioctls/vcpu.hpp"
 #include "vmm/kvm/detail/ioctls/device.hpp"
@@ -35,29 +37,30 @@ auto vm::memslot(kvm_userspace_memory_region region) const -> void
     m_fd.ioctl(KVM_SET_USER_MEMORY_REGION, &region);
 }
 
-//auto vm::dirty_log(uint32_t slot, unsigned long memory_size) const -> std::vector<uint64_t> {
-    //// Compute length of bitmap needed for all dirty pages in one memory slot.
-    //// One memory page is `page_size` bytes and KVM_GET_DIRTY_LOG returns one
-    //// dirty bit for each page.
-    //auto page_size = sysconf(_SC_PAGESIZE);
+auto vm::dirty_log(uint32_t slot,
+                   unsigned long memory_size) const -> std::vector<uint64_t> {
+    // Compute length of bitmap needed for all dirty pages in one memory slot.
+    // One memory page is `page_size` bytes and KVM_GET_DIRTY_LOG returns one
+    // dirty bit for each page.
+    auto page_size = sysconf(_SC_PAGESIZE);
 
-    //if (page_size == -1)
-        //VMM_THROW(std::system_error(errno, std::system_category()));
+    if (page_size == -1)
+        VMM_THROW(std::system_error(errno, std::system_category()));
 
-    //// For ease of access we are saving the bitmap in a u64 vector.
-    //auto bitmap = std::vector<uint64_t>{};
+    // For ease of access we are saving the bitmap in a u64 vector.
+    auto bitmap = std::vector<uint64_t>{};
 
-    //// We use ceiling division to ensure all dirty pages are counted even when
-    //// memory_size isn't a multiple of page_size * 64.
-    //bitmap.reserve((memory_size + (page_size * 64)) / (page_size * 64));
+    // Ceiling division to ensure all dirty pages are counted even when
+    // memory_size isn't a multiple of page_size * 64.
+    bitmap.reserve((memory_size + static_cast<unsigned long>(page_size) * 64 - 1) / static_cast<unsigned long>(page_size) * 64);
 
-    //auto dirtylog = kvm_dirty_log{};
-    //dirtylog.slot = slot;
-    //dirtylog.dirty_bitmap = bitmap.data();
+    auto dirtylog = kvm_dirty_log{};
+    dirtylog.slot = slot;
+    dirtylog.dirty_bitmap = bitmap.data();
 
-    //m_fd.ioctl(KVM_GET_DIRTY_LOG, &dirtylog);
-    //return bitmap;
-//}
+    m_fd.ioctl(KVM_GET_DIRTY_LOG, &dirtylog);
+    return bitmap;
+}
 
 auto vm::mmap_size() const -> std::size_t
 {

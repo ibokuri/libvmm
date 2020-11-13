@@ -7,6 +7,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t, uint64_t
 #include <linux/kvm.h> // kvm_*, KVM_*
+#include <vector> // vector
 
 #include "vmm/kvm/detail/ioctls/system.hpp"
 #include "vmm/kvm/detail/types/file_descriptor.hpp"
@@ -56,6 +57,13 @@ class vm
         //
         // See the documentation for KVM_SET_USER_MEMORY_REGION.
         auto memslot(kvm_userspace_memory_region) const -> void;
+
+        // Given a memory slot, returns a vector containing any pages dirtied
+        // since the last call to this ioctl.
+        //
+        // See the documentation for KVM_GET_DIRTY_LOG.
+        auto dirty_log(uint32_t slot,
+                       unsigned long memory_size) const -> std::vector<uint64_t>;
 
         // Attaches an ioeventfd to a legal pio/mmio address within the guest.
         //
