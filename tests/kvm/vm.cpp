@@ -241,7 +241,55 @@ TEST_CASE("Preferred target") {
 }
 #endif
 
-//#if defined(__aarch64__)
+#if defined(__aarch64__)
+TEST_CASE("IRQ line") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+    auto vgic = vm.device(KVM_DEV_TYPE_ARM_VGIC_V3);
+
+    // Set supported # of IRQs
+    auto attributes = kvm_device_attr {
+        0, // flags
+        KVM_DEV_ARM_VGIC_GRP_NR_IRQS, // group
+        0, // attr
+        128, // addr
+    };
+
+    REQUIRE_NOTHROW(vgic.set_attr(attributes));
+
+    // Request vGIC initialization
+    auto attributes = kvm_device_attr {
+        0, // flags
+        KVM_DEV_ARM_VGIC_GRP_CTRL, // group
+        KVM_DEV_ARM_VGIC_CTRL_INIT, // attr
+        128, // addr
+    };
+
+    REQUIRE_NOTHROW(vgic.set_attr(attributes));
+
+    // On arm/aarch64, irq field is interpreted like so:
+    //
+    //   bits:  | 31 ... 24 | 23  ... 16 | 15    ...    0 |
+    //   field: | irq_type  | vcpu_index |     irq_id     |
+    //
+    // The irq_type field has the following values:
+    //
+    //   - irq_type[0]: out-of-kernel GIC: irq_id 0 is IRQ, irq_id 1 is FIQ
+    //   - irq_type[1]: in-kernel GIC: SPI, irq_id between 32 and 1019 (incl.) (the vcpu_index field is ignored)
+    //   - irq_type[2]: in-kernel GIC: PPI, irq_id between 16 and 31 (incl.)
+
+    // Case 1: irq_type = 1, irq_id = 32 (decimal)
+    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, true));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, false));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, true));
+
+    // Case 2: irq_type = 2, vcpu_index = 0, irq_id = 16 (decimal)
+    REQUIRE(vm.set_irq_line(0x02'00'0010, true));
+    REQUIRE(vm.set_irq_line(0x02'00'0010, false));
+    REQUIRE(vm.set_irq_line(0x02'00'0010, true));
+}
+
 //TEST_CASE("IRQ file descriptor") {
     //auto kvm = vmm::kvm::system{};
     //auto vm = kvm.vm();
@@ -266,7 +314,7 @@ TEST_CASE("Preferred target") {
     //// NOTE: KVM doesn't report unregisters with different levels as errors
     //REQUIRE_NOTHROW(vm.unregister_irqfd(eventfd3, 5));
 //}
-//#endif
+#endif
 
 #if defined(__s390__)
 TEST_CASE("IRQ chip creation") {
