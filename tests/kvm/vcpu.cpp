@@ -185,7 +185,7 @@ TEST_CASE("Register") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
-    auto kvi = vm.preferred_target(kvi);
+    auto kvi = vm.preferred_target();
 
     vcpu.init(kvi);
 
