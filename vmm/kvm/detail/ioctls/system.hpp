@@ -68,7 +68,7 @@ class system
         // ioctl's result.
         //
         // See the documentation for KVM_CREATE_VM.
-        [[nodiscard]] auto vm(int machine_type=0) const -> vmm::kvm::detail::vm;
+        [[nodiscard]] auto vm(std::size_t machine_type=0) const -> vmm::kvm::detail::vm;
 
         // Returns a positive integer if a KVM extension is available; 0 otherwise.
         //

@@ -24,7 +24,7 @@ class vm
         KvmFd m_fd;
         std::size_t m_mmap_size;
 
-        friend vm system::vm(int machine_type) const;
+        friend vm system::vm(std::size_t machine_type) const;
 
         vm(int fd, std::size_t mmap_size) noexcept
             : m_fd{fd}, m_mmap_size{mmap_size} {}
