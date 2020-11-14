@@ -20,14 +20,14 @@ namespace vmm::kvm::detail {
             VMM_THROW(std::system_error(errno, std::system_category()));
     }
 
-    auto vcpu::set_immediate_exit(uint8_t val) -> void
-    {
-        m_run->immediate_exit = val;
-    }
-
-    auto vcpu::immediate_exit() -> uint8_t
+    auto vcpu::immediate_exit() const noexcept -> uint8_t
     {
         return m_run->immediate_exit;
+    }
+
+    auto vcpu::set_immediate_exit(uint8_t val) noexcept -> void
+    {
+        m_run->immediate_exit = val;
     }
 
 #if defined(__i386__) || defined(__x86_64__)  || \

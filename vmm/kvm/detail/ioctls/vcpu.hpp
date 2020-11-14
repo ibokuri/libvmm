@@ -25,16 +25,16 @@ class vcpu
         explicit vcpu(int fd, std::size_t mmap_size);
     public:
         // Returns the immediate_exit flag in m_run.
-        auto immediate_exit() -> uint8_t;
+        [[nodiscard]] auto immediate_exit() const noexcept -> uint8_t;
 
         // Sets the immediate_exit flag in m_run.
-        auto set_immediate_exit(uint8_t val) -> void;
+        auto set_immediate_exit(uint8_t val) noexcept -> void;
 
 #if !defined(__arm__) && !defined(__aarch64__)
         // Returns the vCPU general purpose registers.
         //
         // See documentation for KVM_GET_REGS.
-        auto regs() const -> kvm_regs;
+        [[nodiscard]] auto regs() const -> kvm_regs;
 
         // Sets the vCPU's general purpose registers.
         //
@@ -47,7 +47,7 @@ class vcpu
         // Returns the vCPU's current "multiprocessing state".
         //
         // See the documentation for KVM_GET_MP_STATE.
-        auto mp_state() const -> kvm_mp_state;
+        [[nodiscard]] auto mp_state() const -> kvm_mp_state;
 
         // Sets the vCPU's current "multiprocessing state".
         //
@@ -61,7 +61,7 @@ class vcpu
         // as related states of the vCPU.
         //
         // See the documentation for KVM_GET_VCPU_EVENTS.
-        auto vcpu_events() const -> kvm_vcpu_events;
+        [[nodiscard]] auto vcpu_events() const -> kvm_vcpu_events;
 
         // Sets pending exceptions, interrupts, and NMIs as well as related
         // states of the vcpu.
@@ -76,7 +76,7 @@ class vcpu
         // Returns special registers of the vCPU.
         //
         // See the documentation for KVM_GET_SREGS.
-        auto sregs() const -> kvm_sregs;
+        [[nodiscard]] auto sregs() const -> kvm_sregs;
 
         // Sets special registers of the vCPU.
         //
@@ -88,7 +88,7 @@ class vcpu
         // Returns the floating point state (FPU) of the vCPU.
         //
         // See the documentation for KVM_GET_FPU.
-        auto fpu() const -> kvm_fpu;
+        [[nodiscard]] auto fpu() const -> kvm_fpu;
 
         // Sets the floating point state (FPU) of the vCPU.
         //
@@ -99,7 +99,7 @@ class vcpu
         // Controller (LAPIC).
         //
         // See the documentation for KVM_GET_LAPIC.
-        auto lapic() const -> kvm_lapic_state;
+        [[nodiscard]] auto lapic() const -> kvm_lapic_state;
 
         // Sets the state of the Local Advanced Programmable Interrupt
         // Controller (LAPIC).
@@ -110,7 +110,7 @@ class vcpu
         // Returns the vCPU's current xsave struct.
         //
         // See the documentation for KVM_GET_XSAVE.
-        auto xsave() const -> kvm_xsave;
+        [[nodiscard]] auto xsave() const -> kvm_xsave;
 
         // Sets the vCPU's current xsave struct.
         //
@@ -120,7 +120,7 @@ class vcpu
         // Returns the vCPU's current xcrs struct.
         //
         // See the documentation for KVM_GET_XCRS.
-        auto xcrs() const -> kvm_xcrs;
+        [[nodiscard]] auto xcrs() const -> kvm_xcrs;
 
         // Sets the vCPU's current xcrs struct.
         //
@@ -130,7 +130,7 @@ class vcpu
         // Returns vCPU's current debug registers.
         //
         // See the documentation for KVM_GET_DEBUGREGS.
-        auto debug_regs() const -> kvm_debugregs;
+        [[nodiscard]] auto debug_regs() const -> kvm_debugregs;
 
         // Sets the vCPU's current debug registers.
         //
@@ -165,7 +165,7 @@ class vcpu
         //
         // See the documentation for KVM_GET_CPUID2.
         template<uint32_t N>
-        auto cpuid2() const -> vmm::kvm::detail::Cpuids<N>
+        [[nodiscard]] auto cpuid2() const -> vmm::kvm::detail::Cpuids<N>
         {
             auto cpuids = vmm::kvm::detail::Cpuids<N>{};
             m_fd.ioctl(KVM_GET_CPUID2, cpuids.data());
@@ -194,7 +194,7 @@ class vcpu
         // Returns the value of the specified vCPU register.
         //
         // See the documentation for KVM_GET_ONE_REG.
-        auto reg(uint64_t id) -> uint64_t;
+        [[nodiscard]] auto reg(uint64_t id) -> uint64_t;
 
         // Sets the value of one register for this vCPU.
         //
