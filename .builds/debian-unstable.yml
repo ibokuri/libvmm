@@ -1,5 +1,4 @@
-image: debian/testing
-arch: arm64
+image: debian/unstable
 packages:
   - catch2
   - g++-9
@@ -17,6 +16,6 @@ tasks:
   - build: |
       cd libvmm
       ninja -C build
-  #- test: |
-      #cd libvmm/build
-      #sudo meson test -v
+  - test: |
+      cd libvmm/build
+      sudo meson test -v
