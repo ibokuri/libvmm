@@ -94,6 +94,8 @@ class vm
         }
 
         // Detaches an ioeventfd from a legal pio/mmio address within the guest.
+        //
+        // See the documentation for KVM_IOEVENTFD.
         template<vmm::types::IoEventAddress T>
         auto detach_ioevent(vmm::types::EventFd eventfd, uint64_t addr,
                             uint64_t datamatch=0) const -> void
