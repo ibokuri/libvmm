@@ -7,7 +7,13 @@ TEST_CASE("VM creation") {
     REQUIRE_NOTHROW(vmm::kvm::system{}.vm());
 }
 
-TEST_CASE("Set invalid memory slot") {
+TEST_CASE("vCPU creation") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    REQUIRE_NOTHROW(vm.vcpu(0));
+}
+
+TEST_CASE("Invalid memory slot") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
     auto mem_region = kvm_userspace_memory_region{};
@@ -15,7 +21,7 @@ TEST_CASE("Set invalid memory slot") {
     REQUIRE_THROWS(vm.memslot(mem_region));
 }
 
-TEST_CASE("Querying vCPU and memory slot information") {
+TEST_CASE("vCPU and memory slot information") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
@@ -24,9 +30,7 @@ TEST_CASE("Querying vCPU and memory slot information") {
     REQUIRE(vm.num_memslots() >= 32);
 }
 
-// TODO: TEST_CASE("vCPU creation");
-
-TEST_CASE("Attach ioevent") {
+TEST_CASE("IOEvent") {
     using EventFd = vmm::types::EventFd;
     using IoEventAddress = vmm::types::IoEventAddress;
 
@@ -34,35 +38,30 @@ TEST_CASE("Attach ioevent") {
     auto vm = kvm.vm();
     auto eventfd = EventFd{EFD_NONBLOCK};
 
-    if (vm.check_extension(KVM_CAP_IOEVENTFD) > 0) {
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Mmio>(eventfd, 0x1000));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xf4));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc1, 0x7f));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc2, 0x1337));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc4, 0xdead'beef));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc8, 0xdead'beef'dead'beef));
+    SECTION("Attach") {
+        if (vm.check_extension(KVM_CAP_IOEVENTFD) > 0) {
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Mmio>(eventfd, 0x1000));
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xf4));
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc1, 0x7f));
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc2, 0x1337));
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc4, 0xdead'beef));
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, 0xc8, 0xdead'beef'dead'beef));
+        }
     }
-}
 
-TEST_CASE("Detach ioevent") {
-    using EventFd = vmm::types::EventFd;
-    using IoEventAddress = vmm::types::IoEventAddress;
+    SECTION("Detach") {
+        if (vm.check_extension(KVM_CAP_IOEVENTFD) > 0) {
+            auto pio_addr = uint64_t{0xf4};
+            auto mmio_addr = uint64_t{0x1000};
 
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
+            REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+            REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr));
 
-    if (vm.check_extension(KVM_CAP_IOEVENTFD) > 0) {
-        auto eventfd = EventFd{EFD_NONBLOCK};
-        auto pio_addr = uint64_t{0xf4};
-        auto mmio_addr = uint64_t{0x1000};
-
-        REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
-        REQUIRE_THROWS(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr));
-
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
-        REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
-        REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
-        REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+            REQUIRE_NOTHROW(vm.attach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
+            REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, pio_addr));
+            REQUIRE_NOTHROW(vm.detach_ioevent<IoEventAddress::Pio>(eventfd, mmio_addr, 0x1337));
+        }
     }
 }
 
@@ -77,16 +76,16 @@ TEST_CASE("IRQ Chip creation") {
     }
 }
 
-// The call the signal_msi() throws b/c MSI vectors are not chosen from the HW
-// side (VMM). The guest OS (or anything that runs inside the VM) is supposed
-// to allocate the MSI vectors, and usually communicates back through PCI
-// configuration space.  Sending a random MSI vector through signal_msi() will
-// always result in a failure.
 TEST_CASE("Fail MSI signal") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
     auto msi = kvm_msi{};
 
+    // This throws b/c MSI vectors aren't chosen from the HW side (VMM). The
+    // guest OS (or anything that runs inside the VM) is supposed to allocate
+    // the MSI vectors, and usually communicates back through PCI
+    // configuration space. Sending a random MSI vector through signal_msi()
+    // will always result in a failure.
     REQUIRE_THROWS(vm.signal_msi(msi));
 }
 #endif
@@ -133,13 +132,11 @@ TEST_CASE("Bootstrap processor (BSP)") {
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0) {
-        SECTION("No vcpu") {
+        SECTION("No vCPU") {
             REQUIRE_NOTHROW(vm.set_bsp(0));
         }
 
-        // TODO: Comment the logic behind the test. I think it was b/c you
-        // can't set the BSP after a vcpu is already created.
-        SECTION("Existing vcpu") {
+        SECTION("vCPU") {
             auto vcpu = vm.vcpu(0);
             REQUIRE_THROWS(vm.set_bsp(0));
         }
@@ -153,11 +150,14 @@ TEST_CASE("GSI routing") {
     if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
         auto table = vmm::kvm::IrqRouting<0>{};
 
-        // No irqchip created yet
-        REQUIRE_THROWS(vm.gsi_routing(table));
+        SECTION("No IRQ chip") {
+            REQUIRE_THROWS(vm.gsi_routing(table));
+        }
 
-        vm.irqchip();
-        REQUIRE_NOTHROW(vm.gsi_routing(table));
+        SECTION("IRQ chip") {
+            vm.irqchip();
+            REQUIRE_NOTHROW(vm.gsi_routing(table));
+        }
     }
 }
 
