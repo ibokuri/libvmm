@@ -30,6 +30,18 @@ class vcpu
         // Sets the immediate_exit flag in m_run.
         auto set_immediate_exit(uint8_t val) -> void;
 
+#if !defined(__arm__) && !defined(__aarch64__)
+        // Returns the vCPU general purpose registers.
+        //
+        // See documentation for KVM_GET_REGS.
+        auto regs() const -> kvm_regs;
+
+        // Sets the vCPU's general purpose registers.
+        //
+        // See documentation for KVM_SET_REGS.
+        auto set_regs(const kvm_regs&) const -> void;
+#endif
+
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__)
         // Returns the vCPU's current "multiprocessing state".
@@ -188,18 +200,6 @@ class vcpu
         //
         // See the documentation for KVM_SET_ONE_REG.
         auto set_reg(uint64_t id, uint64_t data) -> void;
-#endif
-
-#if !defined(__arm__) && !defined(__aarch64__)
-        // Returns the vCPU general purpose registers.
-        //
-        // See documentation for KVM_GET_REGS.
-        auto regs() const -> kvm_regs;
-
-        // Sets the vCPU's general purpose registers.
-        //
-        // See documentation for KVM_SET_REGS.
-        auto set_regs(const kvm_regs&) const -> void;
 #endif
 };
 

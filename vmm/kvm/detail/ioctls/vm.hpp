@@ -35,6 +35,9 @@ class vm
         auto operator=(const vm& other) -> vm& = delete;
         auto operator=(vm&& other) -> vm& = default;
 
+        // Returns the VM's kvm_run's shared memory region size.
+        [[nodiscard]] auto mmap_size() const -> std::size_t;
+
         // Adds a vcpu to a virtual machine.
         //
         // See the documentation for KVM_CREATE_VCPU.
@@ -120,9 +123,6 @@ class vm
 
             m_fd.ioctl(KVM_IOEVENTFD, &ioeventfd);
         }
-
-        // Returns KVM_RUN's shared memory region size.
-        [[nodiscard]] auto mmap_size() const -> std::size_t;
 
         // Returns the recommended number for max_vcpus.
         [[nodiscard]] auto num_vcpus() const -> int;
