@@ -116,11 +116,11 @@ auto vm::unregister_irqfd(vmm::types::EventFd eventfd, uint32_t gsi) const -> vo
 
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__)
-auto vm::set_irq_line(const uint32_t irq, bool active) const -> void
+auto vm::set_irq_line(const uint32_t irq, IrqLevel level) const -> void
 {
     auto irq_level = kvm_irq_level {
         { irq },
-        active ? uint32_t{1} : uint32_t{0} // level
+        static_cast<uint32_t>(level)
     };
 
     m_fd.ioctl(KVM_IRQ_LINE, &irq_level);

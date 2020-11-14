@@ -166,9 +166,9 @@ TEST_CASE("IRQ line") {
     auto vm = kvm.vm();
 
     REQUIRE_NOTHROW(vm.irqchip());
-    REQUIRE_NOTHROW(vm.set_irq_line(4, true));
-    REQUIRE_NOTHROW(vm.set_irq_line(4, false));
-    REQUIRE_NOTHROW(vm.set_irq_line(4, true));
+    REQUIRE_NOTHROW(vm.set_irq_line(4, vmm::kvm::IrqLevel::Active));
+    REQUIRE_NOTHROW(vm.set_irq_line(4, vmm::kvm::IrqLevel::Inactive));
+    REQUIRE_NOTHROW(vm.set_irq_line(4, vmm::kvm::IrqLevel::Active));
 }
 
 TEST_CASE("IRQ file descriptor") {
@@ -306,14 +306,14 @@ TEST_CASE("IRQ line") {
     //   - irq_type[2]: in-kernel GIC: PPI, irq_id between 16 and 31 (incl.)
 
     // Case 1: irq_type = 1, irq_id = 32 (decimal)
-    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, true));
-    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, false));
-    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, true));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, vmm::kvm::IrqLevel::Active));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, vmm::kvm::IrqLevel::Inactive));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, vmm::kvm::IrqLevel::Active));
 
     // Case 2: irq_type = 2, vcpu_index = 0, irq_id = 16 (decimal)
-    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, true));
-    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, false));
-    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, true));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, vmm::kvm::IrqLevel::Active));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, vmm::kvm::IrqLevel::Inactive));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, vmm::kvm::IrqLevel::Active));
 }
 
 TEST_CASE("IRQ file descriptor") {

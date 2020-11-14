@@ -16,6 +16,11 @@
 
 namespace vmm::kvm::detail {
 
+enum class IrqLevel: uint32_t {
+    Inactive,
+    Active
+};
+
 class vcpu;
 class device;
 
@@ -164,7 +169,7 @@ class vm
         // the kernel.
         //
         // See the documentation for KVM_IRQ_LINE.
-        auto set_irq_line(const uint32_t irq, bool active) const -> void;
+        auto set_irq_line(const uint32_t irq, IrqLevel) const -> void;
 
         // Directly injects a MSI message. Returns > 0 when the MSI is
         // delivered and 0 when the guest blocked the MSI.

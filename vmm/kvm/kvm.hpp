@@ -19,11 +19,13 @@ using vm = vmm::kvm::detail::vm;
 using vcpu = vmm::kvm::detail::vcpu;
 using device = vmm::kvm::detail::device;
 
+using IrqLevel = vmm::kvm::detail::IrqLevel;
+
+template<std::size_t N> using IrqRouting = vmm::kvm::detail::IrqRouting<N>;
 #if defined(__i386__) || defined(__x86_64__)
 template<std::size_t N> using MsrList = vmm::kvm::detail::MsrList<N>;
 template<std::size_t N> using Msrs = vmm::kvm::detail::Msrs<N>;
 template<std::size_t N> using Cpuids = vmm::kvm::detail::Cpuids<N>;
 #endif
-template<std::size_t N> using IrqRouting = vmm::kvm::detail::IrqRouting<N>;
 
 }  // namespace vmm::kvm
