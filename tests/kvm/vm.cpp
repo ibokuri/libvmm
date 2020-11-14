@@ -285,7 +285,7 @@ TEST_CASE("IRQ line") {
     REQUIRE_NOTHROW(vgic.set_attr(attributes));
 
     // Request vGIC initialization
-    auto attributes = kvm_device_attr {
+    attributes = kvm_device_attr {
         0, // flags
         KVM_DEV_ARM_VGIC_GRP_CTRL, // group
         KVM_DEV_ARM_VGIC_CTRL_INIT, // attr
@@ -311,9 +311,9 @@ TEST_CASE("IRQ line") {
     REQUIRE_NOTHROW(vm.set_irq_line(0x01'00'0020, true));
 
     // Case 2: irq_type = 2, vcpu_index = 0, irq_id = 16 (decimal)
-    REQUIRE(vm.set_irq_line(0x02'00'0010, true));
-    REQUIRE(vm.set_irq_line(0x02'00'0010, false));
-    REQUIRE(vm.set_irq_line(0x02'00'0010, true));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, true));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, false));
+    REQUIRE_NOTHROW(vm.set_irq_line(0x02'00'0010, true));
 }
 
 TEST_CASE("IRQ file descriptor") {
@@ -335,7 +335,7 @@ TEST_CASE("IRQ file descriptor") {
     REQUIRE_NOTHROW(vgic.set_attr(attributes));
 
     // Request vGIC initialization
-    auto attributes = kvm_device_attr {
+    attributes = kvm_device_attr {
         0, // flags
         KVM_DEV_ARM_VGIC_GRP_CTRL, // group
         KVM_DEV_ARM_VGIC_CTRL_INIT, // attr
