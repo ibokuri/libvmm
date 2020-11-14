@@ -175,7 +175,7 @@ class vm
         // delivered and 0 when the guest blocked the MSI.
         //
         // See the documentation for KVM_SIGNAL_MSI.
-        auto signal_msi(const kvm_msi &msi) const -> int;
+        auto signal_msi(const kvm_msi&) const -> int;
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)
