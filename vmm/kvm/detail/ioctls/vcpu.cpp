@@ -2,9 +2,12 @@
 // vcpu.cpp - vCPU ioctls
 //
 
+#include <stdexcept> // runtime_error
+
 #include <sys/mman.h> // mmap, PROT_READ, PROT_WRITE, MAP_FAILED, MAP_SHARED
 
 #include "vmm/kvm/detail/ioctls/vcpu.hpp"
+#include "vmm/types/detail/exceptions.hpp"
 
 namespace vmm::kvm::detail {
     vcpu::vcpu(int fd, std::size_t mmap_size)
@@ -18,6 +21,52 @@ namespace vmm::kvm::detail {
         // TODO: Do I need to close fd here? Or is it cleaned up elsewhere.
         if (m_run == MAP_FAILED)
             VMM_THROW(std::system_error(errno, std::system_category()));
+    }
+
+    // Runs the current vCPU. Returns an exit reason.
+    //
+    // See documentation for `KVM_RUN`.
+    auto vcpu::run() const -> VcpuExit {
+        m_fd.ioctl(KVM_RUN);
+
+        switch(m_run->exit_reason) {
+            case KVM_EXIT_UNKNOWN:
+            case KVM_EXIT_EXCEPTION:
+            case KVM_EXIT_IO:
+            case KVM_EXIT_HYPERCALL:
+            case KVM_EXIT_DEBUG:
+            case KVM_EXIT_HLT:
+            case KVM_EXIT_MMIO:
+            case KVM_EXIT_IRQ_WINDOW_OPEN:
+            case KVM_EXIT_SHUTDOWN:
+            case KVM_EXIT_FAIL_ENTRY:
+            case KVM_EXIT_INTR:
+            case KVM_EXIT_SET_TPR:
+            case KVM_EXIT_TPR_ACCESS:
+            case KVM_EXIT_S390_SIEIC:
+            case KVM_EXIT_S390_RESET:
+            case KVM_EXIT_DCR:
+            case KVM_EXIT_NMI:
+            case KVM_EXIT_INTERNAL_ERROR:
+            case KVM_EXIT_OSI:
+            case KVM_EXIT_PAPR_HCALL:
+            case KVM_EXIT_S390_UCONTROL:
+            case KVM_EXIT_WATCHDOG:
+            case KVM_EXIT_S390_TSCH:
+            case KVM_EXIT_EPR:
+            case KVM_EXIT_SYSTEM_EVENT:
+            case KVM_EXIT_S390_STSI:
+            case KVM_EXIT_IOAPIC_EOI:
+            case KVM_EXIT_HYPERV:
+            case KVM_EXIT_ARM_NISV:
+                return static_cast<VcpuExit>(m_run->exit_reason);
+            default:
+                VMM_THROW(std::runtime_error("Unexpected exit reason"));
+        };
+    }
+
+    auto vcpu::data() const noexcept -> kvm_run* {
+        return m_run;
     }
 
     auto vcpu::immediate_exit() const noexcept -> uint8_t

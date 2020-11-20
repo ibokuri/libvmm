@@ -1,6 +1,10 @@
 #define CATCH_CONFIG_MAIN
 
+#include <bitset>
 #include <catch2/catch.hpp>
+
+#include <sys/mman.h> // mmap, PROT_READ, PROT_WRITE, MAP_ANONYMOUS, MAP_SHARED
+
 #include "vmm/kvm/kvm.hpp"
 
 TEST_CASE("vCPU creation") {
@@ -74,6 +78,113 @@ TEST_CASE("CPUID2") {
                 REQUIRE(supported_cpuids[i].edx == cpuids[i].edx);
             }
         }
+    }
+}
+
+TEST_CASE("Run") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+
+    // Add 2 small numbers
+    const auto code = std::array<uint8_t, 24>{
+        0xba, 0xf8, 0x03,             // mov $0x3f8, %dx
+        0x00, 0xd8,                   // add %bl, %al
+        0x04, '0',                    // add $'0', %al
+        0xee,                         // out %al, %dx
+        0xec,                         // in %dx, %al
+        0xc6, 0x06, 0x00, 0x80, 0x00, // movl $0, (0x8000); This generates a MMIO Write.
+        0x8a, 0x16, 0x00, 0x80,       // movl (0x8000), %dl; This generates a MMIO Read.
+        0xc6, 0x06, 0x00, 0x20, 0x00, // movl $0, (0x2000); Dirty one page in guest mem.
+        0xf4,                         // hlt
+    };
+
+    // mmap code
+    auto guest_addr = uint64_t{0x1000};
+    auto mem_size = uint64_t{0x4000};
+    auto mem = mmap(NULL, mem_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    std::memcpy(mem, code.data(), sizeof(code));
+
+    // Configure VM with the memory region storing the code
+    auto mem_region = kvm_userspace_memory_region {
+        0,
+        KVM_MEM_LOG_DIRTY_PAGES,
+        guest_addr,
+        mem_size,
+        reinterpret_cast<uintptr_t>(mem)
+    };
+
+    vm.memslot(mem_region);
+
+    // Initialize CS to point at 0, via a read-modify-write of sregs.
+    auto sregs = vcpu.sregs();
+
+    REQUIRE(sregs.cs.base != 0);
+    REQUIRE(sregs.cs.selector != 0);
+
+    sregs.cs.base = 0;
+    sregs.cs.selector = 0;
+    vcpu.set_sregs(sregs);
+
+    // Initialize registers: IP for our code, addends, and flags needed by x86.
+    auto regs = kvm_regs{};
+    regs.rip = guest_addr,
+    regs.rax = 2,
+    regs.rbx = 3,
+    regs.rflags = 2,
+    vcpu.set_regs(regs);
+
+    // Run vCPU
+    while (1) {
+        auto exit = vcpu.run();
+
+        switch (exit) {
+            case vmm::kvm::VcpuExit::Io: {
+                const auto io = vcpu.data()->io;
+
+                if (io.direction == KVM_EXIT_IO_IN) {
+                    REQUIRE(io.port == 0x3f8);
+                    REQUIRE(io.count == 1);
+                }
+                else if (io.direction == KVM_EXIT_IO_OUT) {
+                    REQUIRE(io.port == 0x3f8);
+                    REQUIRE(io.count == 1);
+                    REQUIRE(*(reinterpret_cast<char*>(vcpu.data()) + io.data_offset) == '5');
+                }
+
+                continue;
+            }
+            case vmm::kvm::VcpuExit::Mmio: {
+                const auto mmio = vcpu.data()->mmio;
+
+                REQUIRE(mmio.phys_addr == 0x8000);
+                REQUIRE(mmio.len == 1);
+
+                if (mmio.is_write)
+                    REQUIRE(mmio.data[0] == 0);
+
+                continue;
+            }
+            case vmm::kvm::VcpuExit::Hlt: {
+                // The code snippet dirties 2 pages:
+                //
+                //  * When the code itself is loaded in memory.
+                //  * From the `movl` that writes to address 0x8000.
+                const auto dirty_pages = vm.dirty_log(0, mem_size);
+
+                auto sum = uint64_t{};
+                for (auto x : dirty_pages)
+                    sum += std::bitset<64>{x}.count();
+
+                REQUIRE(sum == 2);
+
+                break;
+            }
+            default:
+                VMM_THROW(/* TODO */);
+        }
+
+        break;
     }
 }
 

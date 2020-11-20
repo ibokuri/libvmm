@@ -19,6 +19,8 @@ using vm = vmm::kvm::detail::vm;
 using vcpu = vmm::kvm::detail::vcpu;
 using device = vmm::kvm::detail::device;
 
+using VcpuExit = vmm::kvm::detail::VcpuExit;
+
 using IrqLevel = vmm::kvm::detail::IrqLevel;
 
 template<std::size_t N> using IrqRouting = vmm::kvm::detail::IrqRouting<N>;

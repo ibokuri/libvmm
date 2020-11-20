@@ -6,12 +6,45 @@
 
 #include <cstddef> // size_t
 #include <cstdint> // uint*_t
+
 #include <linux/kvm.h> // kvm_*, KVM_*
 
 #include "vmm/kvm/detail/ioctls/vm.hpp"
 #include "vmm/kvm/detail/types/file_descriptor.hpp"
 
 namespace vmm::kvm::detail {
+
+enum class VcpuExit: uint32_t {
+    Unknown,       // KVM_EXIT_UNKNOWN
+    Exception,     // KVM_EXIT_EXCEPTION
+    Io,            // KVM_EXIT_IO
+    Hypercall,     // KVM_EXIT_HYPERCALL
+    Debug,         // KVM_EXIT_DEBUG
+    Hlt,           // KVM_EXIT_HLT
+    Mmio,          // KVM_EXIT_MMIO
+    IrqWindowOpen, // KVM_EXIT_IRQ_WINDOW_OPEN
+    Shutdown,      // KVM_EXIT_SHUTDOWN
+    FailEntry,     // KVM_EXIT_FAIL_ENTRY
+    Intr,          // KVM_EXIT_INTR
+    SetTpr,        // KVM_EXIT_SET_TPR
+    TprAccess,     // KVM_EXIT_TPR_ACCESS
+    S390Sieic,     // KVM_EXIT_S390_SIEIC
+    S390Reset,     // KVM_EXIT_S390_RESET
+    Dcr,           // KVM_EXIT_DCR
+    Nmi,           // KVM_EXIT_NMI
+    InternalError, // KVM_EXIT_INTERNAL_ERROR
+    Osi,           // KVM_EXIT_OSI
+    PaprHcall,     // KVM_EXIT_PAPR_HCALL
+    S390Ucontrol,  // KVM_EXIT_S390_UCONTROL
+    Watchdog,      // KVM_EXIT_WATCHDOG
+    S390Tsch,      // KVM_EXIT_S390_TSCH
+    Epr,           // KVM_EXIT_EPR
+    SystemEvent,   // KVM_EXIT_SYSTEM_EVENT
+    S390Stsi,      // KVM_EXIT_S390_STSI
+    IoapicEoi,     // KVM_EXIT_IOAPIC_EOI
+    Hyperv,        // KVM_EXIT_HYPERV
+    ArmNsiv,       // KVM_EXIT_HYPERV
+};
 
 class vcpu
 {
@@ -24,6 +57,9 @@ class vcpu
 
         explicit vcpu(int fd, std::size_t mmap_size);
     public:
+        [[nodiscard]] auto run() const -> VcpuExit;
+        [[nodiscard]] auto data() const noexcept -> kvm_run*;
+
         // Returns the immediate_exit flag in m_run.
         [[nodiscard]] auto immediate_exit() const noexcept -> uint8_t;
 
@@ -72,7 +108,6 @@ class vcpu
 
 #if defined(__i386__) || defined(__x86_64__) || \
     defined(__ppc__)  || defined(__ppc64__)
-
         // Returns special registers of the vCPU.
         //
         // See the documentation for KVM_GET_SREGS.
