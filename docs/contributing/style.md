@@ -1,46 +1,24 @@
 # Coding Style
 
-
-
 ## General
 
 ### Line Length
 
-Try to keep lines under 80 columns. If a line can't be broken across multiple
-lines in a readable manner, you may go up to 100 characters.
+Try to keep lines under 80 characters. If a line surpasses that limit, but
+can't be broken across multiple lines in a readable manner, you may go up to
+100 characters.
 
-### Indentation
+### Tabs
 
-Use 4-space tabs for indentation. Tabs should be converted to spaces.
-
-If a function is being broken up across multiple lines at its parameters,
-prefer indenting all non-first parameters to align with the first one. If an
-if/else/for/while condition, class inheritance line, or constructor member
-initializer list is broken across multiple lines, the broken off lines should
-be by two tabs.
-
-```cpp
-auto long_function_name1(arg1, arg2, arg3,
-                         arg4, arg5);
-
-auto long_function_name2(really_long_parameter1,
-                         really_long_parameter2,
-                         really_long_parameter3);
-
-if (cond1 && cond2 &&
-        cond3) {
-    ...
-}
-```
+Use 4-space tabs for indentation. Tabs should be converted into spaces.
 
 ### Braces
 
-For functions and classes, opening braces should be on a separate line unless
-the function/class is empty. for everything else, the braces do not go on a
-separate line.
+For functions and classes, opening braces go on a separate line unless the
+function or class is empty.
 
 ```cpp
-auto foo()
+void foo()
 {
     if (condition) {
         ...
@@ -59,83 +37,117 @@ class Widget
 }
 ```
 
+### Multi-Liners
 
+#### Functions
+
+For multi-line function names, break along the function's parameters and align
+noninitial lines with the first parameter.
+
+```cpp
+void long_function_name1(arg1, arg2, arg3,
+                         arg4, arg5);
+
+void long_function_name2(really_long_parameter1,
+                         really_long_parameter2,
+                         really_long_parameter3);
+```
+
+#### Classes
+
+For long derived class names, break at the base-clause (`: <base>`).
+
+```cpp
+class LongWidgetName
+    : BaseWidget;
+```
+
+For long control statements (`if`, `else`, `for`, `while`), break wherever
+appropriate, but indent noninitial lines by 2 tabs.
+
+```cpp
+if (cond1 && cond2 &&
+        cond3) {
+    ...
+}
+
+while (really_long_parameter == 0 ||
+        really_long_parameter == 1) {
+    ...
+}
+```
+
+For everything else, opening braces do not go on a separate line.
 
 ## Naming Conventions
 
+### `snake_case` vs. `CamelCase`
+
 Generally, `snake_case` is used for variable, function, and file names,
 `CAPS_SNAKE_CASE` for macros, and `CamelCase` is used for everything else.
-There are some exceptions though. In particular, if a type can be described by
-a single word, is publicly available to users, and is something that can be
-reasonably considered as a primitive in the context of the module that it is
-in, then I like to use all lowercase letters. For example, the KVM API wrapper
-has classes `vmm::kvm::vm` and `vmm::kvm::vcpu`, both of which are absolutely
-fundamental to how the API functions and therefore may be considered KVM
-"primitives".
 
-For classes, there are a few rules to follow as well. To start, all non-static
-data members should be prefixed with `m_`. As for methods, all setter methods
-should be prefixed with `set_`, while getter methods should use bare names.
-The name of a setter/getter method should match (ignoring any prefixes) the
-variable that they are setting/getting. Now, there are cases where a `get_`
-prefix may be used for getter methods. Specifically, the prefix may be used
-when a getter method's bare name conflicts with a keyword or well-known name
-(e.g., `allocator`), if what the method does isn't obvious/accurate from the
-bare name, or if the method returns values through out parameters. In addition,
-if the word "get" does not accurately describe a getter method's functionality,
-another prefix may be used (e.g., `read_`).
+However, there are exceptions. In particular, if a user-defined type can be
+described by a single word, is publicly available to users, and is something
+that can be reasonably considered as a primitive in the context of the module
+that it is in, then prefer lowercase letters. For example, the KVM API wrapper
+has classes such as `vmm::kvm::vm` and `vmm::kvm::vcpu`, both of which are
+absolutely fundamental to how the API functions and therefore may be considered
+KVM "primitives."
 
-For function declarations, omit any redundant parameter names. That is, if what
-a parameter is is clear from its type, then it does not need a name. Generally,
-this leaves names for just bools, strings, and numerical parameters.
+### Classes
 
+#### Data Members
 
+All non-static data members should be prefixed with `m_`.
+
+#### Methods
+
+All setter methods should be prefixed with `set_`. And generally, getter
+methods should use bare names. In either case, the name of the method should,
+ignoring any prefixes, match the data member that they are setting/getting.
+
+In cases where a getter method using a bare name conflicts with a keyword or
+well-known name, returns values via out parameters, or is not accurately
+described by the word "get," another prefix may be used (e.g., `read_`).
+
+#### Functions
+
+Omit redundant parameter names in function declarations.
+
+```cpp
+void foo(Widget, MsrIndexList&, std::vector<int>& bitmap);
+```
 
 ## Types
 
-Variable types should be specified as `auto` wherever possible. When type
-ambiguity is not permitted, explicitly construct the type on the right-hand
-side to ensure that the variable's type is clear to readers. Similarly,
-trailing return types should be used for functions.
+### `auto`
 
-Prefer enums over bools for function parameters. For setter methods, bools are
-fine since the name of the method makes clear what the parameter is.
+Wherever possible, prefer specifying types as `auto`. When type ambiguity is
+not permitted/desired, explicitly specify the type on the right-hand side to ensure
+that the variable's type is clear to readers.
 
-
-
-## Classes
-
-### A class constructor's braces depends on the body's contents
-
-If a constructor's body is empty, the opening brace should appear on the same
-line as the function name or member initializer list. If the body is not
-empty, the opening brace should appear on its own line.
+Similarly, trailing return types should be used for functions.
 
 ```cpp
-class Foo {
-    private:
-        int m_foo = 0;
-        bool m_bar = false;
-    public:
-        MyClass() {}
+auto foo() noexcept -> void;
 
-        MyClass(int foo)
-            : m_foo(foo) {}
-
-        MyClass(bool bar)
-            : m_bar(bar)
-        {
-            std::cout << "I'm on a new line!" << std::endl;
-        }
-};
+auto a = 0;
+auto b = int{};
+auto c = std::vector<int>{};
 ```
+
+### Enums
+
+Prefer enum classes over bools for function parameters. However, for setter
+methods, bools are fine since the name of the method makes clear what the
+parameter is.
+
+## Classes
 
 ### Member Initialization
 
 Where possible, initialize class members at member definition. Otherwise,
-initialize members with initializer lists. Each member (or base class) in an
-initializer list should be indented on a separate line, with commas at the end
-of each non-last line.
+initialize members via initializer lists.
 
 ```cpp
 class Foo {
@@ -145,13 +157,16 @@ class Foo {
     public:
         MyClass(int foo)
             : BaseClass(),
-              m_foo{foo} {}
+              m_foo{foo}, m_bar{true} {}
 
         MyClass() : BaseClass() {}
 };
 ```
 
+### `explicit`
 
+Mark constructors with single parameters as `explicit` unless implicit
+conversion is desired and the type conversion is intuitive and fast.
 
 ## Pointers and References
 
@@ -160,21 +175,10 @@ class Foo {
 Pointer and reference types should be written with no space between the
 variable name and the `*` or `&`.
 
-### Out Arguments
+### Out Parameters
 
-An out argument of a function should be passed by reference except rare cases
-where it is optional in which case it should be passed by pointer.
-
-
-
-## Classes
-
-### `explicit` Keyword
-
-Mark constructors with single parameters as `explicit` unless implicit
-conversion is desired and the type conversion is intuitive and fast.
-
-
+An out parameter should be passed by reference except rare cases where it is
+optional, in which case it should be passed by pointer.
 
 ## Virtual Methods
 
