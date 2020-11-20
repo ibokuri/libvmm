@@ -2,3 +2,4 @@ build
 .builds/extra
 .clangd
 NOTES
+lgtm.yml
