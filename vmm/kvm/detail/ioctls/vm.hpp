@@ -71,7 +71,7 @@ class vm
         //
         // See the documentation for KVM_GET_DIRTY_LOG.
         auto dirty_log(uint32_t slot,
-                       unsigned long memory_size) const -> std::vector<uint64_t>;
+                       unsigned long mem_size) const -> std::vector<uint64_t>;
 
         // Attaches an ioeventfd to a legal pio/mmio address within the guest.
         //
