@@ -3,7 +3,7 @@ extraction:
     prepare:
       packages:
         - g++-9
-        - catch2
+        - catch
     configure:
       command:
         - meson build
