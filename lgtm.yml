@@ -107,6 +107,8 @@ extraction:
        # be installed.
        packages:
          - catch2
+         - meson
+         - ninja
     # Add an `after-prepare` step if you need to run commands after the prepare step.
     # Each command should be listed on a separate line.
     # This step is useful for C/C++ analysis where you want to prepare the environment
