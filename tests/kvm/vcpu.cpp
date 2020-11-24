@@ -3,6 +3,7 @@
 #include <bitset>
 #include <catch2/catch.hpp>
 
+#include <string.h> // memcmp
 #include <sys/mman.h> // mmap, PROT_READ, PROT_WRITE, MAP_ANONYMOUS, MAP_SHARED
 
 #include "vmm/kvm/kvm.hpp"
@@ -40,15 +41,19 @@ TEST_CASE("Multi-processing state") {
 
 #if defined(__i386__) || defined(__x86_64__) || \
     defined(__arm__)  || defined(__aarch64__)
-//TEST_CASE("vCPU events") {
-    //auto kvm = vmm::kvm::system{};
-    //auto vm = kvm.vm();
-    //auto vcpu = vm.vcpu(0);
-    //auto events = vcpu.vcpu_events();
+TEST_CASE("vCPU events") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
 
-    //REQUIRE_NOTHROW(vcpu.set_vcpu_events(events));
-    //auto other = vcpu.vcpu_events();
-//}
+    REQUIRE(kvm.check_extension(KVM_CAP_VCPU_EVENTS));
+
+    auto events = vcpu.vcpu_events();
+    REQUIRE_NOTHROW(vcpu.set_vcpu_events(events));
+
+    auto other = vcpu.vcpu_events();
+    REQUIRE(memcmp(&events, &other, sizeof(kvm_vcpu_events)) == 0);
+}
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)
