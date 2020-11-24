@@ -327,4 +327,111 @@ TEST_CASE("Register") {
         REQUIRE(vcpu.reg(PSTATE_REG_ID) == PSTATE_FAULT_BITS_64);
     }
 }
+
+TEST_CASE("Run") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    // Add 2 small numbers
+    const auto code = std::array<uint8_t, 48>{
+        0x40, 0x20, 0x80, 0x52, // mov w0, #0x102
+        0x00, 0x01, 0x00, 0xb9, // str w0, [x8]; test physical memory write
+        0x81, 0x60, 0x80, 0x52, // mov w1, #0x304
+        0x02, 0x00, 0x80, 0x52, // mov w2, #0x0
+        0x20, 0x01, 0x40, 0xb9, // ldr w0, [x9]; test MMIO read
+        0x1f, 0x18, 0x14, 0x71, // cmp w0, #0x506
+        0x20, 0x00, 0x82, 0x1a, // csel w0, w1, w2, eq
+        0x20, 0x01, 0x00, 0xb9, // str w0, [x9]; test MMIO write
+        0x00, 0x80, 0xb0, 0x52, // mov w0, #0x84000000
+        0x00, 0x00, 0x1d, 0x32, // orr w0, w0, #0x08
+        0x02, 0x00, 0x00, 0xd4, // hvc #0x0
+        0x00, 0x00, 0x00, 0x14, // b <this address>; shouldn't get here, but if so loop forever
+    };
+
+    // mmap code
+    auto guest_addr = uint64_t{0x10000};
+    auto mem_size = uint64_t{0x20000};
+    auto mem = mmap(NULL, mem_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    std::memcpy(mem, code.data(), sizeof(code));
+
+    // Configure VM with the memory region storing the code
+    auto mem_region = kvm_userspace_memory_region {
+        0,
+        KVM_MEM_LOG_DIRTY_PAGES,
+        guest_addr,
+        mem_size,
+        reinterpret_cast<uintptr_t>(mem)
+    };
+
+    vm.memslot(mem_region);
+
+    auto vcpu = vm.vcpu(0);
+    auto kvi = kvm_vcpu_init{};
+    vm.preferred_target(kvi);
+    kvi.features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
+    vcpu.init(kvi);
+
+    auto core_reg_base = uint64_t{0x6030'0000'0010'0000};
+    auto mmio_addr = uint64_t{guest_addr + mem_size};
+
+    // Set PC to guest address (where code is)
+    vcpu.set_reg(core_reg_base + 2 * 32, guest_addr);
+
+    // Set x8 and x9 to addreses the guest test code needs
+    vcpu.set_reg(core_reg_base + 2 * 8, guest_addr + 0x10000);
+    vcpu.set_reg(core_reg_base + 2 * 9, mmio_addr);
+
+    // Run vCPU
+    while (1) {
+        auto exit = vcpu.run();
+
+        switch (exit) {
+            case vmm::kvm::VcpuExit::Mmio: {
+                const auto mmio = vcpu.data()->mmio;
+
+                REQUIRE(mmio.phys_addr == mmio_addr);
+                REQUIRE(mmio.len == 4);
+
+                REQUIRE(data[3] == 0x0);
+                REQUIRE(data[2] == 0x0);
+
+                if (mmio.is_write) {
+                    REQUIRE(mmio.data[1] == 3);
+                    REQUIRE(mmio.data[0] == 4);
+
+                    // The code snippet dirties 1 page at guest_addr +
+                    // 0x10000.
+                    //
+                    // The code page shouldn't be dirty, as it's not written
+                    // to by the guest.
+                    auto dirty_bitmap = vm.dirty_log(0, mem_size);
+
+                    auto sum = uint64_t{};
+                    for (auto pages : dirty_pages)
+                        sum += std::bitset<64>{pages}.count();
+
+                    REQUIRE(sum == 1);
+                }
+                else {
+                    REQUIRE(mmio.data[1] == 5);
+                    REQUIRE(mmio.data[0] == 6);
+                }
+
+                continue;
+            }
+            case vmm::kvm::VcpuExit::SystemEvent: {
+                auto system = vcpu.data()->system;
+
+                REQUIRE(system.type_ == KVM_SYSTEM_EVENT_SHUTDOWN);
+                REQUIRE(system.flags == 0);
+
+                break;
+            }
+            default:
+                VMM_THROW(/* TODO */);
+        }
+
+        break;
+    }
+}
 #endif
