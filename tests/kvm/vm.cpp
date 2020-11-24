@@ -96,7 +96,7 @@ TEST_CASE("IRQ chip") {
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
-        REQUIRE_NOTHROW(vm.irqchip());
+        vm.irqchip();
 
         auto irqchip1 = kvm_irqchip{KVM_IRQCHIP_PIC_MASTER};
         irqchip1.chip.pic.irq_base = 10;

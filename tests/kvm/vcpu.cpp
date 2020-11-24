@@ -86,6 +86,110 @@ TEST_CASE("CPUID2") {
     }
 }
 
+TEST_CASE("FPU") {
+    // From https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/fpu/internal.h
+    auto KVM_FPU_CWD = uint16_t{0x37f};
+    auto KVM_FPU_MXCSR = uint32_t{0x1f80};
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+    auto fpu = kvm_fpu{};
+    fpu.fcw = KVM_FPU_CWD;
+    fpu.mxcsr = KVM_FPU_MXCSR;
+
+    REQUIRE_NOTHROW(vcpu.set_fpu(fpu));
+    REQUIRE(vcpu.fpu().fcw == KVM_FPU_CWD);
+}
+
+//TEST_CASE("LAPIC") {
+    //auto kvm = vmm::kvm::system{};
+    //auto vm = kvm.vm();
+
+    //REQUIRE(kvm.check_extension(KVM_CAP_IRQCHIP));
+    //REQUIRE_NOTHROW(vm.irqchip());
+
+    //auto vcpu = vm.vcpu(0);
+    //auto klapic = vcpu.lapic();
+
+    //auto reg_offset = 0x300;
+    //auto value = uint32_t{2};
+//}
+
+TEST_CASE("Xsave") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+    auto xsave = vcpu.xsave();
+
+    REQUIRE_NOTHROW(vcpu.set_xsave(xsave));
+    auto other = vcpu.xsave();
+
+    for (int i = 0; i < 1024; i++)
+        REQUIRE(xsave.region[i] == other.region[i]);
+}
+
+TEST_CASE("Xcrs") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+    auto xcrs = vcpu.xcrs();
+
+    REQUIRE_NOTHROW(vcpu.set_xcrs(xcrs));
+    auto other = vcpu.xcrs();
+
+    REQUIRE(xcrs.nr_xcrs == other.nr_xcrs);
+    REQUIRE(xcrs.flags == other.flags);
+
+    for (int i = 0; i < KVM_MAX_XCRS; i++) {
+        REQUIRE(xcrs.xcrs[i].xcr == other.xcrs[i].xcr);
+        REQUIRE(xcrs.xcrs[i].value == other.xcrs[i].value);
+    }
+}
+
+TEST_CASE("Debug registers") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+    auto regs = vcpu.debug_regs();
+
+    REQUIRE_NOTHROW(vcpu.set_debug_regs(regs));
+    auto other = vcpu.debug_regs();
+
+    for (int i = 0; i < 4; i++)
+        REQUIRE(regs.db[i] == other.db[i]);
+
+    REQUIRE(regs.dr6 == other.dr6);
+    REQUIRE(regs.dr7 == other.dr7);
+    REQUIRE(regs.flags == other.flags);
+}
+
+TEST_CASE("MSRs") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(0);
+    auto entries = std::array<kvm_msr_entry, 2>{{
+        {0x0000'0174},
+        {0x0000'0175, 0, 1}
+    }};
+
+    auto msrs_to_set = vmm::kvm::Msrs<2>{entries.begin(), entries.end()};
+    REQUIRE_NOTHROW(vcpu.set_msrs(msrs_to_set));
+
+    auto msrs_to_read = vmm::kvm::Msrs<2>{{
+        kvm_msr_entry{0x0000'0174},
+        kvm_msr_entry{0x0000'0175}
+    }};
+    auto nmsrs = vcpu.get_msrs(msrs_to_read);
+
+    REQUIRE(nmsrs == msrs_to_set.size());
+    REQUIRE(nmsrs == msrs_to_read.size());
+
+    for (std::size_t i = 0; i < msrs_to_read.size(); i++) {
+        REQUIRE(msrs_to_read[i].index == entries[i].index);
+        REQUIRE(msrs_to_read[i].data == entries[i].data);
+    }
+}
+
 TEST_CASE("Run") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
@@ -190,96 +294,6 @@ TEST_CASE("Run") {
         }
 
         break;
-    }
-}
-
-TEST_CASE("FPU") {
-    // From https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/fpu/internal.h
-    auto KVM_FPU_CWD = uint16_t{0x37f};
-    auto KVM_FPU_MXCSR = uint32_t{0x1f80};
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto vcpu = vm.vcpu(0);
-    auto fpu = kvm_fpu{};
-    fpu.fcw = KVM_FPU_CWD;
-    fpu.mxcsr = KVM_FPU_MXCSR;
-
-    REQUIRE_NOTHROW(vcpu.set_fpu(fpu));
-    REQUIRE(vcpu.fpu().fcw == KVM_FPU_CWD);
-}
-
-TEST_CASE("Xsave") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto vcpu = vm.vcpu(0);
-    auto xsave = vcpu.xsave();
-
-    REQUIRE_NOTHROW(vcpu.set_xsave(xsave));
-    auto other = vcpu.xsave();
-
-    for (int i = 0; i < 1024; i++)
-        REQUIRE(xsave.region[i] == other.region[i]);
-}
-
-TEST_CASE("Xcrs") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto vcpu = vm.vcpu(0);
-    auto xcrs = vcpu.xcrs();
-
-    REQUIRE_NOTHROW(vcpu.set_xcrs(xcrs));
-    auto other = vcpu.xcrs();
-
-    REQUIRE(xcrs.nr_xcrs == other.nr_xcrs);
-    REQUIRE(xcrs.flags == other.flags);
-
-    for (int i = 0; i < KVM_MAX_XCRS; i++) {
-        REQUIRE(xcrs.xcrs[i].xcr == other.xcrs[i].xcr);
-        REQUIRE(xcrs.xcrs[i].value == other.xcrs[i].value);
-    }
-}
-
-TEST_CASE("Debug registers") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto vcpu = vm.vcpu(0);
-    auto regs = vcpu.debug_regs();
-
-    REQUIRE_NOTHROW(vcpu.set_debug_regs(regs));
-    auto other = vcpu.debug_regs();
-
-    for (int i = 0; i < 4; i++)
-        REQUIRE(regs.db[i] == other.db[i]);
-
-    REQUIRE(regs.dr6 == other.dr6);
-    REQUIRE(regs.dr7 == other.dr7);
-    REQUIRE(regs.flags == other.flags);
-}
-
-TEST_CASE("MSRs") {
-    auto kvm = vmm::kvm::system{};
-    auto vm = kvm.vm();
-    auto vcpu = vm.vcpu(0);
-    auto entries = std::array<kvm_msr_entry, 2>{{
-        {0x0000'0174},
-        {0x0000'0175, 0, 1}
-    }};
-
-    auto msrs_to_set = vmm::kvm::Msrs<2>{entries.begin(), entries.end()};
-    REQUIRE_NOTHROW(vcpu.set_msrs(msrs_to_set));
-
-    auto msrs_to_read = vmm::kvm::Msrs<2>{{
-        kvm_msr_entry{0x0000'0174},
-        kvm_msr_entry{0x0000'0175}
-    }};
-    auto nmsrs = vcpu.get_msrs(msrs_to_read);
-
-    REQUIRE(nmsrs == msrs_to_set.size());
-    REQUIRE(nmsrs == msrs_to_read.size());
-
-    for (std::size_t i = 0; i < msrs_to_read.size(); i++) {
-        REQUIRE(msrs_to_read[i].index == entries[i].index);
-        REQUIRE(msrs_to_read[i].data == entries[i].data);
     }
 }
 #endif
