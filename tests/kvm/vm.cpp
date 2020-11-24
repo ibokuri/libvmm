@@ -247,6 +247,22 @@ TEST_CASE("PIT2") {
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)
+TEST_CASE("IRQ chip") {
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+
+    if (vm.check_extension(KVM_CAP_IRQCHIP)) {
+        auto gic_dev = kvm_create_device{
+            KVM_DEV_TYPE_ARM_VGIC_V2, // type_
+            0, // fd
+            KVM_CREATE_DEVICE_TEST // flags
+        };
+
+        auto vgic_v2_supported = vm.device(gic_dev);
+        REQUIRE(vm.irqchip() == vgic_v2_supported);
+    }
+}
+
 TEST_CASE("GSI routing") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
