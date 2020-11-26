@@ -2,6 +2,7 @@ kvm_test_suite = {
   'KVM system ioctls' : files('system.cpp'),
   'KVM VM ioctls' : files('vm.cpp'),
   'KVM vCPU ioctls' : files('vcpu.cpp'),
+  'KVM device ioctls' : files('device.cpp'),
   'KVM FAM structs' : files('fam_struct.cpp'),
 }
 
