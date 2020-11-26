@@ -406,8 +406,8 @@ TEST_CASE("Run") {
                 REQUIRE(mmio.phys_addr == mmio_addr);
                 REQUIRE(mmio.len == 4);
 
-                REQUIRE(data[3] == 0x0);
-                REQUIRE(data[2] == 0x0);
+                REQUIRE(mmio.data[3] == 0x0);
+                REQUIRE(mmio.data[2] == 0x0);
 
                 if (mmio.is_write) {
                     REQUIRE(mmio.data[1] == 3);
@@ -421,7 +421,7 @@ TEST_CASE("Run") {
                     auto dirty_bitmap = vm.dirty_log(0, mem_size);
 
                     auto sum = uint64_t{};
-                    for (auto pages : dirty_pages)
+                    for (auto pages : dirty_bitmap)
                         sum += std::bitset<64>{pages}.count();
 
                     REQUIRE(sum == 1);
@@ -434,9 +434,9 @@ TEST_CASE("Run") {
                 continue;
             }
             case vmm::kvm::VcpuExit::SystemEvent: {
-                auto system = vcpu.data()->system;
+                auto system = vcpu.data()->system_event;
 
-                REQUIRE(system.type_ == KVM_SYSTEM_EVENT_SHUTDOWN);
+                REQUIRE(system.type == KVM_SYSTEM_EVENT_SHUTDOWN);
                 REQUIRE(system.flags == 0);
 
                 break;
