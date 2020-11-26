@@ -25,6 +25,11 @@ class device
             : m_fd{static_cast<int>(dev.fd)}, m_type{dev.type},
               m_flags{dev.flags} {}
     public:
+        // Checks whether an attribute for a device is supported.
+        //
+        // See the documentation for KVM_HAS_DEVICE_ATTR.
+        auto has_attr(kvm_device_attr&) -> bool;
+
         // Gets a specified piece of device configuration/state.
         //
         // See the documentation for KVM_GET_DEVICE_ATTR.
@@ -34,35 +39,6 @@ class device
         //
         // See the documentation for KVM_SET_DEVICE_ATTR.
         auto set_attr(kvm_device_attr&) -> void;
-
-        // Checks whether an attribute for a device is supported.
-        //
-        // See the documentation for KVM_HAS_DEVICE_ATTR.
-        //
-        // Examples
-        // ========
-        // ```
-        // #include <vmm/kvm.hpp>
-        //
-        // auto kvm = vmm::kvm::system{};
-        // auto vm = kvm.vm();
-        // auto dev = vm.device(KVM_DEV_TYPE_VFIO);
-        // auto vfio_fd = 0u;
-        //
-        // FIXME: set_attr() will give a "Invalid argument" error due to
-        // .addr's value.
-        //
-        // auto attr = kvm_device_attr{
-        //     .flags = 0,
-        //     .group = KVM_DEV_VFIO_GROUP,
-        //     .attr = KVM_DEV_VFIO_GROUP_ADD,
-        //     .addr = reinterpret_cast<uint64_t>(&vfio_fd)
-        // };
-        //
-        // if (dev.has_attr(attr))
-        //    dev.set_attr(attr);
-        // ```
-        auto has_attr(kvm_device_attr&) -> bool;
 };
 
 }  // namespace vmm::kvm::detail
