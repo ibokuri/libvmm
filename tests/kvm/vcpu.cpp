@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include <bitset>
+#include <bitset> // bitset
 #include <catch2/catch.hpp>
 
 #include <string.h> // memcmp
