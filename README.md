@@ -1,14 +1,6 @@
-<!--<p align="center"><img src="" width="350px"></p>-->
+# Libvmm
 
-<h1 align="center">Libvmm</h1>
-
-<p align="center">An umbrella library for VMM and hypervisor development.</p>
-
-<!--<p align="center">-->
-  <!--<a href="https://lgtm.com/projects/g/libvmm/libvmm/context:cpp">-->
-  <!--<img src="https://img.shields.io/lgtm/grade/cpp/g/libvmm/libvmm.svg?logo=lgtm&logoWidth=18" alt="Language grade: C/C++" />-->
-  <!--</a>-->
-<!--</p>-->
+An umbrella library for VMM and hypervisor development.
 
 <!--VMMs and hypervisors often share a large portion of their core functionality-->
 <!--(e.g., VM lifecycle and resource management via KVM, I/O virtualization via-->
@@ -18,7 +10,7 @@
 
 ## Installation
 
-### Manual
+<!--### Manual-->
 
 To build and install from source:
 
