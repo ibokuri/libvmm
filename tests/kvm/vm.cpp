@@ -252,10 +252,8 @@ TEST_CASE("IRQ chip") {
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQCHIP)) {
-        auto vgic_v2_supported = vm.device(KVM_DEV_TYPE_ARM_VGIC_V2,
-                                           KVM_CREATE_DEVICE_TEST);
-
-        REQUIRE(vm.irqchip() == vgic_v2_supported);
+        REQUIRE_NOTHROW(vm.device(KVM_DEV_TYPE_ARM_VGIC_V2, KVM_CREATE_DEVICE_TEST));
+        REQUIRE_NOTHROW(vm.irqchip());
     }
 }
 
