@@ -195,7 +195,7 @@ auto vm::set_pit2(const kvm_pit_state2 &state) const -> void {
 auto vm::preferred_target() const -> kvm_vcpu_init
 {
     auto kvi = kvm_vcpu_init{};
-    m_fd.ioctl(KVM_GET_CLOCK, &kvi);
+    m_fd.ioctl(KVM_ARM_PREFERRED_TARGET, &kvi);
     return kvi;
 }
 #endif

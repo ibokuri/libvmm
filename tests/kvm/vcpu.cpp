@@ -375,9 +375,11 @@ TEST_CASE("Run (x86)") {
                    reinterpret_cast<uintptr_t>(mem),
                    KVM_MEM_LOG_DIRTY_PAGES);
 
+    // create vCPU
     auto vcpu = vm.vcpu(0);
-    auto kvi = kvm_vcpu_init{};
-    vm.preferred_target(kvi);
+
+    // initialize vCPU
+    auto kvi = vm.preferred_target();
     kvi.features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
     vcpu.init(kvi);
 
