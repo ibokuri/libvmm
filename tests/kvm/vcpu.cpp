@@ -190,12 +190,12 @@ TEST_CASE("MSRs") {
     }
 }
 
-TEST_CASE("Run") {
+TEST_CASE("Run (arm)") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
 
-    // Add 2 small numbers
+    // code for adding 2 small numbers together
     const auto code = std::array<uint8_t, 24>{
         0xba, 0xf8, 0x03,             // mov $0x3f8, %dx
         0x00, 0xd8,                   // add %bl, %al
@@ -208,13 +208,13 @@ TEST_CASE("Run") {
         0xf4,                         // hlt
     };
 
-    // mmap code
+    // mmap our code
     auto guest_addr = uint64_t{0x1000};
     auto mem_size = uint64_t{0x4000};
     auto mem = mmap(NULL, mem_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     std::memcpy(mem, code.data(), sizeof(code));
 
-    // Configure VM with the memory region storing the code
+    // configure the VM with a memory region containing our code
     auto mem_region = kvm_userspace_memory_region {
         0,
         KVM_MEM_LOG_DIRTY_PAGES,
@@ -225,9 +225,8 @@ TEST_CASE("Run") {
 
     vm.memslot(mem_region);
 
-    // Initialize CS to point at 0, via a read-modify-write of sregs.
+    // initialize CS to point at 0, via a read-modify-write of sregs.
     auto sregs = vcpu.sregs();
-
     REQUIRE(sregs.cs.base != 0);
     REQUIRE(sregs.cs.selector != 0);
 
@@ -235,7 +234,7 @@ TEST_CASE("Run") {
     sregs.cs.selector = 0;
     vcpu.set_sregs(sregs);
 
-    // Initialize registers: IP for our code, addends, and flags needed by x86.
+    // initialize registers: IP for our code, addends, and flags needed by x86.
     auto regs = kvm_regs{};
     regs.rip = guest_addr,
     regs.rax = 2,
@@ -342,11 +341,11 @@ TEST_CASE("Register") {
     }
 }
 
-TEST_CASE("Run") {
+TEST_CASE("Run (x86)") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
-    // Add 2 small numbers
+    // code for adding 2 small numbers together
     const auto code = std::array<uint8_t, 48>{
         0x40, 0x20, 0x80, 0x52, // mov w0, #0x102
         0x00, 0x01, 0x00, 0xb9, // str w0, [x8]; test physical memory write
