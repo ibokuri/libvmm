@@ -64,7 +64,11 @@ class vm
         // Creates, modifies, or deletes a guest physical memory slot.
         //
         // See the documentation for KVM_SET_USER_MEMORY_REGION.
-        auto memslot(kvm_userspace_memory_region&) const -> void;
+        auto set_memslot(kvm_userspace_memory_region&) const -> void;
+
+        auto set_memslot(uint32_t slot, uintptr_t guest_addr,
+                         uint64_t mem_size, uintptr_t user_addr,
+                         uint32_t flags) const -> void;
 
         // Given a memory slot, returns a vector containing any pages dirtied
         // since the last call to this ioctl.

@@ -18,7 +18,7 @@ TEST_CASE("Invalid memory slot") {
     auto vm = kvm.vm();
     auto mem_region = kvm_userspace_memory_region{};
 
-    REQUIRE_THROWS(vm.memslot(mem_region));
+    REQUIRE_THROWS(vm.set_memslot(mem_region));
 }
 
 TEST_CASE("vCPU and memory slot information") {

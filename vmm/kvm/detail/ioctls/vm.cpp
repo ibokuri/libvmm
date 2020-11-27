@@ -32,9 +32,24 @@ auto vm::check_extension(int cap) const -> int
     return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
-auto vm::memslot(kvm_userspace_memory_region &region) const -> void
+auto vm::set_memslot(kvm_userspace_memory_region &region) const -> void
 {
     m_fd.ioctl(KVM_SET_USER_MEMORY_REGION, &region);
+}
+
+auto vm::set_memslot(uint32_t slot, uintptr_t guest_addr,
+                     uint64_t mem_size, uintptr_t user_addr,
+                     uint32_t flags) const -> void
+{
+    auto mem_region = kvm_userspace_memory_region {
+        slot,
+        flags,
+        guest_addr,
+        mem_size,
+        user_addr,
+    };
+
+    set_memslot(mem_region);
 }
 
 auto vm::dirty_log(uint32_t slot,

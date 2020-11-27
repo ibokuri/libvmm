@@ -223,7 +223,7 @@ TEST_CASE("Run (arm)") {
         reinterpret_cast<uintptr_t>(mem)
     };
 
-    vm.memslot(mem_region);
+    vm.set_memslot(mem_region);
 
     // initialize CS to point at 0, via a read-modify-write of sregs.
     auto sregs = vcpu.sregs();
@@ -361,22 +361,19 @@ TEST_CASE("Run (x86)") {
         0x00, 0x00, 0x00, 0x14, // b <this address>; shouldn't get here, but if so loop forever
     };
 
-    // mmap code
+    // mmap our code
+    auto slot = uint32_t{};
     auto guest_addr = uint64_t{0x10000};
     auto mem_size = uint64_t{0x20000};
     auto mem = mmap(NULL, mem_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     std::memcpy(mem, code.data(), sizeof(code));
 
-    // Configure VM with the memory region storing the code
-    auto mem_region = kvm_userspace_memory_region {
-        0,
-        KVM_MEM_LOG_DIRTY_PAGES,
-        guest_addr,
-        mem_size,
-        reinterpret_cast<uintptr_t>(mem)
-    };
-
-    vm.memslot(mem_region);
+    // configure the VM with a memory region containing our code
+    vm.set_memslot(slot,
+                   guest_addr,
+                   size,
+                   reinterpret_cast<uintptr_t>(mem),
+                   KVM_MEM_LOG_DIRTY_PAGES);
 
     auto vcpu = vm.vcpu(0);
     auto kvi = kvm_vcpu_init{};
@@ -417,7 +414,7 @@ TEST_CASE("Run (x86)") {
                     //
                     // The code page shouldn't be dirty, as it's not written
                     // to by the guest.
-                    auto dirty_bitmap = vm.dirty_log(0, mem_size);
+                    auto dirty_bitmap = vm.dirty_log(slot, mem_size);
 
                     auto sum = uint64_t{};
                     for (auto pages : dirty_bitmap)
