@@ -242,7 +242,7 @@ TEST_CASE("Run (arm)") {
     regs.rflags = 2,
     vcpu.set_regs(regs);
 
-    // Run vCPU
+    // run vCPU
     while (1) {
         auto exit = vcpu.run();
 
@@ -383,16 +383,16 @@ TEST_CASE("Run (x86)") {
     kvi.features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
     vcpu.init(kvi);
 
-    // Set PC to guest address (where code is)
+    // set PC to guest address (where code is)
     auto core_reg_base = uint64_t{0x6030'0000'0010'0000};
     vcpu.set_reg(core_reg_base + 2 * 32, guest_addr);
 
-    // Set x8 and x9 to addreses the guest test code needs
+    // set x8 and x9 to addreses the guest test code needs
     auto mmio_addr = uint64_t{guest_addr + mem_size};
     vcpu.set_reg(core_reg_base + 2 * 8, guest_addr + 0x10000);
     vcpu.set_reg(core_reg_base + 2 * 9, mmio_addr);
 
-    // Run vCPU
+    // run vCPU
     while (1) {
         auto exit = vcpu.run();
 
