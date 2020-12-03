@@ -165,10 +165,7 @@ class vm
         {
             m_fd.ioctl(KVM_SET_GSI_ROUTING, table.data());
         }
-#endif
 
-#if defined(__i386__) || defined(__x86_64__)  || \
-    defined(__arm__)  || defined(__aarch64__)
         // Sets the level of a GSI input to the interrupt controller model in
         // the kernel.
         //
