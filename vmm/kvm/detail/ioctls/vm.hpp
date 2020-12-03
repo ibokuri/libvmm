@@ -144,7 +144,7 @@ class vm
 
 #if defined(__i386__) || defined(__x86_64__)  || \
     defined(__arm__)  || defined(__aarch64__)
-        // Creates an interrupt controller model in the kernel
+        // Creates an interrupt controller model in the kernel.
         //
         // See the documentation for `KVM_CREATE_IRQCHIP`.
         auto irqchip() const -> void;
@@ -234,7 +234,7 @@ class vm
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)
-        // Returns the preferred CPU target type which can be emulated by KVM
+        // Returns the preferred CPU target which can be emulated by KVM
         // on underlying host.
         //
         // See documentation for KVM_ARM_PREFERRED_TARGET.
