@@ -8,12 +8,15 @@ TEST_CASE("VM creation") {
 }
 
 TEST_CASE("vCPU creation") {
+    const auto VCPU_ID = 0;
+
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
-    REQUIRE_NOTHROW(vm.vcpu(0));
+
+    REQUIRE_NOTHROW(vm.vcpu(VCPU_ID));
 }
 
-TEST_CASE("Invalid memory slot") {
+TEST_CASE("Empty memory region") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
     auto mem_region = kvm_userspace_memory_region{};
@@ -91,6 +94,25 @@ TEST_CASE("Fail MSI signal") {
 #endif
 
 #if defined(__i386__) || defined(__x86_64__)
+// FIXME: In the kernel's KVM selftests, there is a FIXME for this test on
+// aarch64 and s390x. On those platforms, KVM_RUN fails with ENOEXEC or EFAULT
+// instead of successfully returning KVM_EXIT_INTERNAL_ERROR.
+//
+// Because of this, this test is currently x86 only. Once the fix is made in
+// the kernel, the test should be made available for all platforms.
+TEST_CASE("No memory region") {
+    const auto N = 64;
+    const auto VCPU_ID = 0;
+
+    auto kvm = vmm::kvm::system{};
+    auto vm = kvm.vm();
+    auto vcpu = vm.vcpu(VCPU_ID);
+
+    REQUIRE_NOTHROW(vm.set_num_mmu_pages(N));
+    REQUIRE(vm.num_mmu_pages() == N);
+    REQUIRE(static_cast<uint32_t>(vcpu.run()) == KVM_EXIT_INTERNAL_ERROR);
+}
+
 TEST_CASE("IRQ chip") {
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
