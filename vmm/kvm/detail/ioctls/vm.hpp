@@ -105,7 +105,8 @@ class vm
             m_fd.ioctl(KVM_IOEVENTFD, &ioeventfd);
         }
 
-        // Detaches an ioeventfd from a legal pio/mmio address within the guest.
+        // Detaches an ioeventfd from a legal pio/mmio address within the
+        // guest.
         //
         // See the documentation for KVM_IOEVENTFD.
         template<vmm::types::IoEventAddress T>
@@ -146,7 +147,7 @@ class vm
     defined(__arm__)  || defined(__aarch64__)
         // Creates an interrupt controller model in the kernel.
         //
-        // See the documentation for `KVM_CREATE_IRQCHIP`.
+        // See the documentation for KVM_CREATE_IRQCHIP.
         auto irqchip() const -> void;
 
         // Registers an event that will, when signaled, trigger the gsi IRQ.
@@ -157,7 +158,7 @@ class vm
 
         // Sets the GSI routing table entries, overwriting previous entries.
         //
-        // See the documentation for `KVM_SET_GSI_ROUTING`.
+        // See the documentation for KVM_SET_GSI_ROUTING.
         template<typename T,
                  typename=std::enable_if_t<std::is_same_v<typename T::value_type,
                                                           kvm_irq_routing_entry>>>

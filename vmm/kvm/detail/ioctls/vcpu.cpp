@@ -25,7 +25,7 @@ namespace vmm::kvm::detail {
 
     // Runs the current vCPU. Returns an exit reason.
     //
-    // See documentation for `KVM_RUN`.
+    // See documentation for KVM_RUN.
     auto vcpu::run() const -> VcpuExit
     {
         m_fd.ioctl(KVM_RUN);
