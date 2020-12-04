@@ -32,6 +32,14 @@ auto vm::check_extension(int cap) const -> int
     return m_fd.ioctl(KVM_CHECK_EXTENSION, cap);
 }
 
+auto vm::set_num_mmu_pages(int n) const -> void {
+    m_fd.ioctl(KVM_SET_NR_MMU_PAGES, n);
+}
+
+auto vm::num_mmu_pages() const -> std::size_t {
+    return static_cast<std::size_t>(m_fd.ioctl(KVM_GET_NR_MMU_PAGES));
+}
+
 auto vm::set_memslot(kvm_userspace_memory_region &region) const -> void
 {
     m_fd.ioctl(KVM_SET_USER_MEMORY_REGION, &region);

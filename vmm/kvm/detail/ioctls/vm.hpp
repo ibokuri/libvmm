@@ -61,6 +61,16 @@ class vm
         // for most capabilities.
         [[nodiscard]] auto check_extension(int cap) const -> int;
 
+        // Sets the number of MMU pages for a virtual machine.
+        //
+        // See the documentation for KVM_SET_NR_MMU_PAGES.
+        auto set_num_mmu_pages(int n) const -> void;
+
+        // Returns the number of MMU pages for a virtual machine.
+        //
+        // See the documentation for KVM_GET_NR_MMU_PAGES.
+        [[nodiscard]] auto num_mmu_pages() const -> std::size_t;
+
         // Creates, modifies, or deletes a guest physical memory slot.
         //
         // See the documentation for KVM_SET_USER_MEMORY_REGION.
