@@ -8,12 +8,29 @@ TEST_CASE("VM creation") {
 }
 
 TEST_CASE("vCPU creation") {
-    const auto VCPU_ID = 0;
-
     auto kvm = vmm::kvm::system{};
     auto vm = kvm.vm();
 
-    REQUIRE_NOTHROW(vm.vcpu(VCPU_ID));
+    const auto kvm_max_vcpus = kvm.check_extension(KVM_CAP_MAX_VCPUS);
+    const auto kvm_max_vcpu_id = kvm.check_extension(KVM_CAP_MAX_VCPU_ID);
+
+    REQUIRE(kvm_max_vcpu_id >= kvm_max_vcpus);
+
+    SECTION("Max # of vCPUs") {
+        for (auto id = 0; id < kvm_max_vcpus; id++)
+            REQUIRE_NOTHROW(vm.vcpu(id));
+
+        REQUIRE_THROWS(vm.vcpu(kvm_max_vcpus));
+    }
+
+    if (kvm_max_vcpu_id > kvm_max_vcpus) {
+        SECTION("Max IDs") {
+            for (auto id = kvm_max_vcpu_id - kvm_max_vcpus; id < kvm_max_vcpu_id; id++)
+                REQUIRE_NOTHROW(vm.vcpu(id));
+
+            REQUIRE_THROWS(vm.vcpu(kvm_max_vcpu_id));
+        }
+    }
 }
 
 TEST_CASE("Empty memory region") {
