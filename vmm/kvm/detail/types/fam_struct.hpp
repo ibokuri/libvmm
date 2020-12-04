@@ -139,7 +139,7 @@ class FamStruct<SizeMember, EntriesMember, N>
             deallocate_fam();
         }
 
-        [[nodiscard]] allocator_type get_allocator() const noexcept
+        [[nodiscard]] auto get_allocator() const noexcept -> allocator_type
         {
             return m_alloc;
         }
