@@ -19,7 +19,7 @@ class device
         uint32_t m_type;
         uint32_t m_flags;
 
-        friend device vm::device(uint32_t type, uint32_t flags) const;
+        friend device Vm::device(uint32_t type, uint32_t flags) const;
 
         device(const kvm_create_device& dev) noexcept
             : m_fd{static_cast<int>(dev.fd)}, m_type{dev.type},

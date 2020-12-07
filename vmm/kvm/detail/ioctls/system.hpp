@@ -19,7 +19,7 @@
 
 namespace vmm::kvm::detail {
 
-class vm;
+class Vm;
 
 class System
 {
@@ -68,12 +68,12 @@ class System
         // ioctl's result.
         //
         // See the documentation for KVM_CREATE_VM.
-        [[nodiscard]] auto vm(std::size_t machine_type=0) const -> vmm::kvm::detail::vm;
+        [[nodiscard]] auto vm(std::size_t machine_type=0) const -> vmm::kvm::detail::Vm;
 
         // Returns a positive integer if a KVM extension is available; 0 otherwise.
         //
         // Based on their initialization, VMs may have different capabilities.
-        // Therefore, `kvm::vm::check_extension()` is preferred when querying
+        // Therefore, `kvm::Vm::check_extension()` is preferred when querying
         // for most capabilities.
         [[nodiscard]] auto check_extension(int cap) const -> int;
 

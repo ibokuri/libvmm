@@ -15,7 +15,7 @@
 namespace vmm::kvm {
 
 using System = vmm::kvm::detail::System;
-using vm = vmm::kvm::detail::vm;
+using Vm = vmm::kvm::detail::Vm;
 using vcpu = vmm::kvm::detail::vcpu;
 using device = vmm::kvm::detail::device;
 

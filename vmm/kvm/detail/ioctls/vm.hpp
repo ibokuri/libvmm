@@ -24,21 +24,21 @@ enum class IrqLevel: uint32_t {
 class vcpu;
 class device;
 
-class vm
+class Vm
 {
     private:
         KvmFd m_fd;
         std::size_t m_mmap_size;
 
-        friend vm System::vm(std::size_t machine_type) const;
+        friend Vm System::vm(std::size_t machine_type) const;
 
-        vm(int fd, std::size_t mmap_size) noexcept
+        Vm(int fd, std::size_t mmap_size) noexcept
             : m_fd{fd}, m_mmap_size{mmap_size} {}
     public:
-        vm(const vm& other) = delete;
-        vm(vm&& other) = default;
-        auto operator=(const vm& other) -> vm& = delete;
-        auto operator=(vm&& other) -> vm& = default;
+        Vm(const Vm& other) = delete;
+        Vm(Vm&& other) = default;
+        auto operator=(const Vm& other) -> Vm& = delete;
+        auto operator=(Vm&& other) -> Vm& = default;
 
         // Returns the VM's kvm_run's shared memory region size.
         [[nodiscard]] auto mmap_size() const -> std::size_t;
@@ -57,7 +57,7 @@ class vm
         // otherwise.
         //
         // Based on their initialization, VMs may have different capabilities.
-        // Therefore, `kvm::vm::check_extension()` is preferred when querying
+        // Therefore, `kvm::Vm::check_extension()` is preferred when querying
         // for most capabilities.
         [[nodiscard]] auto check_extension(int cap) const -> int;
 

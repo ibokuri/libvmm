@@ -12,9 +12,9 @@ auto System::api_version() const -> int
     return m_fd.ioctl(KVM_GET_API_VERSION);
 }
 
-auto System::vm(std::size_t machine_type) const -> vmm::kvm::detail::vm
+auto System::vm(std::size_t machine_type) const -> vmm::kvm::detail::Vm
 {
-    return vmm::kvm::detail::vm{m_fd.ioctl(KVM_CREATE_VM, machine_type),
+    return vmm::kvm::detail::Vm{m_fd.ioctl(KVM_CREATE_VM, machine_type),
                                 vcpu_mmap_size()};
 }
 

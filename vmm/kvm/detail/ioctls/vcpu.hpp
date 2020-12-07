@@ -53,7 +53,7 @@ class vcpu
         std::size_t m_mmap_size;
         kvm_run *m_run = nullptr;
 
-        friend vcpu vm::vcpu(int vcpu_id) const;
+        friend vcpu Vm::vcpu(int vcpu_id) const;
 
         explicit vcpu(int fd, std::size_t mmap_size);
     public:
