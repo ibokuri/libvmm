@@ -12,16 +12,16 @@
 
 namespace vmm::kvm::detail {
 
-class device
+class Device
 {
     private:
         KvmFd m_fd;
         uint32_t m_type;
         uint32_t m_flags;
 
-        friend device Vm::device(uint32_t type, uint32_t flags) const;
+        friend Device Vm::device(uint32_t type, uint32_t flags) const;
 
-        device(const kvm_create_device& dev) noexcept
+        Device(const kvm_create_device& dev) noexcept
             : m_fd{static_cast<int>(dev.fd)}, m_type{dev.type},
               m_flags{dev.flags} {}
     public:

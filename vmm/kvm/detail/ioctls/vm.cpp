@@ -16,7 +16,7 @@ auto Vm::vcpu(int vcpu_id) const -> vmm::kvm::detail::Vcpu
                                   m_mmap_size};
 }
 
-auto Vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device
+auto Vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::Device
 {
     auto dev = kvm_create_device{};
     dev.type = type;
@@ -24,7 +24,7 @@ auto Vm::device(uint32_t type, uint32_t flags) const -> vmm::kvm::detail::device
 
     m_fd.ioctl(KVM_CREATE_DEVICE, &dev);
 
-    return vmm::kvm::detail::device{dev};
+    return vmm::kvm::detail::Device{dev};
 }
 
 auto Vm::check_extension(int cap) const -> int

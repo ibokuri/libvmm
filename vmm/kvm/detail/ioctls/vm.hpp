@@ -22,7 +22,7 @@ enum class IrqLevel: uint32_t {
 };
 
 class Vcpu;
-class device;
+class Device;
 
 class Vm
 {
@@ -51,7 +51,7 @@ class Vm
         // Adds a device to a virtual machine.
         //
         // See the documentation for KVM_CREATE_DEVICE.
-        [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) const -> vmm::kvm::detail::device;
+        [[nodiscard]] auto device(uint32_t type, uint32_t flags=0) const -> vmm::kvm::detail::Device;
 
         // Returns a positive integer if a KVM extension is available; 0
         // otherwise.
