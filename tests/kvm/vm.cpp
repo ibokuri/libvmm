@@ -4,11 +4,11 @@
 #include "vmm/kvm/kvm.hpp"
 
 TEST_CASE("VM creation") {
-    REQUIRE_NOTHROW(vmm::kvm::system{}.vm());
+    REQUIRE_NOTHROW(vmm::kvm::System{}.vm());
 }
 
 TEST_CASE("vCPU creation") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     const auto kvm_max_vcpus = kvm.check_extension(KVM_CAP_MAX_VCPUS);
@@ -34,7 +34,7 @@ TEST_CASE("vCPU creation") {
 }
 
 TEST_CASE("Empty memory region") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto mem_region = kvm_userspace_memory_region{};
 
@@ -42,7 +42,7 @@ TEST_CASE("Empty memory region") {
 }
 
 TEST_CASE("vCPU and memory slot information") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     REQUIRE(vm.num_vcpus() >= 4);
@@ -54,7 +54,7 @@ TEST_CASE("IOEvent") {
     using EventFd = vmm::types::EventFd;
     using IoEventAddress = vmm::types::IoEventAddress;
 
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto eventfd = EventFd{EFD_NONBLOCK};
 
@@ -88,7 +88,7 @@ TEST_CASE("IOEvent") {
 #if defined(__i386__) || defined(__x86_64__) || \
     defined(__arm__)  || defined(__aarch64__)
 TEST_CASE("IRQ Chip creation") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
@@ -97,7 +97,7 @@ TEST_CASE("IRQ Chip creation") {
 }
 
 TEST_CASE("Fail MSI signal") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto msi = kvm_msi{};
 
@@ -121,7 +121,7 @@ TEST_CASE("No memory region") {
     const auto N = 64;
     const auto VCPU_ID = 0;
 
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(VCPU_ID);
 
@@ -131,7 +131,7 @@ TEST_CASE("No memory region") {
 }
 
 TEST_CASE("IRQ chip") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQCHIP) > 0) {
@@ -151,7 +151,7 @@ TEST_CASE("IRQ chip") {
 }
 
 TEST_CASE("Clock") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_ADJUST_CLOCK) > 0) {
@@ -167,7 +167,7 @@ TEST_CASE("Clock") {
 }
 
 TEST_CASE("Bootstrap processor (BSP)") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_SET_BOOT_CPU_ID) > 0) {
@@ -183,7 +183,7 @@ TEST_CASE("Bootstrap processor (BSP)") {
 }
 
 TEST_CASE("GSI routing") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
@@ -201,7 +201,7 @@ TEST_CASE("GSI routing") {
 }
 
 TEST_CASE("IRQ line") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     REQUIRE_NOTHROW(vm.irqchip());
@@ -211,7 +211,7 @@ TEST_CASE("IRQ line") {
 }
 
 TEST_CASE("IRQ file descriptor") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};
     auto eventfd2 = vmm::types::EventFd{EFD_NONBLOCK};
@@ -237,14 +237,14 @@ TEST_CASE("IRQ file descriptor") {
 }
 
 TEST_CASE("TSS address") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     REQUIRE_NOTHROW(vm.set_tss_address(0xfffb'd000));
 }
 
 TEST_CASE("PIT2") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     SECTION("Creation/get") {
@@ -287,7 +287,7 @@ TEST_CASE("PIT2") {
 
 #if defined(__arm__) || defined(__aarch64__)
 TEST_CASE("IRQ chip") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQCHIP)) {
@@ -297,7 +297,7 @@ TEST_CASE("IRQ chip") {
 }
 
 TEST_CASE("GSI routing") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     if (vm.check_extension(KVM_CAP_IRQ_ROUTING) > 0) {
@@ -310,7 +310,7 @@ TEST_CASE("GSI routing") {
 
 #if defined(__arm__) || defined(__aarch64__)
 TEST_CASE("Preferred target") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     REQUIRE_NOTHROW(vm.preferred_target());
 }
@@ -318,7 +318,7 @@ TEST_CASE("Preferred target") {
 
 #if defined(__aarch64__)
 TEST_CASE("IRQ line") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto vgic = vm.device(KVM_DEV_TYPE_ARM_VGIC_V3);
@@ -366,7 +366,7 @@ TEST_CASE("IRQ line") {
 }
 
 TEST_CASE("IRQ file descriptor") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vgic = vm.device(KVM_DEV_TYPE_ARM_VGIC_V3);
     auto eventfd1 = vmm::types::EventFd{EFD_NONBLOCK};

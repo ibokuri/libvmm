@@ -21,24 +21,24 @@ namespace vmm::kvm::detail {
 
 class vm;
 
-class system
+class System
 {
     private:
         KvmFd m_fd;
     public:
-        system() : m_fd{open()} {}
+        System() : m_fd{open()} {}
 
         // Constructs a kvm object from a file descriptor.
         //
         // The passed file descriptor should have O_RDWR permissions for things
         // to work. It is also encouraged to have O_CLOEXEC set, though it may
         // be omitted as needed.
-        explicit system(int fd) : m_fd{fd} {}
+        explicit System(int fd) : m_fd{fd} {}
 
-        system(const system& other) = delete;
-        system(system&& other) = default;
-        auto operator=(const system& other) -> system& = delete;
-        auto operator=(system&& other) -> system& = default;
+        System(const System& other) = delete;
+        System(System&& other) = default;
+        auto operator=(const System& other) -> System& = delete;
+        auto operator=(System&& other) -> System& = default;
 
         // Opens /dev/kvm and returns a file descriptor.
         //

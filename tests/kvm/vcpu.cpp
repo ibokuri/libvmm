@@ -9,14 +9,14 @@
 #include "vmm/kvm/kvm.hpp"
 
 TEST_CASE("vCPU creation") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     REQUIRE_NOTHROW(vm.vcpu(0));
 }
 
 TEST_CASE("Immediate exit") {
-        auto kvm = vmm::kvm::system{};
+        auto kvm = vmm::kvm::System{};
         auto vm = kvm.vm();
         auto vcpu = vm.vcpu(0);
 
@@ -28,7 +28,7 @@ TEST_CASE("Immediate exit") {
 #if defined(__i386__) || defined(__x86_64__) || \
     defined(__arm__)  || defined(__aarch64__)
 TEST_CASE("Multi-processing state") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto mp_state = vcpu.mp_state();
@@ -42,7 +42,7 @@ TEST_CASE("Multi-processing state") {
 #if defined(__i386__) || defined(__x86_64__) || \
     defined(__arm__)  || defined(__aarch64__)
 TEST_CASE("vCPU events") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
 
@@ -58,7 +58,7 @@ TEST_CASE("vCPU events") {
 
 #if defined(__i386__) || defined(__x86_64__)
 TEST_CASE("CPUID2") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
 
     if (kvm.check_extension(KVM_CAP_EXT_CPUID)) {
         auto vm = kvm.vm();
@@ -90,7 +90,7 @@ TEST_CASE("FPU") {
     // From https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/fpu/internal.h
     auto KVM_FPU_CWD = uint16_t{0x37f};
     auto KVM_FPU_MXCSR = uint32_t{0x1f80};
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto fpu = kvm_fpu{};
@@ -102,7 +102,7 @@ TEST_CASE("FPU") {
 }
 
 //TEST_CASE("LAPIC") {
-    //auto kvm = vmm::kvm::system{};
+    //auto kvm = vmm::kvm::System{};
     //auto vm = kvm.vm();
 
     //REQUIRE(kvm.check_extension(KVM_CAP_IRQCHIP));
@@ -116,7 +116,7 @@ TEST_CASE("FPU") {
 //}
 
 TEST_CASE("Xsave") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto xsave = vcpu.xsave();
@@ -129,7 +129,7 @@ TEST_CASE("Xsave") {
 }
 
 TEST_CASE("Xcrs") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto xcrs = vcpu.xcrs();
@@ -147,7 +147,7 @@ TEST_CASE("Xcrs") {
 }
 
 TEST_CASE("Debug registers") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto regs = vcpu.debug_regs();
@@ -164,7 +164,7 @@ TEST_CASE("Debug registers") {
 }
 
 TEST_CASE("MSRs") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto entries = std::array<kvm_msr_entry, 2>{{
@@ -191,7 +191,7 @@ TEST_CASE("MSRs") {
 }
 
 TEST_CASE("Run (arm)") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
 
@@ -299,7 +299,7 @@ TEST_CASE("Run (arm)") {
 
 #if defined(__arm__) || defined(__aarch64__)
 TEST_CASE("Preferred target initialization") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto kvi = kvm_vcpu_init{};
@@ -310,7 +310,7 @@ TEST_CASE("Preferred target initialization") {
 }
 
 TEST_CASE("Register") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
     auto vcpu = vm.vcpu(0);
     auto kvi = vm.preferred_target();
@@ -342,7 +342,7 @@ TEST_CASE("Register") {
 }
 
 TEST_CASE("Run (x86)") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     // code for adding 2 small numbers together

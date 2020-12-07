@@ -22,8 +22,8 @@
 namespace vmm::kvm::detail {
 
 // Forward declaration for MsrIndexList, which may only be constructed by
-// kvm::system::msr_index_list().
-class system;
+// kvm::System::msr_index_list().
+class System;
 
 // Primary FAM struct template
 template<auto SizeMember, auto EntriesMember, std::size_t N>
@@ -264,7 +264,7 @@ class MsrList
     using allocator_type = typename Base::allocator_type;
 
     private:
-        friend system;
+        friend System;
 
         MsrList() : Base::FamStruct() {}
 

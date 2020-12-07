@@ -12,7 +12,7 @@
 //        true even if the calls were made in separate test cases... Because of
 //        this, we can't exactly test just device creation.
 TEST_CASE("Device creation") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     // Fails b/c there's no VGIC on x86_64.
@@ -83,7 +83,7 @@ auto test_device_creation(vmm::kvm::device&& device) {
 }
 
 TEST_CASE("Device creation") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto vm = kvm.vm();
 
     // Fails on aarch64 since it doesn't use MPIC, it uses the VGIC.

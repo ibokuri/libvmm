@@ -5,15 +5,15 @@
 
 TEST_CASE("KVM system creation (fd)") {
     SECTION("Normal") {
-        REQUIRE_NOTHROW(vmm::kvm::system{});
+        REQUIRE_NOTHROW(vmm::kvm::System{});
     }
 
     SECTION("Good file descriptor") {
-        REQUIRE_NOTHROW(vmm::kvm::system{vmm::kvm::system::open()});
+        REQUIRE_NOTHROW(vmm::kvm::System{vmm::kvm::System::open()});
     }
 
     SECTION("Bad file descriptor") {
-        auto kvm = vmm::kvm::system{999};
+        auto kvm = vmm::kvm::System{999};
 
         REQUIRE_THROWS(kvm.api_version());
         REQUIRE_THROWS(kvm.vm());
@@ -23,23 +23,23 @@ TEST_CASE("KVM system creation (fd)") {
 }
 
 TEST_CASE("API version") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     REQUIRE(kvm.api_version() == KVM_API_VERSION);
 }
 
 TEST_CASE("VM creation") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     REQUIRE(kvm.vm().mmap_size() == kvm.vcpu_mmap_size());
 }
 
 TEST_CASE("vCPU mmap size") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     REQUIRE(kvm.vcpu_mmap_size() > 0);
 }
 
 #if defined(__i386__) || defined(__x86_64__)
 TEST_CASE("MSR lists") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
 
     SECTION("Index list") {
         auto msrs = kvm.msr_index_list();
@@ -55,7 +55,7 @@ TEST_CASE("MSR lists") {
 }
 
 TEST_CASE("Read MSR features") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto entries = std::vector<kvm_msr_entry>{};
 
     SECTION("Feature list") {
@@ -72,7 +72,7 @@ TEST_CASE("Read MSR features") {
 }
 
 TEST_CASE("Cpuids") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
 
     SECTION("Supported cpuids") {
         if (kvm.check_extension(KVM_CAP_EXT_CPUID) > 0) {
@@ -101,7 +101,7 @@ TEST_CASE("Cpuids") {
 
 #if defined(__arm__) || defined(__aarch64__)
 TEST_CASE("Host IPA limit") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
     auto ipa_limit = kvm.host_ipa_limit();
 
     if (ipa_limit > 0)
@@ -111,7 +111,7 @@ TEST_CASE("Host IPA limit") {
 }
 
 TEST_CASE("VM creation (with IPA size)") {
-    auto kvm = vmm::kvm::system{};
+    auto kvm = vmm::kvm::System{};
 
     if (kvm.check_extension(KVM_CAP_ARM_VM_IPA_SIZE) > 0) {
         auto host_ipa_limit = kvm.host_ipa_limit();
