@@ -10,9 +10,9 @@
 
 namespace vmm::kvm::detail {
 
-auto Vm::vcpu(int vcpu_id) const -> vmm::kvm::detail::vcpu
+auto Vm::vcpu(int vcpu_id) const -> vmm::kvm::detail::Vcpu
 {
-    return vmm::kvm::detail::vcpu{m_fd.ioctl(KVM_CREATE_VCPU, vcpu_id),
+    return vmm::kvm::detail::Vcpu{m_fd.ioctl(KVM_CREATE_VCPU, vcpu_id),
                                   m_mmap_size};
 }
 

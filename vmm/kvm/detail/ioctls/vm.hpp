@@ -21,7 +21,7 @@ enum class IrqLevel: uint32_t {
     Active
 };
 
-class vcpu;
+class Vcpu;
 class device;
 
 class Vm
@@ -46,7 +46,7 @@ class Vm
         // Adds a vcpu to a virtual machine.
         //
         // See the documentation for KVM_CREATE_VCPU.
-        [[nodiscard]] auto vcpu(int vcpu_id) const -> vmm::kvm::detail::vcpu;
+        [[nodiscard]] auto vcpu(int vcpu_id) const -> vmm::kvm::detail::Vcpu;
 
         // Adds a device to a virtual machine.
         //

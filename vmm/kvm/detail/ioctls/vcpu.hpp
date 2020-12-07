@@ -46,16 +46,16 @@ enum class VcpuExit: uint32_t {
     ArmNsiv,       // KVM_EXIT_HYPERV
 };
 
-class vcpu
+class Vcpu
 {
     private:
         KvmFd m_fd;
         std::size_t m_mmap_size;
         kvm_run *m_run = nullptr;
 
-        friend vcpu Vm::vcpu(int vcpu_id) const;
+        friend Vcpu Vm::vcpu(int vcpu_id) const;
 
-        explicit vcpu(int fd, std::size_t mmap_size);
+        explicit Vcpu(int fd, std::size_t mmap_size);
     public:
         [[nodiscard]] auto run() const -> VcpuExit;
         [[nodiscard]] auto data() const noexcept -> kvm_run*;
