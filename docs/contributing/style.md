@@ -86,14 +86,6 @@ For everything else, opening braces do not go on a separate line.
 Generally, `snake_case` is used for variable, function, and file names,
 `CAPS_SNAKE_CASE` for macros, and `CamelCase` is used for everything else.
 
-However, there are exceptions. In particular, if a user-defined type can be
-described by a single word, is publicly available to users, and is something
-that can be reasonably considered as a primitive in the context of the module
-that it is in, then prefer lowercase letters. For example, the KVM API wrapper
-has classes such as `vmm::kvm::vm` and `vmm::kvm::vcpu`, both of which are
-absolutely fundamental to how the API functions and therefore may be considered
-KVM "primitives."
-
 ### Classes
 
 #### Data Members
