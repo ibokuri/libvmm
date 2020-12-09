@@ -42,7 +42,7 @@ TEST_CASE("Device creation") {
 // The test case tries to create a vGIC2 device if creating a vGIC3 device
 // failed. To avoid duplicating logic in both try/catch sections, we call out
 // to this function.
-auto test_device_creation(vmm::kvm::device&& device) {
+auto test_device_creation(vmm::kvm::Device&& device) {
     // set attribute which don't apply to VGIC (i.e., expected to fail)
     auto attr = kvm_device_attr {
         0,
