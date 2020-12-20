@@ -1,9 +1,11 @@
 public_headers = include_directories(
-  'types',
   'kvm',
+  'memory',
+  'types',
   'virtio'
 )
 
-subdir('types')
 subdir('kvm')
+subdir('memory')
+subdir('types')
 subdir('virtio')

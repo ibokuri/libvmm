@@ -1,5 +1,6 @@
 test_dep = dependency('catch2')
 
 subdir('kvm')
-subdir('virtio')
+subdir('memory')
 subdir('types')
+subdir('virtio')
