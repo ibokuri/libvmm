@@ -85,7 +85,7 @@ class GuestAddress : public Address<GuestAddress, uint64_t>
         // Aligns the address to a power of 2.
         //
         // If an "overflow" occurs, an exception is thrown.
-        auto checked_align_up(const size_type alignment) -> void;
+        auto checked_align_up(const size_type alignment) -> void override;
 };
 
 }  // vmm::memory::detail
