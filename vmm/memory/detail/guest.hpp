@@ -56,7 +56,7 @@ class GuestAddress : public Address<GuestAddress, uint64_t>
         auto operator-(const_reference addr) const noexcept -> value_type override;
 
         // Aligns the address to a power of 2.
-        auto align_up(const size_type alignment) noexcept -> void override;
+        auto align(const size_type alignment) noexcept -> void override;
 };
 
 }  // vmm::memory::detail

@@ -1,7 +1,5 @@
 #include "vmm/memory/detail/guest.hpp"
 #include "vmm/types/detail/exceptions.hpp"
-#include <stdexcept>
-#include <string>
 
 namespace vmm::memory::detail {
 
@@ -40,7 +38,7 @@ auto GuestAddress::operator-(const_reference addr) const noexcept -> value_type
     return *this - addr.data();
 }
 
-auto GuestAddress::align_up(const size_type alignment) noexcept -> void
+auto GuestAddress::align(const size_type alignment) noexcept -> void
 {
     const auto mask = alignment - 1;
     m_addr = (*this + mask) & !mask;
