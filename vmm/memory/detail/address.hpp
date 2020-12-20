@@ -40,25 +40,8 @@ class Address
         virtual auto operator-(const Size) const noexcept -> Concrete = 0;
         virtual auto operator-(const Concrete&) const noexcept -> Concrete = 0;
 
-        // Adds `other` to the address' value.
-        //
-        // Returns a pair consisting of the sum and a boolean indicating
-        // whether an overflow would have occurred. If an overflow would have
-        // occurred, the wrapped address is returned.
-        virtual auto add(const Size) const -> Concrete = 0;
-        virtual auto add(const Concrete&) const -> Concrete = 0;
-
-        // Subtracts `other` from the address' value.
-        //
-        // Returns a pair containing the difference and a boolean indicating
-        // whether an arithmetic underflow would have occurred. If an overflow
-        // would have occurred, then the wrapped address is returned.
-        virtual auto subtract(const Size) const -> Concrete = 0;
-        virtual auto subtract(const Concrete&) const -> Concrete = 0;
-
         // Aligns the address to a power of 2.
         virtual auto align_up(const Size) noexcept -> void = 0;
-        virtual auto checked_align_up(const Size) -> void = 0;
 };
 
 //template<typename Derived>

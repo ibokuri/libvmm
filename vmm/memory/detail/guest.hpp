@@ -55,37 +55,8 @@ class GuestAddress : public Address<GuestAddress, uint64_t>
         // (difference is wrapped).
         auto operator-(const_reference addr) const noexcept -> value_type override;
 
-        // Returns the address plus some value.
-        //
-        // If an "overflow" occurs, an exception is thrown.
-        auto add(const size_type val) const -> value_type override;
-
-        // Returns the sum of the address and another address.
-        //
-        // If an "overflow" occurs, an exception is thrown.
-        auto add(const_reference addr) const -> value_type override;
-
-        // Returns the address minus some value.
-        //
-        // If an "underflow" occurs, an exception is thrown.
-        auto subtract(const size_type val) const -> value_type override;
-
-        // Returns the difference between the address and another address.
-        //
-        // If an "underflow" occurs, an exception is thrown.
-        auto subtract(const_reference addr) const -> value_type override;
-
-        // Returns the offset between `m_addr` to `base`.
-        //auto offset_from(const_reference base) const noexcept -> value_type;
-        //auto checked_offset_from(const_reference base) const -> value_type;
-
         // Aligns the address to a power of 2.
         auto align_up(const size_type alignment) noexcept -> void override;
-
-        // Aligns the address to a power of 2.
-        //
-        // If an "overflow" occurs, an exception is thrown.
-        auto checked_align_up(const size_type alignment) -> void override;
 };
 
 }  // vmm::memory::detail
