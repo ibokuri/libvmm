@@ -34,11 +34,13 @@ class GuestAddress : public Address<GuestAddress, uint64_t>
     public:
         explicit GuestAddress(size_type addr=0) noexcept : m_addr{addr} {}
 
-        // Returns the raw value of the address.
         auto data() const noexcept -> size_type override;
 
         // Returns the bitwise AND of the address and a mask.
-        auto mask(const size_type mask) const noexcept -> size_type override;
+        auto operator&(const size_type mask) const noexcept -> size_type override;
+
+        // Returns the bitwise OR of the address and a mask.
+        auto operator|(const size_type mask) const noexcept -> size_type override;
 
         // Returns the address plus some value (sum is wrapped).
         auto operator+(const size_type val) const noexcept -> value_type override;

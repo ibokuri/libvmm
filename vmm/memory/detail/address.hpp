@@ -26,8 +26,11 @@ class Address
         // Returns the raw value of the address.
         virtual auto data() const noexcept -> Size = 0;
 
-        // Returns a bitwise AND of the address and a mask.
-        virtual auto mask(const Size) const noexcept -> Size = 0;
+        // Returns the bitwise AND of the address and a mask.
+        virtual auto operator&(const Size) const noexcept -> Size = 0;
+
+        // Returns the bitwise OR of the address and a mask.
+        virtual auto operator|(const Size) const noexcept -> Size = 0;
 
         // Adds `other` to the address' value.
         virtual auto operator+(const Size) const noexcept -> Concrete = 0;

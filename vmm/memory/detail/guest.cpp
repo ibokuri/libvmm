@@ -10,9 +10,14 @@ auto GuestAddress::data() const noexcept -> size_type
     return m_addr;
 }
 
-auto GuestAddress::mask(const size_type mask) const noexcept -> size_type
+auto GuestAddress::operator&(const size_type mask) const noexcept -> size_type
 {
     return m_addr & mask;
+}
+
+auto GuestAddress::operator|(const size_type mask) const noexcept -> size_type
+{
+    return m_addr | mask;
 }
 
 auto GuestAddress::operator+(const size_type val) const noexcept -> value_type
