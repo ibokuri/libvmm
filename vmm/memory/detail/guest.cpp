@@ -41,7 +41,7 @@ auto GuestAddress::operator-(const_reference addr) const noexcept -> value_type
 auto GuestAddress::align(const size_type alignment) noexcept -> void
 {
     const auto mask = alignment - 1;
-    m_addr = (*this + mask) & !mask;
+    m_addr = (*this + mask) & ~mask;
 }
 
 }  // vmm::memory::detail
