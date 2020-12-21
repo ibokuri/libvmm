@@ -22,12 +22,7 @@ class GuestAddress : public Address<GuestAddress, uint64_t>
 {
     using value_type = GuestAddress;
     using size_type = uint64_t;
-    using pointer = value_type*;
-    using const_pointer = const value_type*;
-    using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = pointer;
-    using const_iterator = const_pointer;
 
     private:
         size_type m_addr{};
