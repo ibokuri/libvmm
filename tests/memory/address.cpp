@@ -2,12 +2,13 @@
 
 #include <catch2/catch.hpp>
 
-#include "vmm/memory.hpp"
+#include "vmm/memory/memory.hpp"
 
 class TestAddress : public vmm::memory::Address<TestAddress, uint64_t>
 {
     using value_type = TestAddress;
     using size_type = uint64_t;
+    using reference = value_type&;
     using const_reference = const value_type&;
 
     private:
@@ -27,10 +28,11 @@ class TestAddress : public vmm::memory::Address<TestAddress, uint64_t>
         auto operator==(const_reference addr) const noexcept -> bool { return m_addr == addr.data(); }
         auto operator!=(const_reference addr) const noexcept -> bool { return m_addr != addr.data(); }
 
-        auto align(const size_type alignment) noexcept -> void override
+        auto align(const size_type alignment) noexcept -> reference override
 		{
             const auto mask = alignment - 1;
             m_addr = (*this + mask) & ~mask;
+            return *this;
 		}
 };
 

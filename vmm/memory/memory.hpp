@@ -16,5 +16,6 @@ template<typename T, typename S>
 using Address = vmm::memory::detail::Address<T, S>;
 
 using GuestAddress = vmm::memory::detail::GuestAddress;
+using MemoryRegionAddress = vmm::memory::detail::MemoryRegionAddress;
 
 }  // vmm::memory

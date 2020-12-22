@@ -41,7 +41,7 @@ class Address
         virtual auto operator-(const Concrete&) const noexcept -> Concrete = 0;
 
         // Aligns the address to a power of 2.
-        virtual auto align(const Size) noexcept -> void = 0;
+        virtual auto align(const Size) noexcept -> Concrete& = 0;
 };
 
 //template<typename Derived>
