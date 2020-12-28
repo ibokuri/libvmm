@@ -18,4 +18,6 @@ using Address = vmm::memory::detail::Address<T, S>;
 using GuestAddress = vmm::memory::detail::GuestAddress;
 using MemoryRegionAddress = vmm::memory::detail::MemoryRegionAddress;
 
+using FileOffset = vmm::memory::detail::FileOffset;
+
 }  // vmm::memory
