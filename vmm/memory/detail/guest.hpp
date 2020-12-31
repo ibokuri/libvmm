@@ -35,115 +35,41 @@ class GuestAddress : public Address<GuestAddress, uint64_t>
 
         auto data() const noexcept -> size_type override;
 
-        // Returns the bitwise AND of the address and a mask.
         auto operator&(const size_type mask) const noexcept -> size_type override;
-
-        // Returns the bitwise OR of the address and a mask.
         auto operator|(const size_type mask) const noexcept -> size_type override;
-
-        // Returns the address plus some value (sum is wrapped).
         auto operator+(const size_type val) const noexcept -> value_type override;
-
-        // Returns the sum of the address and another address (sum is wrapped).
         auto operator+(const_reference addr) const noexcept -> value_type override;
-
-        // Returns the address minus some value (difference is wrapped).
         auto operator-(const size_type val) const noexcept -> value_type override;
-
-        // Returns the difference between the address and another address
-        // (difference is wrapped).
         auto operator-(const_reference addr) const noexcept -> value_type override;
 
-        // Aligns the address to a power of 2.
         auto align(const size_type alignment) noexcept -> reference override;
+    private:
+        size_type m_addr{};
 };
 
 // An offset into a memory region.
 class MemoryRegionAddress : public Address<MemoryRegionAddress, uint64_t>
 {
-    using value_type = MemoryRegionAddress;
-    using size_type = uint64_t;
-    using reference = value_type&;
-    using const_reference = const value_type&;
-
-    private:
-        size_type m_addr{};
     public:
+        using value_type = MemoryRegionAddress;
+        using size_type = uint64_t;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+
         explicit MemoryRegionAddress(size_type addr=0) noexcept : m_addr{addr} {}
 
         auto data() const noexcept -> size_type override;
 
-        // Returns the bitwise AND of the address and a mask.
         auto operator&(const size_type mask) const noexcept -> size_type override;
-
-        // Returns the bitwise OR of the address and a mask.
         auto operator|(const size_type mask) const noexcept -> size_type override;
-
-        // Returns the address plus some value (sum is wrapped).
         auto operator+(const size_type val) const noexcept -> value_type override;
-
-        // Returns the sum of the address and another address (sum is wrapped).
         auto operator+(const_reference addr) const noexcept -> value_type override;
-
-        // Returns the address minus some value (difference is wrapped).
         auto operator-(const size_type val) const noexcept -> value_type override;
-
-        // Returns the difference between the address and another address
-        // (difference is wrapped).
         auto operator-(const_reference addr) const noexcept -> value_type override;
 
-        // Aligns the address to a power of 2.
         auto align(const size_type alignment) noexcept -> reference override;
-};
-
-// The starting point of a file that backs a GuestMemoryRegion.
-class FileOffset {
     private:
-        std::shared_ptr<std::fstream> m_fstream;
-        long m_start{};
-    public:
-        FileOffset(const char* filename, std::ios_base::openmode mode,
-                   const long start={})
-            : m_fstream{std::make_shared<std::fstream>(filename, mode)},
-              m_start{start}
-        {
-            if (start) {
-                // TODO (?): Only call these if the appropriate openmode is set.
-                m_fstream->seekg(start);
-                m_fstream->seekp(start);
-            }
-        }
-
-        explicit FileOffset(const char* filename, const long start={})
-            : FileOffset(filename, std::ios_base::in | std::ios_base::out, start) {}
-
-        explicit FileOffset(const std::string& filename, const long start=0)
-            : FileOffset(filename.c_str(), start) {}
-
-        FileOffset(const std::string& filename,
-                   const std::ios_base::openmode mode,
-                   const long start={})
-            : FileOffset(filename.c_str(), mode, start) {}
-
-        explicit FileOffset(const std::filesystem::path& filename, const long start=0)
-            : FileOffset(filename.c_str(), start) {}
-
-        FileOffset(const std::filesystem::path& filename,
-                   const std::ios_base::openmode mode,
-                   const long start={})
-            : FileOffset(filename.c_str(), mode, start) {}
-
-        // TODO: thread-safety
-        [[nodiscard]] auto data() const -> std::basic_filebuf<std::fstream::char_type,
-                                                              std::fstream::traits_type>*
-        {
-            return m_fstream->rdbuf();
-        }
-
-        [[nodiscard]] constexpr auto start() const noexcept -> long
-        {
-            return m_start;
-        }
+        size_type m_addr{};
 };
 
 }  // vmm::memory::detail
