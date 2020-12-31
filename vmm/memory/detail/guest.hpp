@@ -25,14 +25,12 @@ namespace vmm::memory::detail {
 // the guest is 32-bit or 64-bit.
 class GuestAddress : public Address<GuestAddress, uint64_t>
 {
-    using value_type = GuestAddress;
-    using size_type = uint64_t;
-    using reference = value_type&;
-    using const_reference = const value_type&;
-
-    private:
-        size_type m_addr{};
     public:
+        using value_type = GuestAddress;
+        using size_type = uint64_t;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+
         explicit GuestAddress(size_type addr=0) noexcept : m_addr{addr} {}
 
         auto data() const noexcept -> size_type override;
