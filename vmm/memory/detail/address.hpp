@@ -6,6 +6,9 @@
 
 namespace vmm::memory::detail {
 
+#include <optional>
+#include <limits>
+
 // An address within some address space.
 //
 // NOTE: The operators (+, -, &, |, etc.) are not supported, meaning clients
@@ -32,13 +35,47 @@ class Address
         // Returns the bitwise OR of the address and a mask.
         virtual auto operator|(const Size) const noexcept -> Size = 0;
 
-        // Adds `other` to the address' value.
+        // Adds a value to the address (sum is wrapped).
         virtual auto operator+(const Size) const noexcept -> Concrete = 0;
+
+        // Adds two addresses together (sum is wrapped).
         virtual auto operator+(const Concrete&) const noexcept -> Concrete = 0;
 
-        // Subtracts `other` from the address' value.
+        // Adds a value to the address (nullopt if wrapped).
+        virtual auto add(const Size value) const -> std::optional<Concrete>
+        {
+            if (std::numeric_limits<Size>::max() - value < data())
+                return std::nullopt;
+
+            return *this + value;
+        }
+
+        // Adds two addresses together (nullopt if wrapped).
+        virtual auto add(const Concrete& address) const -> std::optional<Concrete>
+        {
+            return add(address.data());
+        }
+
+        // Subtracts a value from the address (difference is wrapped).
         virtual auto operator-(const Size) const noexcept -> Concrete = 0;
+
+        // Subtracts two addresses from each other (difference is wrapped).
         virtual auto operator-(const Concrete&) const noexcept -> Concrete = 0;
+
+        // Subtracts a value from the address (nullopt if wrapped).
+        virtual auto subtract(const Size value) const -> std::optional<Concrete>
+        {
+            if (data() < value)
+                return std::nullopt;
+
+            return *this - value;
+        }
+
+        // Subtracts two addresses from each other (nullopt if wrapped).
+        virtual auto subtract(const Concrete& address) const -> std::optional<Concrete>
+        {
+            return subtract(address.data());
+        }
 
         // Aligns the address to a power of 2.
         virtual auto align(const Size) noexcept -> Concrete& = 0;
