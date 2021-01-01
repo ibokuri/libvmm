@@ -4,10 +4,10 @@
 
 #pragma once
 
-namespace vmm::memory::detail {
-
-#include <optional>
 #include <limits>
+#include <optional>
+
+namespace vmm::memory::detail {
 
 // An address within some address space.
 //

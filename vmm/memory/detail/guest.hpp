@@ -10,8 +10,8 @@
 #include <fstream> // fstream
 #include <ios> // ios_base
 #include <iostream> // ostream
-#include <limits> // numeric_limits
 #include <memory> // shared_ptr
+#include <stdexcept> // runtime_error
 #include <string> // string
 
 #include "vmm/memory/detail/address.hpp" // Address, AddressValue

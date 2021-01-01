@@ -9,15 +9,16 @@
 
 namespace vmm::memory {
 
-template<typename T>
-using AddressValue = vmm::memory::detail::AddressValue<T>;
+//template<typename T>
+//using AddressValue = vmm::memory::detail::AddressValue<T>;
 
 template<typename T, typename S>
 using Address = vmm::memory::detail::Address<T, S>;
 
 using GuestAddress = vmm::memory::detail::GuestAddress;
-using MemoryRegionAddress = vmm::memory::detail::MemoryRegionAddress;
+//using MemoryRegionAddress = vmm::memory::detail::MemoryRegionAddress;
+//using MemoryRegion = vmm::memory::detail::MemoryRegion;
 
-using FileOffset = vmm::memory::detail::FileOffset;
+//using FileOffset = vmm::memory::detail::FileOffset;
 
 }  // vmm::memory

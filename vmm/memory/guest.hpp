@@ -4,5 +4,4 @@
 
 //namespace vmm::memory {
 
-
 //}  // vmm::memory
